@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace LibraryApi.Models
 {
     public class PhieuMuon
     {
-        public int Id { get; set; }                     // Mã phiếu
-        public int DocGiaId { get; set; }
+        [Key]
+        public int MaPhieuMuon { get; set; } // PRIMARY KEY
+        public int MaDG { get; set; }
         public DocGia DocGia { get; set; }
+        public DateTime? NgayMuon { get; set; }
+        public DateTime? NgayTraDuKien { get; set; }
+        public string NguoiLap { get; set; }
 
-        public DateTime NgayMuon { get; set; }          // Ngày mượn
-        public DateTime NgayHenTra { get; set; }         // Ngày hẹn trả
-        public DateTime? NgayTraThuc { get; set; }      // Ngày trả thực (nullable nếu chưa trả)
-
-        public string TrangThai { get; set; }           // Đang mượn, Đã trả hết, Còn sách chưa trả
-        public string GhiChu { get; set; }              // Ghi chú thêm
-
-        public ICollection<ChiTietPhieuMuon> ChiTietPhieuMuons { get; set; }
+        // Navigation
+        public ICollection<CT_PhieuMuon> CT_PhieuMuons { get; set; }
+        public ICollection<PhieuGiaHan> PhieuGiaHans { get; set; }
+        public ICollection<PhieuTra> PhieuTras { get; set; }
     }
 }

@@ -21,104 +21,48 @@ namespace LibraryApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+        public async Task<ActionResult<IEnumerable<NguoiDung>>> GetAllUsers()
         {
-            var users = await _context.Users
-                .Include(u => u.DocGia)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.Username,
-                    u.Email,
-                    u.Role,
-                    u.CreatedAt,
-                    u.LastLoginAt,
-                    u.IsActive,
-                    u.DocGiaId,
-                    DocGiaName = u.DocGia != null ? u.DocGia.HoTen : null
-                })
-                .ToListAsync();
-
+            var users = await _context.NguoiDungs.ToListAsync();
             return Ok(users);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<NguoiDung>> GetUser(int id)
         {
-            var user = await _context.Users
-                .Include(u => u.DocGia)
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
+            var user = await _context.NguoiDungs.FindAsync(id);
+            if (user == null) return NotFound();
             return Ok(user);
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser([FromBody] CreateUserRequest request)
+        public async Task<ActionResult<NguoiDung>> CreateUser([FromBody] NguoiDung request)
         {
-            // Check if username or email already exists
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+            // Check if username already exists
+            if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == request.TenDangNhap))
+                return BadRequest("Tên đăng nhập đã tồn tại");
+            var user = new NguoiDung
             {
-                return BadRequest(new { message = "Tên đăng nhập đã tồn tại" });
-            }
-
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            {
-                return BadRequest(new { message = "Email đã tồn tại" });
-            }
-
-            var user = new User
-            {
-                Username = request.Username,
-                Email = request.Email,
-                PasswordHash = HashPassword(request.Password),
-                Role = request.Role,
-                CreatedAt = DateTime.Now,
-                IsActive = true,
-                DocGiaId = request.DocGiaId
+                TenDangNhap = request.TenDangNhap,
+                MatKhau = request.MatKhau,
+                ChucVu = request.ChucVu
             };
-
-            _context.Users.Add(user);
+            _context.NguoiDungs.Add(user);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.MaND }, user);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] NguoiDung request)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            // Check if username or email already exists (excluding current user)
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username && u.Id != id))
-            {
-                return BadRequest(new { message = "Tên đăng nhập đã tồn tại" });
-            }
-
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email && u.Id != id))
-            {
-                return BadRequest(new { message = "Email đã tồn tại" });
-            }
-
-            user.Username = request.Username;
-            user.Email = request.Email;
-            user.Role = request.Role;
-            user.IsActive = request.IsActive;
-            user.DocGiaId = request.DocGiaId;
-
-            if (!string.IsNullOrEmpty(request.Password))
-            {
-                user.PasswordHash = HashPassword(request.Password);
-            }
-
+            var user = await _context.NguoiDungs.FindAsync(id);
+            if (user == null) return NotFound();
+            // Check if username already exists (excluding current user)
+            if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == request.TenDangNhap && u.MaND != id))
+                return BadRequest("Tên đăng nhập đã tồn tại");
+            user.TenDangNhap = request.TenDangNhap;
+            user.MatKhau = request.MatKhau;
+            user.ChucVu = request.ChucVu;
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -126,50 +70,11 @@ namespace LibraryApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            // Don't allow deleting the last admin
-            if (user.Role == "Quản trị viên")
-            {
-                var adminCount = await _context.Users.CountAsync(u => u.Role == "Quản trị viên" && u.IsActive);
-                if (adminCount <= 1)
-                {
-                    return BadRequest(new { message = "Không thể xóa quản trị viên cuối cùng" });
-                }
-            }
-
-            _context.Users.Remove(user);
+            var user = await _context.NguoiDungs.FindAsync(id);
+            if (user == null) return NotFound();
+            _context.NguoiDungs.Remove(user);
             await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        [HttpPost("{id}/reset-password")]
-        public async Task<IActionResult> ResetPassword(int id, [FromBody] ResetPasswordRequest request)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            user.PasswordHash = HashPassword(request.NewPassword);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
         }
     }
 

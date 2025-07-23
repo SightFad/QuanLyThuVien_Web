@@ -26,7 +26,7 @@ namespace LibraryApi.Controllers
         [HttpGet("{id}")]
         public ActionResult<DocGia> GetById(int id)
         {
-            var docGia = _context.DocGias.Find(id);
+            var docGia = _context.DocGias.FirstOrDefault(dg => dg.MaDG == id);
             if (docGia == null)
                 return NotFound();
             return Ok(docGia);
@@ -38,16 +38,15 @@ namespace LibraryApi.Controllers
         {
             _context.DocGias.Add(docGia);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetById), new { id = docGia.Id });
+            return CreatedAtAction(nameof(GetById), new { id = docGia.MaDG }, docGia);
         }
 
         // PUT: api/DocGia/5
         [HttpPut("{id}")]
         public IActionResult Update(int id, DocGia docGia)
         {
-            if (id != docGia.Id) 
+            if (id != docGia.MaDG)
                 return BadRequest();
-
             _context.Entry(docGia).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
@@ -57,10 +56,9 @@ namespace LibraryApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var docGia = _context.DocGias.Find(id);
-            if (docGia == null) 
+            var docGia = _context.DocGias.FirstOrDefault(dg => dg.MaDG == id);
+            if (docGia == null)
                 return NotFound();
-
             _context.DocGias.Remove(docGia);
             _context.SaveChanges();
             return NoContent();

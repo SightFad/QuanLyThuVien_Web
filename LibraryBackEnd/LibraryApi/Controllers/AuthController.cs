@@ -23,97 +23,64 @@ namespace LibraryApi.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var user = await _context.Users
-                .Include(u => u.DocGia)
-                .FirstOrDefaultAsync(u => u.Username == request.Username && u.IsActive);
-
-            if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
-            {
-                return Unauthorized(new { message = "Tên đăng nhập hoặc mật khẩu không đúng" });
-            }
-
-            // Update last login
-            user.LastLoginAt = DateTime.Now;
-            await _context.SaveChangesAsync();
-
+            var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDangNhap == request.Username);
+            if (user == null || user.MatKhau != request.Password)
+                return Unauthorized("Sai tên đăng nhập hoặc mật khẩu");
             var token = _jwtService.GenerateToken(user);
-            var response = new LoginResponse
+            // Map role cho frontend
+            string mappedRole = user.ChucVu switch
             {
-                Token = token,
-                Username = user.Username,
-                Role = user.Role,
-                Email = user.Email,
-                ExpiresAt = DateTime.UtcNow.AddHours(8)
+                "Admin" => "Quản trị viên",
+                "Librarian" => "Thủ thư",
+                "Accountant" => "Kế toán",
+                "Reader" => "Độc giả",
+                _ => user.ChucVu
             };
-
-            return Ok(response);
+            return Ok(new { token, username = user.TenDangNhap, role = mappedRole });
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] NguoiDung request)
         {
-            // Check if username or email already exists
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+            if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == request.TenDangNhap))
+                return BadRequest("Tên đăng nhập đã tồn tại");
+            var user = new NguoiDung
             {
-                return BadRequest(new { message = "Tên đăng nhập đã tồn tại" });
-            }
-
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            {
-                return BadRequest(new { message = "Email đã tồn tại" });
-            }
-
-            var user = new User
-            {
-                Username = request.Username,
-                Email = request.Email,
-                PasswordHash = HashPassword(request.Password),
-                Role = "Độc giả", // Default role
-                CreatedAt = DateTime.Now,
-                IsActive = true
+                TenDangNhap = request.TenDangNhap,
+                MatKhau = request.MatKhau, // Không hash nữa
+                ChucVu = request.ChucVu
             };
-
-            _context.Users.Add(user);
+            _context.NguoiDungs.Add(user);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            return Ok(user);
         }
 
         [HttpGet("user/{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<NguoiDung>> GetUser(int id)
         {
-            var user = await _context.Users
-                .Include(u => u.DocGia)
-                .FirstOrDefaultAsync(u => u.Id == id);
-
+            var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.MaND == id);
             if (user == null)
             {
                 return NotFound();
             }
-
             return Ok(user);
         }
 
         [HttpGet("profile")]
-        public async Task<ActionResult<User>> GetProfile()
+        public async Task<ActionResult<NguoiDung>> GetProfile()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int id))
             {
                 return Unauthorized();
             }
-
-            var user = await _context.Users
-                .Include(u => u.DocGia)
-                .FirstOrDefaultAsync(u => u.Id == id);
-
+            var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.MaND == id);
             if (user == null)
             {
                 return NotFound();
             }
-
             return Ok(user);
         }
 

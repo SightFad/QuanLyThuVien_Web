@@ -35,7 +35,7 @@ namespace LibraryApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var reservations = await _context.Reservations
+            var reservations = await _context.PhieuDatTruocs
                 .Include(r => r.DocGia)
                 .Include(r => r.Sach)
                 .OrderByDescending(r => r.NgayDat)

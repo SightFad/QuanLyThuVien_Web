@@ -1,5 +1,6 @@
 using LibraryApi.Data;
 using Microsoft.EntityFrameworkCore;
+using LibraryApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
+
+builder.Services.AddScoped<JwtService>();
 
 var app = builder.Build();
 

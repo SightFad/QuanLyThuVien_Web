@@ -26,7 +26,7 @@ namespace LibraryApi.Controllers
         [HttpGet("{id}")]
         public ActionResult<PhieuMuon> GetById(int id)
         {
-            var phieu = _context.PhieuMuons.Find(id);
+            var phieu = _context.PhieuMuons.FirstOrDefault(p => p.MaPhieuMuon == id);
             if (phieu == null)
                 return NotFound();
             return Ok(phieu);
@@ -38,16 +38,15 @@ namespace LibraryApi.Controllers
         {
             _context.PhieuMuons.Add(phieu);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetById), new { id = phieu.Id }, phieu);
+            return CreatedAtAction(nameof(GetById), new { id = phieu.MaPhieuMuon }, phieu);
         }
 
         // PUT: api/PhieuMuon/5
         [HttpPut("{id}")]
         public IActionResult Update(int id, PhieuMuon phieu)
         {
-            if (id != phieu.Id)
+            if (id != phieu.MaPhieuMuon)
                 return BadRequest();
-
             _context.Entry(phieu).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
@@ -57,10 +56,9 @@ namespace LibraryApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var phieu = _context.PhieuMuons.Find(id);
+            var phieu = _context.PhieuMuons.FirstOrDefault(p => p.MaPhieuMuon == id);
             if (phieu == null)
                 return NotFound();
-
             _context.PhieuMuons.Remove(phieu);
             _context.SaveChanges();
             return NoContent();

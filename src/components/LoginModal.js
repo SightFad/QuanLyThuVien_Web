@@ -25,7 +25,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
     setError('');
 
     try {
-      const response = await fetch('https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Auth/login', {
+      const response = await fetch('http://localhost:5280/api/Auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

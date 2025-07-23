@@ -37,7 +37,7 @@ namespace LibraryApi.Controllers
         {
             var borrows = await _context.PhieuMuons
                 .Include(p => p.DocGia)
-                .Include(p => p.ChiTietPhieuMuons)
+                .Include(p => p.CT_PhieuMuons)
                 .ThenInclude(ct => ct.Sach)
                 .OrderByDescending(p => p.NgayMuon)
                 .ToListAsync();
@@ -50,9 +50,9 @@ namespace LibraryApi.Controllers
         {
             var phieu = await _context.PhieuMuons
                 .Include(p => p.DocGia)
-                .Include(p => p.ChiTietPhieuMuons)
+                .Include(p => p.CT_PhieuMuons)
                 .ThenInclude(ct => ct.Sach)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.MaPhieuMuon == id);
             if (phieu == null)
                 return NotFound();
             return Ok(phieu);
@@ -62,22 +62,13 @@ namespace LibraryApi.Controllers
         [HttpPost("return")]
         public async Task<IActionResult> ReturnBook([FromBody] ReturnBookRequest request)
         {
-            var result = await _borrowService.ReturnBook(request.ChiTietPhieuMuonId, request.IsDamaged);
+            var result = await _borrowService.ReturnBook(request.MaPhieuMuon, request.MaSach);
             if (!result.Success)
                 return BadRequest(new { message = result.Message });
             return Ok(new { message = result.Message });
         }
 
-        // POST: api/Borrow/renew
-        [HttpPost("renew")]
-        [Authorize(Policy = "RequireReader")]
-        public async Task<IActionResult> RenewBook([FromBody] RenewBookRequest request)
-        {
-            var result = await _borrowService.RenewBook(request.ChiTietPhieuMuonId);
-            if (!result.Success)
-                return BadRequest(new { message = result.Message });
-            return Ok(new { message = result.Message });
-        }
+        // Đã xóa toàn bộ endpoint và logic liên quan đến renew (gia hạn sách)
     }
 
     public class CreateBorrowRequest
@@ -90,12 +81,7 @@ namespace LibraryApi.Controllers
 
     public class ReturnBookRequest
     {
-        public int ChiTietPhieuMuonId { get; set; }
-        public bool IsDamaged { get; set; } = false;
-    }
-
-    public class RenewBookRequest
-    {
-        public int ChiTietPhieuMuonId { get; set; }
+        public int MaPhieuMuon { get; set; }
+        public int MaSach { get; set; }
     }
 } 

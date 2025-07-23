@@ -31,11 +31,9 @@ namespace LibraryApi.Controllers
 
                 var totalBooks = await _context.Saches.CountAsync();
                 var totalReaders = await _context.DocGias.CountAsync();
-                var booksBorrowed = await _context.ChiTietPhieuMuons
-                    .Where(ct => ct.NgayTra == null)
+                var booksBorrowed = await _context.CT_PhieuMuons
                     .CountAsync();
-                var booksOverdue = await _context.ChiTietPhieuMuons
-                    .Where(ct => ct.NgayTra == null && ct.NgayHenTra < now)
+                var booksOverdue = await _context.CT_PhieuMuons
                     .CountAsync();
 
                 var summary = new DashboardSummaryDto

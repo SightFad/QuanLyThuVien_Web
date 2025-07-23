@@ -2,32 +2,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LibraryApi.Models
 {
-    public class User
+    public class NguoiDung
     {
-        public int Id { get; set; }
-        
-        [Required]
-        [StringLength(100)]
-        public string Username { get; set; }
-        
-        [Required]
-        [StringLength(100)]
-        public string Email { get; set; }
-        
-        [Required]
-        public string PasswordHash { get; set; }
-        
-        [Required]
-        public string Role { get; set; } // Độc giả, Thủ thư, Kế toán, Quản trị viên
-        
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        
-        public DateTime? LastLoginAt { get; set; }
-        
-        public bool IsActive { get; set; } = true;
-        
-        // Foreign key to DocGia if this user is a reader
-        public int? DocGiaId { get; set; }
-        public DocGia? DocGia { get; set; }
+        [Key]
+        public int MaND { get; set; } // PRIMARY KEY
+        public string TenDangNhap { get; set; }
+        public string MatKhau { get; set; }
+        public string ChucVu { get; set; }
+        // Navigation
+        public ICollection<PhieuCapQuyen> PhieuCapQuyens { get; set; }
+        public ICollection<NhatKyHoatDong> NhatKyHoatDongs { get; set; }
     }
 } 

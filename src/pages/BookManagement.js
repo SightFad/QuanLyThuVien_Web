@@ -12,7 +12,7 @@ const BookManagement = () => {
   const [loading, setLoading] = useState(true);
 
   const apiUrl =
-    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Sach";
+    "http://localhost:5280/api/Sach";
 
   // Tải dữ liệu sách từ API
   useEffect(() => {

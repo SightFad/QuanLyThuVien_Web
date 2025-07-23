@@ -12,159 +12,69 @@ namespace LibraryApi.Services
             _context = context;
         }
 
-        public async Task<(bool Success, string Message)> CheckBorrowConditions(int docGiaId, List<int> sachIds)
+        public async Task<(bool Success, string Message)> CheckBorrowConditions(int maDG, List<int> maSachList)
         {
-            var docGia = await _context.DocGias.FindAsync(docGiaId);
+            var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
                 return (false, "Độc giả không tồn tại");
-            if (docGia.TrangThai != "Hoạt động")
-                return (false, "Tài khoản độc giả đang bị khóa hoặc không hoạt động");
-            if (docGia.SachDangMuon >= 5)
-                return (false, "Độc giả đã mượn tối đa 5 cuốn sách");
-            if (sachIds.Count > 5)
-                return (false, "Chỉ được mượn tối đa 5 cuốn/lần");
-
-            // TODO: Kiểm tra nợ phí, quá hạn (nếu có bảng phí/phạt)
-
-            foreach (var sachId in sachIds)
+            // Có thể bổ sung kiểm tra khác nếu cần
+            foreach (var maSach in maSachList)
             {
-                var sach = await _context.Saches.FindAsync(sachId);
+                var sach = await _context.Saches.FindAsync(maSach);
                 if (sach == null)
-                    return (false, $"Sách ID {sachId} không tồn tại");
-                if (sach.SoLuongCoSan <= 0)
+                    return (false, $"Sách ID {maSach} không tồn tại");
+                if (sach.SoLuong == null || sach.SoLuong <= 0)
                     return (false, $"Sách '{sach.TenSach}' đã hết, không thể mượn");
             }
             return (true, "OK");
         }
 
-        public async Task<(bool Success, string Message, PhieuMuon? PhieuMuon)> CreateBorrow(int docGiaId, List<int> sachIds, int soNgayMuon = 14, string? ghiChu = null)
+        public async Task<(bool Success, string Message, PhieuMuon? PhieuMuon)> CreateBorrow(int maDG, List<int> maSachList, int soNgayMuon = 14, string? ghiChu = null)
         {
-            var check = await CheckBorrowConditions(docGiaId, sachIds);
+            var check = await CheckBorrowConditions(maDG, maSachList);
             if (!check.Success)
                 return (false, check.Message, null);
-
             var now = DateTime.Now;
-            var ngayHenTra = now.AddDays(soNgayMuon);
-
+            var ngayTraDuKien = now.AddDays(soNgayMuon);
             var phieu = new PhieuMuon
             {
-                DocGiaId = docGiaId,
+                MaDG = maDG,
                 NgayMuon = now,
-                NgayHenTra = ngayHenTra,
-                TrangThai = "Đang mượn",
-                GhiChu = ghiChu ?? string.Empty,
-                ChiTietPhieuMuons = new List<ChiTietPhieuMuon>()
+                NgayTraDuKien = ngayTraDuKien,
+                NguoiLap = "",
+                CT_PhieuMuons = new List<CT_PhieuMuon>()
             };
-
-            foreach (var sachId in sachIds)
+            foreach (var maSach in maSachList)
             {
-                var sach = await _context.Saches.FindAsync(sachId);
-                if (sach == null || sach.SoLuongCoSan <= 0)
+                var sach = await _context.Saches.FindAsync(maSach);
+                if (sach == null || sach.SoLuong == null || sach.SoLuong <= 0)
                     continue;
-                phieu.ChiTietPhieuMuons.Add(new ChiTietPhieuMuon
+                phieu.CT_PhieuMuons.Add(new CT_PhieuMuon
                 {
-                    SachId = sachId,
-                    NgayMuon = now,
-                    NgayHenTra = ngayHenTra,
-                    TrangThai = "Đang mượn",
-                    GhiChu = string.Empty
+                    MaSach = maSach,
+                    Sach = sach
                 });
-                sach.SoLuongCoSan--;
+                sach.SoLuong--;
             }
-
             _context.PhieuMuons.Add(phieu);
-            var docGia = await _context.DocGias.FindAsync(docGiaId);
-            if (docGia != null)
-            {
-                docGia.SachDangMuon += phieu.ChiTietPhieuMuons.Count;
-                docGia.TongLuotMuon += phieu.ChiTietPhieuMuons.Count;
-            }
             await _context.SaveChangesAsync();
             return (true, "Tạo phiếu mượn thành công", phieu);
         }
 
-        public async Task<(bool Success, string Message)> ReturnBook(int chiTietPhieuMuonId, bool isDamaged = false)
+        public async Task<(bool Success, string Message)> ReturnBook(int maPhieuMuon, int maSach)
         {
-            var chitiet = await _context.ChiTietPhieuMuons
-                .Include(ct => ct.PhieuMuon)
-                .Include(ct => ct.Sach)
-                .FirstOrDefaultAsync(ct => ct.Id == chiTietPhieuMuonId);
+            var chitiet = await _context.CT_PhieuMuons
+                .FirstOrDefaultAsync(ct => ct.MaPhieuMuon == maPhieuMuon && ct.MaSach == maSach);
             if (chitiet == null)
                 return (false, "Không tìm thấy chi tiết phiếu mượn");
-            if (chitiet.TrangThai == "Đã trả")
-                return (false, "Sách này đã được trả");
-
-            var now = DateTime.Now;
-            chitiet.NgayTra = now;
-            chitiet.TrangThai = isDamaged ? "Hư hỏng" : (now > chitiet.NgayHenTra ? "Quá hạn" : "Đã trả");
-
-            // Tính phí phạt nếu quá hạn
-            int phiPhat = 0;
-            if (now > chitiet.NgayHenTra)
-            {
-                var daysLate = (now.Date - chitiet.NgayHenTra.Date).Days;
-                phiPhat += daysLate * 5; // 5.000đ/ngày
-            }
-            // Phí hư hỏng (ví dụ: 100% giá trị sách, có thể điều chỉnh)
-            if (isDamaged)
-            {
-                phiPhat += 100; // Giả sử 100.000đ/sách hư (cần lấy giá trị thực tế nếu có)
-            }
-            chitiet.PhiPhat = phiPhat;
-
-            // Cập nhật số lượng sách
-            if (chitiet.Sach != null)
-                chitiet.Sach.SoLuongCoSan++;
-
-            // Cập nhật số sách đang mượn của độc giả
-            if (chitiet.PhieuMuon != null)
-            {
-                var docGia = await _context.DocGias.FindAsync(chitiet.PhieuMuon.DocGiaId);
-                if (docGia != null && docGia.SachDangMuon > 0)
-                    docGia.SachDangMuon--;
-            }
-
-            // Nếu tất cả sách trong phiếu đã trả thì cập nhật trạng thái phiếu
-            if (chitiet.PhieuMuon != null)
-            {
-                var allReturned = await _context.ChiTietPhieuMuons
-                    .Where(ct => ct.PhieuMuonId == chitiet.PhieuMuonId)
-                    .AllAsync(ct => ct.TrangThai == "Đã trả" || ct.TrangThai == "Hư hỏng" || ct.TrangThai == "Quá hạn");
-                if (allReturned)
-                {
-                    chitiet.PhieuMuon.TrangThai = "Đã trả hết";
-                    chitiet.PhieuMuon.NgayTraThuc = now;
-                }
-                else
-                {
-                    chitiet.PhieuMuon.TrangThai = "Còn sách chưa trả";
-                }
-            }
-
+            // Logic trả sách chỉ cập nhật số lượng sách, không cập nhật trạng thái trên CT_PhieuMuon
+            var sach = await _context.Saches.FindAsync(maSach);
+            if (sach != null && sach.SoLuong != null)
+                sach.SoLuong++;
             await _context.SaveChangesAsync();
             return (true, "Trả sách thành công");
         }
 
-        public async Task<(bool Success, string Message)> RenewBook(int chiTietPhieuMuonId)
-        {
-            var chitiet = await _context.ChiTietPhieuMuons
-                .Include(ct => ct.Sach)
-                .FirstOrDefaultAsync(ct => ct.Id == chiTietPhieuMuonId);
-            if (chitiet == null)
-                return (false, "Không tìm thấy chi tiết phiếu mượn");
-            if (chitiet.TrangThai != "Đang mượn")
-                return (false, "Chỉ có thể gia hạn sách đang mượn");
-            if (chitiet.NgayHenTra.AddDays(7) < DateTime.Now)
-                return (false, "Đã quá hạn, không thể gia hạn");
-            // Giả sử có trường RenewCount để kiểm tra số lần gia hạn
-            if (chitiet.GhiChu != null && chitiet.GhiChu.Contains("Đã gia hạn"))
-                return (false, "Mỗi sách chỉ được gia hạn 1 lần");
-            // TODO: Kiểm tra nếu đã có người đặt trước sách này (nếu có bảng đặt trước)
-
-            chitiet.NgayHenTra = chitiet.NgayHenTra.AddDays(7);
-            chitiet.GhiChu = (chitiet.GhiChu ?? "") + " | Đã gia hạn";
-            await _context.SaveChangesAsync();
-            return (true, "Gia hạn thành công thêm 7 ngày");
-        }
+        // Đã loại bỏ hàm RenewBook và mọi truy cập ct.Id, ct.TrangThai, ct.NgayHenTra, ct.GhiChu trên CT_PhieuMuon
     }
 } 

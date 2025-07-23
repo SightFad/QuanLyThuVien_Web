@@ -16,11 +16,8 @@ namespace LibraryApi.Data
                         TacGia = "Dale Carnegie",
                         ISBN = "978-604-1-00001-1",
                         TheLoai = "Kỹ năng sống",
-                        NhaXuatBan = "NXB Tổng hợp TP.HCM",
-                        NamXuatBan = 2019,
                         SoLuong = 5,
-                        SoLuongCoSan = 3,
-                        ViTriLuuTru = "Kệ A1"
+                        TrangThai = "Còn"
                     },
                     new Sach
                     {
@@ -28,11 +25,8 @@ namespace LibraryApi.Data
                         TacGia = "Paulo Coelho",
                         ISBN = "978-604-1-00002-2",
                         TheLoai = "Tiểu thuyết",
-                        NhaXuatBan = "NXB Văn học",
-                        NamXuatBan = 2020,
                         SoLuong = 3,
-                        SoLuongCoSan = 1,
-                        ViTriLuuTru = "Kệ B2"
+                        TrangThai = "Còn"
                     },
                     new Sach
                     {
@@ -40,11 +34,8 @@ namespace LibraryApi.Data
                         TacGia = "Rosie Nguyễn",
                         ISBN = "978-604-1-00003-3",
                         TheLoai = "Kỹ năng sống",
-                        NhaXuatBan = "NXB Hội nhà văn",
-                        NamXuatBan = 2018,
                         SoLuong = 4,
-                        SoLuongCoSan = 2,
-                        ViTriLuuTru = "Kệ A3"
+                        TrangThai = "Còn"
                     }
                 );
             }
@@ -53,64 +44,59 @@ namespace LibraryApi.Data
             if (!context.DocGias.Any())
             {
                 context.DocGias.AddRange(
-                new DocGia
-                {
-                    HoTen = "Nguyễn Văn A",
-                    Email = "nguyenvana@email.com",
-                    SoDienThoai = "0123456789",
-                    DiaChi = "123 Lê Lợi, Q1",
-                    NgayDangKy = DateTime.Now.AddDays(-10),
-                    TrangThai = "Hoạt động",
-                    TongLuotMuon = 15,
-                    SachDangMuon = 2
-                },
-                new DocGia
-                {
-                    HoTen = "Trần Thị B",
-                    Email = "tranthib@email.com",
-                    SoDienThoai = "0987654321",
-                    DiaChi = "456 Nguyễn Trãi, Q5",
-                    NgayDangKy = DateTime.Now.AddDays(-10),
-                    TrangThai = "Hoạt động",
-                    TongLuotMuon = 8,
-                    SachDangMuon = 0
-                },
-                new DocGia
-                {
-                    HoTen = "Lê Văn C",
-                    Email = "levanc@email.com",
-                    SoDienThoai = "0987654321",
-                    DiaChi = "456 Nguyễn Trãi, Q5",
-                    NgayDangKy = DateTime.Now.AddDays(-10),
-                    TrangThai = "Không hoạt động",
-                    TongLuotMuon = 3,
-                    SachDangMuon = 1
-                },
-                new DocGia
-                {
-                    HoTen = "Phạm Thị D",
-                    Email = "phamthid@email.com",
-                    SoDienThoai = "0987654321",
-                    DiaChi = "456 Nguyễn Trãi, Q5",
-                    NgayDangKy = DateTime.Now.AddDays(-10),
-                    TrangThai = "Hoạt động",
-                    TongLuotMuon = 22,
-                    SachDangMuon = 3
-                },
-                new DocGia
-                {
-                    HoTen = "Hoàng Văn E",
-                    Email = "hoangvane@email.com",
-                    SoDienThoai = "0444555666",
-                    DiaChi = "456 Nguyễn Trãi, Q5",
-                    NgayDangKy = DateTime.Now.AddDays(-10),
-                    TrangThai = "Hoạt động",
-                    TongLuotMuon = 5,
-                    SachDangMuon = 0
-                }
-            );
+                    new DocGia
+                    {
+                        HoTen = "Nguyễn Văn A",
+                        Email = "nguyenvana@email.com",
+                        SDT = "0123456789",
+                        DiaChi = "123 Lê Lợi, Q1",
+                        GioiTinh = "Nam"
+                    },
+                    new DocGia
+                    {
+                        HoTen = "Trần Thị B",
+                        Email = "tranthib@email.com",
+                        SDT = "0987654321",
+                        DiaChi = "456 Nguyễn Trãi, Q5",
+                        GioiTinh = "Nữ"
+                    }
+                );
             }
             else return;
+
+            if (!context.NguoiDungs.Any())
+            {
+                context.NguoiDungs.Add(new NguoiDung
+                {
+                    TenDangNhap = "admin",
+                    MatKhau = "admin123",
+                    ChucVu = "Admin"
+                });
+            }
+            context.SaveChanges();
+
+            // Seed phiếu mượn nếu chưa có
+            if (!context.PhieuMuons.Any())
+            {
+                var docGia = context.DocGias.FirstOrDefault();
+                var sach = context.Saches.FirstOrDefault();
+                if (docGia != null && sach != null)
+                {
+                    var phieuMuon = new PhieuMuon
+                    {
+                        MaDG = docGia.MaDG,
+                        NgayMuon = DateTime.Now.AddDays(-2),
+                        NgayTraDuKien = DateTime.Now.AddDays(12),
+                        NguoiLap = "admin"
+                    };
+                    context.PhieuMuons.Add(phieuMuon);
+                    context.CT_PhieuMuons.Add(new CT_PhieuMuon
+                    {
+                        MaPhieuMuon = phieuMuon.MaPhieuMuon,
+                        MaSach = sach.MaSach
+                    });
+                }
+            }
             context.SaveChanges();
         }
     }
