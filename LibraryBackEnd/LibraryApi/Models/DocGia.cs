@@ -22,5 +22,14 @@ namespace LibraryApi.Models
         public ICollection<PhieuPhat> PhieuPhats { get; set; }
         public ICollection<PhieuThu> PhieuThus { get; set; }
         public ICollection<PhieuDatTruoc> PhieuDatTruocs { get; set; }
+
+        public DocGia()
+        {
+            PhieuMuons = new List<PhieuMuon>();
+            PhieuTras = new List<PhieuTra>();
+            PhieuPhats = new List<PhieuPhat>();
+            PhieuThus = new List<PhieuThu>();
+            PhieuDatTruocs = new List<PhieuDatTruoc>();
+        }
     }
 }

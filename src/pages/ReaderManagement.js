@@ -15,69 +15,26 @@ const apiUrl =
     "http://localhost:5280/api/DocGia";
 
   useEffect(() => {
-    // Simulate loading data
-    setTimeout(() => {
-      const mockReaders = [
-        {
-          id: 1,
-          name: 'Nguyễn Văn A',
-          email: 'nguyenvana@email.com',
-          phone: '0123456789',
-          address: '123 Đường ABC, Quận 1, TP.HCM',
-          memberSince: '2023-01-15',
-          status: 'active',
-          totalBorrows: 15,
-          currentBorrows: 2
-        },
-        {
-          id: 2,
-          name: 'Trần Thị B',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          address: '456 Đường XYZ, Quận 2, TP.HCM',
-          memberSince: '2023-03-20',
-          status: 'active',
-          totalBorrows: 8,
-          currentBorrows: 0
-        },
-        {
-          id: 3,
-          name: 'Lê Văn C',
-          email: 'levanc@email.com',
-          phone: '0555666777',
-          address: '789 Đường DEF, Quận 3, TP.HCM',
-          memberSince: '2023-06-10',
-          status: 'inactive',
-          totalBorrows: 3,
-          currentBorrows: 1
-        },
-        {
-          id: 4,
-          name: 'Phạm Thị D',
-          email: 'phamthid@email.com',
-          phone: '0111222333',
-          address: '321 Đường GHI, Quận 4, TP.HCM',
-          memberSince: '2023-08-05',
-          status: 'active',
-          totalBorrows: 22,
-          currentBorrows: 3
-        },
-        {
-          id: 5,
-          name: 'Hoàng Văn E',
-          email: 'hoangvane@email.com',
-          phone: '0444555666',
-          address: '654 Đường JKL, Quận 5, TP.HCM',
-          memberSince: '2023-11-12',
-          status: 'active',
-          totalBorrows: 5,
-          currentBorrows: 0
-        }
-      ];
-      setReaders(mockReaders);
-      setFilteredReaders(mockReaders);
-      setLoading(false);
-    }, 1000);
+    setLoading(true);
+    fetch(apiUrl)
+      .then((res) => res.json())
+      .then((data) => {
+        const mappedReaders = data.map((dg) => ({
+          id: dg.maDG,
+          name: dg.hoTen,
+          email: dg.email,
+          phone: dg.sdt,
+          address: dg.diaChi,
+          // Có thể bổ sung memberSince, status nếu backend trả về
+        }));
+        setReaders(mappedReaders);
+        setFilteredReaders(mappedReaders);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi tải độc giả:", err);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -101,29 +58,85 @@ const apiUrl =
 
   const handleDeleteReader = (readerId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa độc giả này?')) {
-      setReaders(readers.filter(reader => reader.id !== readerId));
+      fetch(`${apiUrl}/${readerId}`, {
+        method: "DELETE",
+      })
+        .then((res) => {
+          if (!res.ok) {
+            return res.text().then((text) => { throw new Error(text); });
+          }
+          // Xóa thành công, reload lại danh sách
+          refreshReaders();
+        })
+        .catch((err) => alert("Lỗi khi xóa độc giả: " + err));
     }
   };
 
   const handleSaveReader = (readerData) => {
+    const requestData = {
+      hoTen: readerData.name,
+      email: readerData.email,
+      sdt: readerData.phone,
+      diaChi: readerData.address,
+      gioiTinh: readerData.gioiTinh,
+      ngaySinh: readerData.ngaySinh || null
+    };
     if (editingReader) {
-      // Update existing reader
-      setReaders(readers.map(reader => 
-        reader.id === editingReader.id ? { ...readerData, id: editingReader.id } : reader
-      ));
+      // Cập nhật
+      fetch(`${apiUrl}/${editingReader.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...requestData, maDG: editingReader.id }),
+      })
+        .then((res) => {
+          if (!res.ok) {
+            return res.text().then((text) => { throw new Error(text); });
+          }
+          refreshReaders();
+        })
+        .catch((err) => alert("Lỗi khi cập nhật độc giả: " + err));
     } else {
-      // Add new reader
-      const newReader = {
-        ...readerData,
-        id: Math.max(...readers.map(r => r.id)) + 1,
-        memberSince: new Date().toISOString().split('T')[0],
-        totalBorrows: 0,
-        currentBorrows: 0
-      };
-      setReaders([...readers, newReader]);
+      // Thêm mới
+      fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const text = await res.text();
+            alert("Lỗi khi thêm độc giả: " + text);
+            return;
+          }
+          return res.json();
+        })
+        .then(() => refreshReaders())
+        .catch((err) => alert("Lỗi khi thêm độc giả: " + err));
     }
     setShowModal(false);
     setEditingReader(null);
+  };
+
+  const refreshReaders = () => {
+    setLoading(true);
+    fetch(apiUrl)
+      .then((res) => res.json())
+      .then((data) => {
+        const mappedReaders = data.map((dg) => ({
+          id: dg.maDG,
+          name: dg.hoTen,
+          email: dg.email,
+          phone: dg.sdt,
+          address: dg.diaChi,
+        }));
+        setReaders(mappedReaders);
+        setFilteredReaders(mappedReaders);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi tải độc giả:", err);
+        setLoading(false);
+      });
   };
 
   const getStatusBadge = (status) => {

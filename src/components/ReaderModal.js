@@ -7,12 +7,18 @@ const ReaderModal = ({ reader, onSave, onClose }) => {
     email: '',
     phone: '',
     address: '',
-    status: 'active'
+    gioiTinh: 'Nam',
+    ngaySinh: ''
   });
 
   useEffect(() => {
     if (reader) {
-      setFormData(reader);
+      setFormData({
+        ...formData,
+        ...reader,
+        gioiTinh: reader.gioiTinh || 'Nam',
+        ngaySinh: reader.ngaySinh ? reader.ngaySinh.split('T')[0] : ''
+      });
     }
   }, [reader]);
 
@@ -101,6 +107,31 @@ const ReaderModal = ({ reader, onSave, onClose }) => {
                 required
               />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Giới tính</label>
+            <select
+              name="gioiTinh"
+              value={formData.gioiTinh}
+              onChange={handleChange}
+              className="form-input"
+            >
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+              <option value="Khác">Khác</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Ngày sinh</label>
+            <input
+              type="date"
+              name="ngaySinh"
+              value={formData.ngaySinh}
+              onChange={handleChange}
+              className="form-input"
+            />
           </div>
 
           <div className="form-group">

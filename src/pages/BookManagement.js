@@ -28,7 +28,7 @@ const BookManagement = () => {
           publisher: book.nhaXuatBan,
           publishYear: book.namXB,
           quantity: book.soLuong,
-          available: book.soLuongCoLai,
+          available: book.soLuongConLai,
           location: book.viTriLuuTru,
         }));
         setBooks(mappedBooks);
@@ -95,7 +95,8 @@ const BookManagement = () => {
       theLoai: bookData.category,
       namXB: bookData.publishYear,
       soLuong: bookData.quantity,
-      trangThai: bookData.trangThai || "Còn"
+      trangThai: bookData.trangThai || "Còn",
+      viTriLuuTru: bookData.location || ""
     };
 
     if (editingBook) {
@@ -105,14 +106,12 @@ const BookManagement = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...requestData, id: editingBook.id }),
       })
-        .then(async (res) => {
+        .then((res) => {
           if (!res.ok) {
-            const text = await res.text();
-            alert("Lỗi khi cập nhật sách: " + text);
-            console.error("Lỗi khi cập nhật sách:", text);
-            return;
+            return res.text().then((text) => { throw new Error(text); });
           }
-          return res.json();
+          // Không cần res.json() vì backend trả về 204 No Content
+          return;
         })
         .then(() => refreshBooks())
         .catch((err) => {
@@ -164,7 +163,7 @@ const BookManagement = () => {
           publisher: book.nhaXuatBan,
           publishYear: book.namXB,
           quantity: book.soLuong,
-          available: book.soLuongCoLai,
+          available: book.soLuongConLai,
           location: book.viTriLuuTru,
         }));
         setBooks(mappedBooks);
@@ -221,6 +220,7 @@ const BookManagement = () => {
                 <th>Tác giả</th>
                 <th>ISBN</th>
                 <th>Thể loại</th>
+                <th>Năm xuất bản</th>
                 <th>Số lượng</th>
                 <th>Còn lại</th>
                 <th>Vị trí</th>
@@ -235,14 +235,12 @@ const BookManagement = () => {
                   <td>
                     <div className="book-title-cell">
                       <strong>{book.title}</strong>
-                      <small>
-                        {book.publisher} - {book.publishYear}
-                      </small>
                     </div>
                   </td>
                   <td>{book.author}</td>
                   <td>{book.isbn}</td>
                   <td>{book.category}</td>
+                  <td>{book.publishYear || ''}</td>
                   <td>{book.quantity}</td>
                   <td>{book.available}</td>
                   <td>{book.location}</td>

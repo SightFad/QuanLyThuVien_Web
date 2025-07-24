@@ -11,5 +11,6 @@ namespace LibraryApi.Models
         public string ISBN { get; set; }
         public int? SoLuong { get; set; }
         public string TrangThai { get; set; }
+        public string ViTriLuuTru { get; set; }
     }
 } 

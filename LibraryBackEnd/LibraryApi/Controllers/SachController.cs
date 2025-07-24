@@ -17,9 +17,30 @@ namespace LibraryApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Sach>>> GetBooks()
+        public async Task<ActionResult<IEnumerable<object>>> GetBooks()
         {
-            return await _context.Saches.ToListAsync();
+            var books = await _context.Saches
+                .Include(s => s.CT_PhieuMuons)
+                .ToListAsync();
+            var result = books.Select(book => {
+                // Số sách đã mượn (chưa trả)
+                int daMuon = book.CT_PhieuMuons?.Count() ?? 0;
+                int tong = book.SoLuong ?? 0;
+                int conLai = tong - daMuon;
+                return new {
+                    book.MaSach,
+                    book.TenSach,
+                    book.TacGia,
+                    book.TheLoai,
+                    book.NamXB,
+                    book.ISBN,
+                    book.SoLuong,
+                    book.TrangThai,
+                    book.ViTriLuuTru,
+                    SoLuongConLai = conLai < 0 ? 0 : conLai
+                };
+            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -41,7 +62,8 @@ namespace LibraryApi.Controllers
                 NamXB = dto.NamXB,
                 ISBN = dto.ISBN,
                 SoLuong = dto.SoLuong,
-                TrangThai = dto.TrangThai
+                TrangThai = dto.TrangThai,
+                ViTriLuuTru = dto.ViTriLuuTru
             };
             _context.Saches.Add(book);
             await _context.SaveChangesAsync();
@@ -49,10 +71,18 @@ namespace LibraryApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(int id, Sach book)
+        public async Task<IActionResult> UpdateBook(int id, [FromBody] CreateSachDto dto)
         {
-            if (id != book.MaSach) return BadRequest();
-            _context.Entry(book).State = EntityState.Modified;
+            var book = await _context.Saches.FirstOrDefaultAsync(s => s.MaSach == id);
+            if (book == null) return NotFound();
+            book.TenSach = dto.TenSach;
+            book.TacGia = dto.TacGia;
+            book.TheLoai = dto.TheLoai;
+            book.NamXB = dto.NamXB;
+            book.ISBN = dto.ISBN;
+            book.SoLuong = dto.SoLuong;
+            book.TrangThai = dto.TrangThai;
+            book.ViTriLuuTru = dto.ViTriLuuTru;
             await _context.SaveChangesAsync();
             return NoContent();
         }

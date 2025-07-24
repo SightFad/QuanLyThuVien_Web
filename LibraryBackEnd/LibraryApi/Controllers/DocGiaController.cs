@@ -34,8 +34,17 @@ namespace LibraryApi.Controllers
 
         // POST: api/DocGia
         [HttpPost]
-        public ActionResult<DocGia> Create(DocGia docGia)
+        public ActionResult<DocGia> Create([FromBody] CreateDocGiaDto dto)
         {
+            var docGia = new DocGia
+            {
+                HoTen = dto.HoTen,
+                Email = dto.Email,
+                SDT = dto.SDT,
+                DiaChi = dto.DiaChi,
+                GioiTinh = dto.GioiTinh,
+                NgaySinh = dto.NgaySinh
+            };
             _context.DocGias.Add(docGia);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetById), new { id = docGia.MaDG }, docGia);
@@ -43,11 +52,17 @@ namespace LibraryApi.Controllers
 
         // PUT: api/DocGia/5
         [HttpPut("{id}")]
-        public IActionResult Update(int id, DocGia docGia)
+        public IActionResult Update(int id, [FromBody] CreateDocGiaDto dto)
         {
-            if (id != docGia.MaDG)
-                return BadRequest();
-            _context.Entry(docGia).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            var docGia = _context.DocGias.FirstOrDefault(dg => dg.MaDG == id);
+            if (docGia == null)
+                return NotFound();
+            docGia.HoTen = dto.HoTen;
+            docGia.Email = dto.Email;
+            docGia.SDT = dto.SDT;
+            docGia.DiaChi = dto.DiaChi;
+            docGia.GioiTinh = dto.GioiTinh;
+            docGia.NgaySinh = dto.NgaySinh;
             _context.SaveChanges();
             return NoContent();
         }
