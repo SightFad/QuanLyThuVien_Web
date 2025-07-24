@@ -31,8 +31,18 @@ namespace LibraryApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Sach>> CreateBook(Sach book)
+        public async Task<ActionResult<Sach>> CreateBook([FromBody] CreateSachDto dto)
         {
+            var book = new Sach
+            {
+                TenSach = dto.TenSach,
+                TacGia = dto.TacGia,
+                TheLoai = dto.TheLoai,
+                NamXB = dto.NamXB,
+                ISBN = dto.ISBN,
+                SoLuong = dto.SoLuong,
+                TrangThai = dto.TrangThai
+            };
             _context.Saches.Add(book);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetBook), new { id = book.MaSach }, book);

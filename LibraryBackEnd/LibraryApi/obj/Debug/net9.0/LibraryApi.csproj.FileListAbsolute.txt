@@ -498,3 +498,9 @@ D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Debug\net9.0\refint\
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Debug\net9.0\LibraryApi.pdb
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Debug\net9.0\LibraryApi.genruntimeconfig.cache
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Debug\net9.0\ref\LibraryApi.dll
+D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\web.config
+D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\appsettings.Development.json
+D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\appsettings.json
+D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.deps.json
+D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.runtimeconfig.json
+D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.staticwebassets.endpoints.json

@@ -20,13 +20,13 @@ const BookManagement = () => {
       .then((res) => res.json())
       .then((data) => {
         const mappedBooks = data.map((book) => ({
-          id: book.id,
+          id: book.maSach,
           title: book.tenSach,
           author: book.tacGia,
           isbn: book.isbn,
           category: book.theLoai,
           publisher: book.nhaXuatBan,
-          publishYear: book.namXuatBan,
+          publishYear: book.namXB,
           quantity: book.soLuong,
           available: book.soLuongCoLai,
           location: book.viTriLuuTru,
@@ -93,11 +93,9 @@ const BookManagement = () => {
       tacGia: bookData.author,
       isbn: bookData.isbn,
       theLoai: bookData.category,
-      nhaXuatBan: bookData.publisher,
-      namXuatBan: bookData.publishYear,
+      namXB: bookData.publishYear,
       soLuong: bookData.quantity,
-      soLuongCoLai: bookData.available,
-      viTriLuuTru: bookData.location,
+      trangThai: bookData.trangThai || "Còn"
     };
 
     if (editingBook) {
@@ -107,8 +105,20 @@ const BookManagement = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...requestData, id: editingBook.id }),
       })
-        .then((res) => res.json())
-        .then(() => refreshBooks());
+        .then(async (res) => {
+          if (!res.ok) {
+            const text = await res.text();
+            alert("Lỗi khi cập nhật sách: " + text);
+            console.error("Lỗi khi cập nhật sách:", text);
+            return;
+          }
+          return res.json();
+        })
+        .then(() => refreshBooks())
+        .catch((err) => {
+          alert("Lỗi khi cập nhật sách: " + err);
+          console.error("Lỗi khi cập nhật sách:", err);
+        });
     } else {
       // Thêm mới
       fetch(apiUrl, {
@@ -116,8 +126,25 @@ const BookManagement = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),
       })
-        .then((res) => res.json())
-        .then(() => refreshBooks());
+        .then(async (res) => {
+          if (!res.ok) {
+            const text = await res.text();
+            alert("Lỗi khi thêm sách: " + text);
+            console.error("Lỗi khi thêm sách:", text);
+            return;
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (data) {
+            console.log("Sách đã thêm thành công:", data);
+            refreshBooks();
+          }
+        })
+        .catch((err) => {
+          alert("Lỗi khi thêm sách: " + err);
+          console.error("Lỗi khi thêm sách:", err);
+        });
     }
 
     setShowModal(false);
@@ -129,13 +156,13 @@ const BookManagement = () => {
       .then((res) => res.json())
       .then((data) => {
         const mappedBooks = data.map((book) => ({
-          id: book.id,
+          id: book.maSach,
           title: book.tenSach,
           author: book.tacGia,
           isbn: book.isbn,
           category: book.theLoai,
           publisher: book.nhaXuatBan,
-          publishYear: book.namXuatBan,
+          publishYear: book.namXB,
           quantity: book.soLuong,
           available: book.soLuongCoLai,
           location: book.viTriLuuTru,
