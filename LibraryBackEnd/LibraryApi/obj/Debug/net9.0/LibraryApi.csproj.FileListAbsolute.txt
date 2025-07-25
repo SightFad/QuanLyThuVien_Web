@@ -504,3 +504,9 @@ D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.deps.json
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.runtimeconfig.json
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.staticwebassets.endpoints.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\web.config
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\appsettings.Development.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\appsettings.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.deps.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.runtimeconfig.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Debug\net9.0\publish_output\LibraryApi.staticwebassets.endpoints.json

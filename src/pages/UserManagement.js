@@ -11,7 +11,7 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const apiUrl = "http://localhost:5280/api/User";
+  const apiUrl = "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Users";
 
   useEffect(() => {
     fetchUsers();

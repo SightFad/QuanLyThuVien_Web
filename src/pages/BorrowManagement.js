@@ -19,7 +19,7 @@ const BorrowManagement = () => {
   const [loading, setLoading] = useState(true);
 
   const apiUrl =
-    "http://localhost:5280/api/PhieuMuon";
+    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/PhieuMuon";
 
   const mapBorrowData = (borrow) => ({
     id: borrow.id,
