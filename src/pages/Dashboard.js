@@ -39,17 +39,34 @@ const Dashboard = () => {
         
         // Get only the last 5 borrows and map them
         const recentBorrowsData = borrowsData
+          .filter(borrow => borrow.ngayMuon && borrow.hanTra) // Filter out invalid dates
           .sort((a, b) => new Date(b.ngayMuon) - new Date(a.ngayMuon))
           .slice(0, 5)
-          .map(borrow => ({
-            id: borrow.id,
-            readerName: borrow.docGia?.tenDocGia || borrow.tenDocGia || "",
-            bookTitle: borrow.sach?.tenSach || borrow.tenSach || "",
-            borrowDate: new Date(borrow.ngayMuon).toISOString().split('T')[0],
-            returnDate: new Date(borrow.hanTra).toISOString().split('T')[0],
-            status: borrow.ngayTra ? 'returned' : 
-                   new Date(borrow.hanTra) < new Date() ? 'overdue' : 'borrowed'
-          }));
+          .map(borrow => {
+            try {
+              const borrowDate = new Date(borrow.ngayMuon);
+              const returnDate = new Date(borrow.hanTra);
+              
+              // Check if dates are valid
+              if (isNaN(borrowDate.getTime()) || isNaN(returnDate.getTime())) {
+                return null;
+              }
+              
+              return {
+                id: borrow.id,
+                readerName: borrow.docGia?.tenDocGia || borrow.tenDocGia || "",
+                bookTitle: borrow.sach?.tenSach || borrow.tenSach || "",
+                borrowDate: borrowDate.toISOString().split('T')[0],
+                returnDate: returnDate.toISOString().split('T')[0],
+                status: borrow.ngayTra ? 'returned' : 
+                       returnDate < new Date() ? 'overdue' : 'borrowed'
+              };
+            } catch (error) {
+              console.warn('Invalid date in borrow record:', borrow);
+              return null;
+            }
+          })
+          .filter(item => item !== null); // Remove null items
         
         setRecentBorrows(recentBorrowsData);
 
@@ -60,8 +77,10 @@ const Dashboard = () => {
         
         // Calculate borrow count for each book from PhieuMuon data
         const bookBorrowCounts = borrowsData.reduce((acc, borrow) => {
-          const bookId = borrow.idSach;
-          acc[bookId] = (acc[bookId] || 0) + 1;
+          const bookId = borrow.maSach || borrow.idSach;
+          if (bookId) {
+            acc[bookId] = (acc[bookId] || 0) + 1;
+          }
           return acc;
         }, {});
 
@@ -70,7 +89,7 @@ const Dashboard = () => {
           .map(book => ({
             title: book.tenSach,
             author: book.tacGia,
-            borrows: bookBorrowCounts[book.id] || 0
+            borrows: bookBorrowCounts[book.maSach] || bookBorrowCounts[book.id] || 0
           }))
           .sort((a, b) => b.borrows - a.borrows)
           .slice(0, 5);

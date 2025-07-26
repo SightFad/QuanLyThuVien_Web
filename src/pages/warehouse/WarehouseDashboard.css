@@ -2,6 +2,8 @@
   padding: 20px;
   background-color: #f5f5f5;
   min-height: 100vh;
+  margin-left: 280px; /* Tránh bị che bởi sidebar */
+  width: calc(100% - 280px); /* Điều chỉnh width */
 }
 
 .dashboard-header {
@@ -384,6 +386,8 @@
 @media (max-width: 768px) {
   .warehouse-dashboard {
     padding: 15px;
+    margin-left: 0; /* Trên mobile, không cần margin */
+    width: 100%;
   }
   
   .dashboard-header h1 {
