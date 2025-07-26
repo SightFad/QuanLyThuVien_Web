@@ -17,6 +17,8 @@ namespace LibraryApi.Services
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
                 return (false, "Độc giả không tồn tại");
+            if (docGia.MemberStatus != "DaThanhToan")
+                return (false, "Chỉ thành viên đã thanh toán mới được mượn sách. Vui lòng đăng ký và thanh toán gói thành viên tại quầy thủ thư.");
             // Có thể bổ sung kiểm tra khác nếu cần
             foreach (var maSach in maSachList)
             {

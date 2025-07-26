@@ -12,6 +12,9 @@ import ReaderSearch from './pages/reader/ReaderSearch';
 import ReaderMyBooks from './pages/reader/ReaderMyBooks';
 import ReaderHistory from './pages/reader/ReaderHistory';
 import ReaderProfile from './pages/reader/ReaderProfile';
+import LibrarianDashboard from './pages/librarian/LibrarianDashboard';
+import AccountantDashboard from './pages/accountant/AccountantDashboard';
+import WarehouseDashboard from './pages/warehouse/WarehouseDashboard';
 import './App.css';
 
 function App() {
@@ -71,13 +74,13 @@ function App() {
               <Routes>
                 {/* Admin Routes */}
                 <Route path="/" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư', 'Kế toán']}>
+                  <ProtectedRoute allowedRoles={['Quản trị viên']}>
                     <Dashboard />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/books" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư', 'Nhân viên kho sách']}>
                     <BookManagement />
                   </ProtectedRoute>
                 } />
@@ -89,7 +92,7 @@ function App() {
                 } />
                 
                 <Route path="/borrows" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư', 'Kế toán']}>
                     <BorrowManagement />
                   </ProtectedRoute>
                 } />
@@ -97,6 +100,90 @@ function App() {
                 <Route path="/users" element={
                   <ProtectedRoute allowedRoles={['Quản trị viên']}>
                     <UserManagement />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Librarian Routes */}
+                <Route path="/librarian" element={
+                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                    <LibrarianDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/librarian/activities" element={
+                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                    <div style={{ padding: '20px' }}>
+                      <h1>Hoạt động thư viện</h1>
+                      <p>Trang quản lý hoạt động thư viện</p>
+                    </div>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Accountant Routes */}
+                <Route path="/accountant" element={
+                  <ProtectedRoute allowedRoles={['Kế toán']}>
+                    <AccountantDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/accountant/finance" element={
+                  <ProtectedRoute allowedRoles={['Kế toán']}>
+                    <div style={{ padding: '20px' }}>
+                      <h1>Quản lý tài chính</h1>
+                      <p>Trang quản lý tài chính thư viện</p>
+                    </div>
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/accountant/fines" element={
+                  <ProtectedRoute allowedRoles={['Kế toán']}>
+                    <div style={{ padding: '20px' }}>
+                      <h1>Quản lý tiền phạt</h1>
+                      <p>Trang quản lý tiền phạt mượn sách</p>
+                    </div>
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/accountant/reports" element={
+                  <ProtectedRoute allowedRoles={['Kế toán']}>
+                    <div style={{ padding: '20px' }}>
+                      <h1>Báo cáo tài chính</h1>
+                      <p>Trang báo cáo tài chính</p>
+                    </div>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Warehouse Routes */}
+                <Route path="/warehouse" element={
+                  <ProtectedRoute allowedRoles={['Nhân viên kho sách']}>
+                    <WarehouseDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/warehouse/inventory" element={
+                  <ProtectedRoute allowedRoles={['Nhân viên kho sách']}>
+                    <div style={{ padding: '20px' }}>
+                      <h1>Quản lý kho</h1>
+                      <p>Trang quản lý kho sách</p>
+                    </div>
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/warehouse/orders" element={
+                  <ProtectedRoute allowedRoles={['Nhân viên kho sách']}>
+                    <div style={{ padding: '20px' }}>
+                      <h1>Quản lý đơn hàng</h1>
+                      <p>Trang quản lý đơn hàng sách</p>
+                    </div>
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/warehouse/check" element={
+                  <ProtectedRoute allowedRoles={['Nhân viên kho sách']}>
+                    <div style={{ padding: '20px' }}>
+                      <h1>Kiểm kê kho</h1>
+                      <p>Trang kiểm kê kho sách</p>
+                    </div>
                   </ProtectedRoute>
                 } />
                 

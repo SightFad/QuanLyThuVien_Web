@@ -31,9 +31,21 @@ namespace LibraryApi.Controllers
 
                 var totalBooks = await _context.Saches.CountAsync();
                 var totalReaders = await _context.DocGias.CountAsync();
+                
+                // Books currently borrowed (have PhieuMuon but no corresponding PhieuTra)
                 var booksBorrowed = await _context.CT_PhieuMuons
+                    .Where(ct => ct.PhieuMuon != null && 
+                                ct.PhieuMuon.NgayTraDuKien != null && 
+                                ct.PhieuMuon.NgayTraDuKien >= now &&
+                                !_context.PhieuTras.Any(pt => pt.MaPhieuMuon == ct.PhieuMuon.MaPhieuMuon))
                     .CountAsync();
+                
+                // Books overdue (have PhieuMuon but no corresponding PhieuTra and past due date)
                 var booksOverdue = await _context.CT_PhieuMuons
+                    .Where(ct => ct.PhieuMuon != null && 
+                                ct.PhieuMuon.NgayTraDuKien != null && 
+                                ct.PhieuMuon.NgayTraDuKien < now &&
+                                !_context.PhieuTras.Any(pt => pt.MaPhieuMuon == ct.PhieuMuon.MaPhieuMuon))
                     .CountAsync();
 
                 var summary = new DashboardSummaryDto

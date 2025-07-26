@@ -162,6 +162,20 @@ namespace LibraryApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MemberStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MemberType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("NgayDangKy")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NgayHetHan")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
@@ -185,6 +199,9 @@ namespace LibraryApi.Migrations
                     b.Property<string>("ChucVu")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DocGiaId")
+                        .HasColumnType("int");
 
                     b.Property<string>("MatKhau")
                         .IsRequired()

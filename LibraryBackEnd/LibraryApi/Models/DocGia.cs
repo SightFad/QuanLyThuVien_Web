@@ -15,6 +15,12 @@ namespace LibraryApi.Models
         public string Email { get; set; }
         public string SDT { get; set; }
 
+        // Thành viên
+        public string MemberType { get; set; } // Thuong, Vip, SinhVien
+        public string MemberStatus { get; set; } // ChuaThanhToan, ChoXacNhan, DaThanhToan, HetHan
+        public DateTime? NgayDangKy { get; set; }
+        public DateTime? NgayHetHan { get; set; }
+
         // Navigation
         public TheThuVien TheThuVien { get; set; }
         public ICollection<PhieuMuon> PhieuMuons { get; set; }

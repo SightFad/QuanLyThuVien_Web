@@ -78,5 +78,39 @@ namespace LibraryApi.Controllers
             _context.SaveChanges();
             return NoContent();
         }
+
+        // POST: api/DocGia/RegisterMembership
+        [HttpPost("RegisterMembership")]
+        public IActionResult RegisterMembership([FromBody] RegisterMembershipRequest request)
+        {
+            var docGia = _context.DocGias.FirstOrDefault(dg => dg.MaDG == request.DocGiaId);
+            if (docGia == null)
+                return NotFound("Không tìm thấy độc giả");
+            if (!string.IsNullOrEmpty(docGia.MemberStatus) && docGia.MemberStatus == "DaThanhToan")
+                return BadRequest("Độc giả đã là thành viên");
+            docGia.MemberType = request.MemberType;
+            docGia.MemberStatus = "ChoXacNhan";
+            docGia.NgayDangKy = DateTime.Now;
+            // NgayHetHan sẽ được cập nhật khi xác nhận thanh toán
+            _context.SaveChanges();
+            return Ok(new { docGia.MaDG, docGia.MemberType, docGia.MemberStatus, docGia.NgayDangKy });
+        }
+
+        // POST: api/DocGia/ConfirmMembership
+        [HttpPost("ConfirmMembership")]
+        public IActionResult ConfirmMembership([FromBody] ConfirmMembershipRequest request)
+        {
+            var docGia = _context.DocGias.FirstOrDefault(dg => dg.MaDG == request.DocGiaId);
+            if (docGia == null)
+                return NotFound("Không tìm thấy độc giả");
+            if (docGia.MemberStatus != "ChoXacNhan")
+                return BadRequest("Yêu cầu không hợp lệ hoặc đã xác nhận");
+            docGia.MemberStatus = "DaThanhToan";
+            docGia.NgayDangKy = DateTime.Now;
+            // Tính ngày hết hạn: mặc định 1 năm cho mọi gói, có thể thay đổi nếu cần
+            docGia.NgayHetHan = DateTime.Now.AddYears(1);
+            _context.SaveChanges();
+            return Ok(new { docGia.MaDG, docGia.MemberType, docGia.MemberStatus, docGia.NgayDangKy, docGia.NgayHetHan });
+        }
     }
 }

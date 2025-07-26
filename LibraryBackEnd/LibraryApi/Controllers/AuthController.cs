@@ -42,19 +42,34 @@ namespace LibraryApi.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] NguoiDung request)
+        public async Task<IActionResult> Register([FromBody] RegisterReaderRequest request)
         {
-            if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == request.TenDangNhap))
+            // Kiểm tra tên đăng nhập đã tồn tại
+            if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == request.Username))
                 return BadRequest("Tên đăng nhập đã tồn tại");
+            // Tạo mới DocGia
+            var docGia = new DocGia
+            {
+                HoTen = request.HoTen,
+                Email = request.Email,
+                SDT = request.SDT,
+                DiaChi = request.DiaChi,
+                GioiTinh = request.GioiTinh,
+                NgaySinh = request.NgaySinh
+            };
+            _context.DocGias.Add(docGia);
+            await _context.SaveChangesAsync();
+            // Tạo mới NguoiDung
             var user = new NguoiDung
             {
-                TenDangNhap = request.TenDangNhap,
-                MatKhau = request.MatKhau, // Không hash nữa
-                ChucVu = request.ChucVu
+                TenDangNhap = request.Username,
+                MatKhau = request.Password, // Có thể hash nếu muốn
+                ChucVu = "Reader",
+                DocGiaId = docGia.MaDG
             };
             _context.NguoiDungs.Add(user);
             await _context.SaveChangesAsync();
-            return Ok(user);
+            return Ok(new { user.MaND, user.TenDangNhap, user.ChucVu, user.DocGiaId });
         }
 
         [HttpGet("user/{id}")]
