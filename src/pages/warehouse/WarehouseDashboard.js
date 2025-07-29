@@ -3,6 +3,9 @@ import { FaBoxes, FaTruck, FaClipboardList, FaExclamationTriangle, FaCheckCircle
 import './WarehouseDashboard.css';
 
 const WarehouseDashboard = () => {
+  console.log('=== WarehouseDashboard Component ===');
+  console.log('Component is rendering...');
+  
   const [stats, setStats] = useState({
     totalBooks: 0,
     booksInStock: 0,
@@ -18,6 +21,7 @@ const WarehouseDashboard = () => {
   }, []);
 
   const fetchDashboardData = async () => {
+    console.log('WarehouseDashboard fetchDashboardData running...');
     try {
       // Mock data for warehouse dashboard
       setStats({
@@ -28,10 +32,12 @@ const WarehouseDashboard = () => {
         todayDeliveries: 8,
         damagedBooks: 23
       });
+      console.log('WarehouseDashboard stats set successfully');
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+      console.log('WarehouseDashboard loading set to false');
     }
   };
 
@@ -50,12 +56,16 @@ const WarehouseDashboard = () => {
 
   if (loading) {
     return (
-      <div className="dashboard-loading">
-        <div className="spinner"></div>
-        <p>Đang tải dữ liệu...</p>
+      <div className="warehouse-dashboard">
+        <div className="dashboard-loading">
+          <div className="spinner"></div>
+          <p>Đang tải dữ liệu...</p>
+        </div>
       </div>
     );
   }
+
+
 
   return (
     <div className="warehouse-dashboard">

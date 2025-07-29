@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBook, FaClock, FaCheck, FaExclamationTriangle, FaSearch, FaUser } from 'react-icons/fa';
+import { FaBook, FaClock, FaCheck, FaExclamationTriangle, FaSearch, FaUser, FaCalendar, FaMapMarkerAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import './ReaderHome.css';
 
@@ -18,7 +18,9 @@ const ReaderHome = () => {
         email: 'nguyenvana@email.com',
         memberSince: '2023-01-15',
         totalBorrows: 15,
-        currentBorrows: 2
+        currentBorrows: 2,
+        overdueBooks: 0,
+        fines: 0
       });
 
       setCurrentBorrows([
@@ -29,7 +31,9 @@ const ReaderHome = () => {
           borrowDate: '2024-01-15',
           returnDate: '2024-02-15',
           daysLeft: 5,
-          status: 'borrowed'
+          status: 'borrowed',
+          category: 'Kỹ năng sống',
+          location: 'Kệ A1'
         },
         {
           id: 2,
@@ -38,7 +42,9 @@ const ReaderHome = () => {
           borrowDate: '2024-01-20',
           returnDate: '2024-02-20',
           daysLeft: 10,
-          status: 'borrowed'
+          status: 'borrowed',
+          category: 'Tiểu thuyết',
+          location: 'Kệ B2'
         }
       ]);
 
@@ -48,21 +54,27 @@ const ReaderHome = () => {
           title: 'Tuổi Trẻ Đáng Giá Bao Nhiêu',
           author: 'Rosie Nguyễn',
           category: 'Kỹ năng sống',
-          available: 3
+          available: 3,
+          total: 5,
+          location: 'Kệ A3'
         },
         {
           id: 2,
           title: 'Cách Nghĩ Để Thành Công',
           author: 'Napoleon Hill',
           category: 'Kinh doanh',
-          available: 4
+          available: 4,
+          total: 6,
+          location: 'Kệ C1'
         },
         {
           id: 3,
           title: 'Đọc Vị Bất Kỳ Ai',
           author: 'David J. Lieberman',
           category: 'Tâm lý học',
-          available: 2
+          available: 2,
+          total: 3,
+          location: 'Kệ B3'
         }
       ]);
 
@@ -78,6 +90,10 @@ const ReaderHome = () => {
     } else {
       return <span className="badge badge-success">Bình thường</span>;
     }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
   if (loading) {
@@ -103,16 +119,16 @@ const ReaderHome = () => {
         <div className="reader-details">
           <h3>{readerInfo.name}</h3>
           <p>{readerInfo.email}</p>
-          <p>Thành viên từ: {readerInfo.memberSince}</p>
+          <p>Thành viên từ: {formatDate(readerInfo.memberSince)}</p>
         </div>
         <div className="reader-stats">
           <div className="stat">
             <span className="stat-number">{readerInfo.totalBorrows}</span>
-            <span className="stat-label">Tổng lượt mượn</span>
+            <span className="stat-label">TỔNG LƯỢT MƯỢN</span>
           </div>
           <div className="stat">
             <span className="stat-number">{readerInfo.currentBorrows}</span>
-            <span className="stat-label">Đang mượn</span>
+            <span className="stat-label">ĐANG MƯỢN</span>
           </div>
         </div>
       </div>
@@ -136,9 +152,11 @@ const ReaderHome = () => {
                   <div className="book-info">
                     <h4>{book.bookTitle}</h4>
                     <p className="book-author">{book.author}</p>
+                    <p className="book-category">{book.category}</p>
+                    <p className="book-location">{book.location}</p>
                     <div className="book-dates">
-                      <p>Mượn: {book.borrowDate}</p>
-                      <p>Trả: {book.returnDate}</p>
+                      <p>Mượn: {formatDate(book.borrowDate)}</p>
+                      <p>Trả: {formatDate(book.returnDate)}</p>
                     </div>
                   </div>
                   <div className="book-status">
@@ -177,19 +195,19 @@ const ReaderHome = () => {
             <Link to="/reader/my-books" className="action-card">
               <FaBook className="action-icon" />
               <h3>Sách của tôi</h3>
-              <p>Xem sách đang mượn và quản lý</p>
+              <p>Xem sách đang mượn và lịch sử mượn</p>
             </Link>
             
-            <Link to="/reader/history" className="action-card">
-              <FaClock className="action-icon" />
-              <h3>Lịch sử mượn</h3>
-              <p>Xem lịch sử mượn trả sách</p>
+            <Link to="/reader/reservations" className="action-card">
+              <FaCalendar className="action-icon" />
+              <h3>Đặt sách</h3>
+              <p>Quản lý sách đã đặt và thông báo</p>
             </Link>
             
-            <Link to="/reader/profile" className="action-card">
-              <FaUser className="action-icon" />
-              <h3>Thông tin cá nhân</h3>
-              <p>Cập nhật thông tin cá nhân</p>
+            <Link to="/reader/fines" className="action-card">
+              <FaExclamationTriangle className="action-icon" />
+              <h3>Tiền phạt</h3>
+              <p>Xem và thanh toán tiền phạt</p>
             </Link>
           </div>
         </div>
@@ -210,6 +228,7 @@ const ReaderHome = () => {
                   <h4>{book.title}</h4>
                   <p className="book-author">{book.author}</p>
                   <p className="book-category">{book.category}</p>
+                  <p className="book-location">{book.location}</p>
                 </div>
                 <div className="book-actions">
                   <span className="availability">
@@ -219,7 +238,7 @@ const ReaderHome = () => {
                       <span className="badge badge-danger">Hết sách</span>
                     )}
                   </span>
-                  <Link to={`/reader/search?book=${book.id}`} className="btn btn-primary btn-sm">
+                  <Link to="/reader/search" className="btn btn-primary btn-sm">
                     Xem chi tiết
                   </Link>
                 </div>

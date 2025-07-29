@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaFilter, FaBook, FaUser, FaCalendar, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaSearch, FaBook, FaUser, FaCalendar, FaMapMarkerAlt } from 'react-icons/fa';
 import './ReaderSearch.css';
 
 const ReaderSearch = () => {
@@ -109,9 +109,10 @@ const ReaderSearch = () => {
           available: 2,
           total: 3,
           location: 'Kệ D1',
-          description: 'Lịch sử phát triển của loài người từ thời nguyên thủy.'
+          description: 'Lịch sử phát triển của loài người từ thời cổ đại.'
         }
       ];
+
       setBooks(mockBooks);
       setFilteredBooks(mockBooks);
       setLoading(false);
@@ -136,12 +137,10 @@ const ReaderSearch = () => {
     }
 
     // Filter by availability
-    if (selectedAvailability) {
-      if (selectedAvailability === 'available') {
-        filtered = filtered.filter(book => book.available > 0);
-      } else if (selectedAvailability === 'unavailable') {
-        filtered = filtered.filter(book => book.available === 0);
-      }
+    if (selectedAvailability === 'available') {
+      filtered = filtered.filter(book => book.available > 0);
+    } else if (selectedAvailability === 'unavailable') {
+      filtered = filtered.filter(book => book.available === 0);
     }
 
     setFilteredBooks(filtered);
@@ -177,7 +176,7 @@ const ReaderSearch = () => {
         <p className="page-subtitle">Tìm kiếm và khám phá kho sách thư viện</p>
       </div>
 
-      <div className="search-filters">
+      <div className="search-section">
         <div className="search-bar">
           <FaSearch className="search-icon" />
           <input
@@ -222,7 +221,7 @@ const ReaderSearch = () => {
         </div>
       </div>
 
-      <div className="search-results">
+      <div className="results-section">
         <div className="results-header">
           <h3>Tìm thấy {filteredBooks.length} sách</h3>
           {searchTerm && (
