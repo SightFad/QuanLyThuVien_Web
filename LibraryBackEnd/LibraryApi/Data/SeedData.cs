@@ -16,9 +16,12 @@ namespace LibraryApi.Data
                         TacGia = "Dale Carnegie",
                         ISBN = "978-604-1-00001-1",
                         TheLoai = "Kỹ năng sống",
+                        NamXB = 2019,
+                        NhaXuatBan = "NXB Tổng hợp TP.HCM",
                         SoLuong = 5,
                         TrangThai = "Còn",
-                        ViTriLuuTru = "Kệ A1"
+                        ViTriLuuTru = "Kệ A1",
+                        AnhBia = "/images/book-covers/dac-nhan-tam.jpg"
                     },
                     new Sach
                     {
@@ -26,9 +29,12 @@ namespace LibraryApi.Data
                         TacGia = "Paulo Coelho",
                         ISBN = "978-604-1-00002-2",
                         TheLoai = "Tiểu thuyết",
+                        NamXB = 2020,
+                        NhaXuatBan = "NXB Văn học",
                         SoLuong = 3,
                         TrangThai = "Còn",
-                        ViTriLuuTru = "Kệ B2"
+                        ViTriLuuTru = "Kệ B2",
+                        AnhBia = "/images/book-covers/nha-gia-kim.jpg"
                     },
                     new Sach
                     {
@@ -36,31 +42,54 @@ namespace LibraryApi.Data
                         TacGia = "Rosie Nguyễn",
                         ISBN = "978-604-1-00003-3",
                         TheLoai = "Kỹ năng sống",
+                        NamXB = 2018,
+                        NhaXuatBan = "NXB Hội nhà văn",
                         SoLuong = 4,
                         TrangThai = "Còn",
-                        ViTriLuuTru = "Kệ A1"
+                        ViTriLuuTru = "Kệ A1",
+                        AnhBia = "/images/book-covers/tuoi-tre-dang-gia-bao-nhieu.jpg"
                     },
                     new Sach
                     {
-                        TenSach = "Lập trình Web với React",
-                        TacGia = "John Doe",
+                        TenSach = "Cách Nghĩ Để Thành Công",
+                        TacGia = "Napoleon Hill",
                         ISBN = "978-604-1-00004-4",
-                        TheLoai = "Công nghệ",
+                        TheLoai = "Kinh doanh",
+                        NamXB = 2021,
+                        NhaXuatBan = "NXB Lao động",
                         SoLuong = 6,
                         TrangThai = "Còn",
-                        ViTriLuuTru = "Kệ C3"
+                        ViTriLuuTru = "Kệ C1",
+                        AnhBia = "/images/book-covers/cach-nghi-de-thanh-cong.jpg"
                     },
                     new Sach
                     {
-                        TenSach = "Cơ sở dữ liệu SQL",
-                        TacGia = "Jane Smith",
+                        TenSach = "Đọc Vị Bất Kỳ Ai",
+                        TacGia = "David J. Lieberman",
                         ISBN = "978-604-1-00005-5",
-                        TheLoai = "Công nghệ",
-                        SoLuong = 4,
+                        TheLoai = "Tâm lý học",
+                        NamXB = 2020,
+                        NhaXuatBan = "NXB Thế giới",
+                        SoLuong = 2,
                         TrangThai = "Còn",
-                        ViTriLuuTru = "Kệ C3"
+                        ViTriLuuTru = "Kệ B3",
+                        AnhBia = "/images/book-covers/doc-vi-bat-ky-ai.jpg"
+                    },
+                    new Sach
+                    {
+                        TenSach = "Sapiens: Lược Sử Loài Người",
+                        TacGia = "Yuval Noah Harari",
+                        ISBN = "978-604-1-00006-6",
+                        TheLoai = "Lịch sử",
+                        NamXB = 2021,
+                        NhaXuatBan = "NXB Thế giới",
+                        SoLuong = 3,
+                        TrangThai = "Còn",
+                        ViTriLuuTru = "Kệ D1",
+                        AnhBia = "/images/book-covers/sapiens.jpg"
                     }
                 );
+                context.SaveChanges();
             }
 
             if (!context.DocGias.Any())

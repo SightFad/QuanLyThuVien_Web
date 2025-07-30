@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import BookCoverUpload from './BookCoverUpload';
 
 const BookModal = ({ book, onSave, onClose }) => {
   const [formData, setFormData] = useState({
@@ -11,12 +12,16 @@ const BookModal = ({ book, onSave, onClose }) => {
     publishYear: new Date().getFullYear(),
     quantity: 1,
     available: 1,
-    location: ''
+    location: '',
+    coverImage: ''
   });
 
   useEffect(() => {
     if (book) {
-      setFormData(book);
+      setFormData({
+        ...book,
+        coverImage: book.coverImage || ''
+      });
     }
   }, [book]);
 
@@ -25,6 +30,13 @@ const BookModal = ({ book, onSave, onClose }) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleImageUpload = (imageUrl) => {
+    setFormData(prev => ({
+      ...prev,
+      coverImage: imageUrl
     }));
   };
 
@@ -193,6 +205,12 @@ const BookModal = ({ book, onSave, onClose }) => {
               placeholder="Ví dụ: Kệ A1, Tủ B2..."
             />
           </div>
+
+          {/* Book Cover Upload */}
+          <BookCoverUpload
+            onImageUpload={handleImageUpload}
+            currentImage={formData.coverImage}
+          />
 
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
