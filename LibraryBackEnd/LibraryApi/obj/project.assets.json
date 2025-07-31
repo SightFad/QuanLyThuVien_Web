@@ -5177,7 +5177,8 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Khoa\\.nuget\\packages\\": {}
+    "C:\\Users\\Khoa\\.nuget\\packages\\": {},
+    "D:\\Work_Place\\SQLServer\\SQL_SDK\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
@@ -5188,13 +5189,20 @@
       "packagesPath": "C:\\Users\\Khoa\\.nuget\\packages\\",
       "outputPath": "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "D:\\Work_Place\\SQLServer\\SQL_SDK\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Khoa\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Khoa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

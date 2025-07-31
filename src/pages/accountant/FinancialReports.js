@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FaFileInvoiceDollar, FaDownload, FaCalendarAlt, FaChartBar, FaChartLine, FaChartPie } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaDownload, FaCalendarAlt, FaChartBar, FaChartLine, FaChartPie, FaTable, FaPrint } from 'react-icons/fa';
 import './FinancialReports.css';
 
 const FinancialReports = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
+  
+  // State cho báo cáo doanh thu
+  const [baoCaodoanhThu, setBaoCaodoanhThu] = useState(null);
+  const [baoCaodoanhThuLoading, setBaoCaodoanhThuLoading] = useState(false);
+  const [tuNgay, setTuNgay] = useState('');
+  const [denNgay, setDenNgay] = useState('');
+  const [loaiBaoCao, setLoaiBaoCao] = useState('tonghop'); // tonghop, phithanhvien, phiphat
 
   useEffect(() => {
     // Mock data
@@ -88,6 +95,53 @@ const FinancialReports = () => {
       style: 'currency',
       currency: 'VND'
     }).format(amount);
+  };
+
+  // Function để lấy báo cáo doanh thu
+  const layBaoCaoDoanhThu = async () => {
+    if (!tuNgay || !denNgay) {
+      alert('Vui lòng chọn từ ngày và đến ngày');
+      return;
+    }
+
+    setBaoCaodoanhThuLoading(true);
+    try {
+      let url = '';
+      switch (loaiBaoCao) {
+        case 'phithanhvien':
+          url = `http://localhost:5000/api/BaoCao/phi-thanh-vien?tuNgay=${tuNgay}&denNgay=${denNgay}`;
+          break;
+        case 'phiphat':
+          url = `http://localhost:5000/api/BaoCao/phi-phat?tuNgay=${tuNgay}&denNgay=${denNgay}`;
+          break;
+        default:
+          url = `http://localhost:5000/api/BaoCao/doanh-thu?tuNgay=${tuNgay}&denNgay=${denNgay}`;
+          break;
+      }
+
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setBaoCaodoanhThu(data);
+      } else {
+        alert('Có lỗi xảy ra khi lấy báo cáo');
+      }
+    } catch (error) {
+      console.error('Lỗi:', error);
+      alert('Có lỗi xảy ra khi kết nối server');
+    } finally {
+      setBaoCaodoanhThuLoading(false);
+    }
+  };
+
+  // Function để in báo cáo
+  const inBaoCao = () => {
+    window.print();
+  };
+
+  // Function để xuất Excel (mock)
+  const xuatExcel = () => {
+    alert('Tính năng xuất Excel sẽ được phát triển sau');
   };
 
   const getReportIcon = (type) => {
@@ -335,6 +389,218 @@ const FinancialReports = () => {
           <p>Không có báo cáo nào được tạo</p>
         </div>
       )}
+
+      {/* Báo cáo doanh thu theo biểu mẫu */}
+      <div className="bao-cao-doanh-thu-section">
+        <div className="section-header">
+          <h2><FaTable /> Báo cáo doanh thu theo biểu mẫu</h2>
+          <p>Báo cáo doanh thu phí thành viên và phí phạt theo định dạng chuẩn</p>
+        </div>
+
+        <div className="bao-cao-controls">
+          <div className="control-group">
+            <label>Từ ngày:</label>
+            <input
+              type="date"
+              value={tuNgay}
+              onChange={(e) => setTuNgay(e.target.value)}
+              className="date-input"
+            />
+          </div>
+          <div className="control-group">
+            <label>Đến ngày:</label>
+            <input
+              type="date"
+              value={denNgay}
+              onChange={(e) => setDenNgay(e.target.value)}
+              className="date-input"
+            />
+          </div>
+          <div className="control-group">
+            <label>Loại báo cáo:</label>
+            <select
+              value={loaiBaoCao}
+              onChange={(e) => setLoaiBaoCao(e.target.value)}
+              className="select-input"
+            >
+              <option value="tonghop">Tổng hợp</option>
+              <option value="phithanhvien">Phí thành viên (BM10)</option>
+              <option value="phiphat">Phí phạt (BM11)</option>
+            </select>
+          </div>
+          <button
+            className="btn-generate-bao-cao"
+            onClick={layBaoCaoDoanhThu}
+            disabled={baoCaodoanhThuLoading}
+          >
+            {baoCaodoanhThuLoading ? 'Đang tải...' : 'Tạo báo cáo'}
+          </button>
+        </div>
+
+        {baoCaodoanhThu && (
+          <div className="bao-cao-result">
+            <div className="bao-cao-header">
+              <h3>{baoCaodoanhThu.TieuDe || 'Báo cáo doanh thu'}</h3>
+              <div className="bao-cao-actions">
+                <button className="btn-print" onClick={inBaoCao}>
+                  <FaPrint /> In báo cáo
+                </button>
+                <button className="btn-excel" onClick={xuatExcel}>
+                  <FaDownload /> Xuất Excel
+                </button>
+              </div>
+            </div>
+
+            {loaiBaoCao === 'phithanhvien' && baoCaodoanhThu.DanhSach && (
+              <div className="bao-cao-table-container">
+                <table className="bao-cao-table">
+                  <thead>
+                    <tr>
+                      <th>Ngày báo cáo</th>
+                      <th>Loại thẻ</th>
+                      <th>Thành tiền (VNĐ)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {baoCaodoanhThu.DanhSach.map((item, index) => (
+                      <tr key={index}>
+                        <td>{new Date(item.NgayBaoCao).toLocaleDateString('vi-VN')}</td>
+                        <td>{item.LoaiThe}</td>
+                        <td className="amount">{formatCurrency(item.ThanhTien)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="total-row">
+                      <td colSpan="2"><strong>Tổng cộng:</strong></td>
+                      <td className="total-amount">
+                        <strong>{formatCurrency(baoCaodoanhThu.TongDoanhThu || 0)}</strong>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+
+            {loaiBaoCao === 'phiphat' && baoCaodoanhThu.DanhSach && (
+              <div className="bao-cao-table-container">
+                <table className="bao-cao-table">
+                  <thead>
+                    <tr>
+                      <th>Ngày báo cáo</th>
+                      <th>Nguồn thu</th>
+                      <th>Số lượng</th>
+                      <th>Thành tiền (VNĐ)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {baoCaodoanhThu.DanhSach.map((item, index) => (
+                      <tr key={index}>
+                        <td>{new Date(item.NgayBaoCao).toLocaleDateString('vi-VN')}</td>
+                        <td>{item.NguonThu}</td>
+                        <td className="quantity">{item.SoLuong}</td>
+                        <td className="amount">{formatCurrency(item.ThanhTien)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="total-row">
+                      <td colSpan="3"><strong>Tổng cộng:</strong></td>
+                      <td className="total-amount">
+                        <strong>{formatCurrency(baoCaodoanhThu.TongDoanhThu || 0)}</strong>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+
+            {loaiBaoCao === 'tonghop' && baoCaodoanhThu.BaoCao && (
+              <div className="bao-cao-tong-hop">
+                <div className="tong-hop-section">
+                  <h4>Báo cáo doanh thu phí thành viên (BM10)</h4>
+                  <table className="bao-cao-table">
+                    <thead>
+                      <tr>
+                        <th>Ngày báo cáo</th>
+                        <th>Loại thẻ</th>
+                        <th>Thành tiền (VNĐ)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {baoCaodoanhThu.BaoCao.DanhSachPhiThanhVien?.map((item, index) => (
+                        <tr key={index}>
+                          <td>{new Date(item.NgayBaoCao).toLocaleDateString('vi-VN')}</td>
+                          <td>{item.LoaiThe}</td>
+                          <td className="amount">{formatCurrency(item.ThanhTien)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="total-row">
+                        <td colSpan="2"><strong>Tổng phí thành viên:</strong></td>
+                        <td className="total-amount">
+                          <strong>{formatCurrency(baoCaodoanhThu.BaoCao.TongDoanhThuPhiThanhVien || 0)}</strong>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <div className="tong-hop-section">
+                  <h4>Báo cáo doanh thu phí phạt (BM11)</h4>
+                  <table className="bao-cao-table">
+                    <thead>
+                      <tr>
+                        <th>Ngày báo cáo</th>
+                        <th>Nguồn thu</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền (VNĐ)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {baoCaodoanhThu.BaoCao.DanhSachPhiPhat?.map((item, index) => (
+                        <tr key={index}>
+                          <td>{new Date(item.NgayBaoCao).toLocaleDateString('vi-VN')}</td>
+                          <td>{item.NguonThu}</td>
+                          <td className="quantity">{item.SoLuong}</td>
+                          <td className="amount">{formatCurrency(item.ThanhTien)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="total-row">
+                        <td colSpan="3"><strong>Tổng phí phạt:</strong></td>
+                        <td className="total-amount">
+                          <strong>{formatCurrency(baoCaodoanhThu.BaoCao.TongDoanhThuPhiPhat || 0)}</strong>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <div className="tong-hop-summary">
+                  <h4>Tổng kết doanh thu</h4>
+                  <div className="summary-grid">
+                    <div className="summary-item">
+                      <span className="label">Tổng doanh thu phí thành viên:</span>
+                      <span className="value positive">{formatCurrency(baoCaodoanhThu.BaoCao.TongDoanhThuPhiThanhVien || 0)}</span>
+                    </div>
+                    <div className="summary-item">
+                      <span className="label">Tổng doanh thu phí phạt:</span>
+                      <span className="value positive">{formatCurrency(baoCaodoanhThu.BaoCao.TongDoanhThuPhiPhat || 0)}</span>
+                    </div>
+                    <div className="summary-item highlight">
+                      <span className="label">Tổng doanh thu:</span>
+                      <span className="value positive">{formatCurrency(baoCaodoanhThu.BaoCao.TongDoanhThu || 0)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

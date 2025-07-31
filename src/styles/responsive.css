@@ -1,0 +1,450 @@
+/**
+ * Additional Responsive Utilities and Components
+ */
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  position: fixed;
+  top: var(--space-md);
+  left: var(--space-md);
+  z-index: var(--z-fixed);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: none;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.mobile-menu-btn:active {
+  transform: translateY(0);
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-modal-backdrop);
+  display: none;
+}
+
+/* Responsive Sidebar States */
+.sidebar {
+  transition: transform var(--transition-base), width var(--transition-base);
+}
+
+.sidebar.mobile {
+  position: fixed;
+  z-index: var(--z-modal);
+  height: 100vh;
+  box-shadow: var(--shadow-xl);
+}
+
+.sidebar.mobile.collapsed {
+  transform: translateX(-100%);
+}
+
+.sidebar.mobile.expanded {
+  transform: translateX(0);
+}
+
+.sidebar.desktop.collapsed {
+  width: 80px;
+}
+
+/* Show mobile elements on small screens */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .sidebar.mobile.expanded + .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Responsive Tables */
+.responsive-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table table {
+  min-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .responsive-table table {
+    font-size: var(--text-sm);
+  }
+
+  .responsive-table th,
+  .responsive-table td {
+    padding: var(--space-sm);
+    white-space: nowrap;
+  }
+}
+
+/* Responsive Cards */
+.responsive-card-grid {
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+@media (max-width: 768px) {
+  .responsive-card-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-card-grid {
+    gap: var(--space-sm);
+  }
+}
+
+/* Responsive Navigation */
+.responsive-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+@media (max-width: 768px) {
+  .responsive-nav {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+}
+
+/* Responsive Form Layout */
+.responsive-form {
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+@media (max-width: 768px) {
+  .responsive-form {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+/* Responsive Button Groups */
+.responsive-btn-group {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .responsive-btn-group {
+    flex-direction: column;
+  }
+
+  .responsive-btn-group .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Responsive Modal */
+.responsive-modal .modal-content {
+  width: 90vw;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .responsive-modal .modal-content {
+    width: 95vw;
+    max-width: none;
+    margin: var(--space-sm);
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-modal .modal-content {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .responsive-modal .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-light);
+  }
+}
+
+/* Responsive Search */
+.responsive-search {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .responsive-search {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
+
+  .responsive-search .search-input {
+    order: -1;
+  }
+}
+
+/* Responsive Stats Grid */
+.responsive-stats {
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .responsive-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .responsive-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 600px) {
+  .responsive-stats {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  h1, .text-4xl { font-size: var(--text-2xl); }
+  h2, .text-3xl { font-size: var(--text-xl); }
+  h3, .text-2xl { font-size: var(--text-lg); }
+  h4, .text-xl { font-size: var(--text-base); }
+  h5, .text-lg { font-size: var(--text-sm); }
+  h6, .text-base { font-size: var(--text-sm); }
+}
+
+/* Responsive Spacing */
+@media (max-width: 768px) {
+  .container {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+  }
+}
+
+/* Utility Classes for Responsive Design */
+.hide-mobile {
+  display: block;
+}
+
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile {
+    display: block !important;
+  }
+
+  .show-mobile.flex {
+    display: flex !important;
+  }
+
+  .show-mobile.inline {
+    display: inline !important;
+  }
+
+  .show-mobile.inline-block {
+    display: inline-block !important;
+  }
+}
+
+.hide-tablet {
+  display: block;
+}
+
+.show-tablet {
+  display: none;
+}
+
+@media (min-width: 481px) and (max-width: 1024px) {
+  .hide-tablet {
+    display: none !important;
+  }
+
+  .show-tablet {
+    display: block !important;
+  }
+}
+
+.hide-desktop {
+  display: block;
+}
+
+.show-desktop {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .hide-desktop {
+    display: none !important;
+  }
+
+  .show-desktop {
+    display: block !important;
+  }
+}
+
+/* Responsive Text Alignment */
+@media (max-width: 768px) {
+  .text-center-mobile {
+    text-align: center !important;
+  }
+
+  .text-left-mobile {
+    text-align: left !important;
+  }
+
+  .text-right-mobile {
+    text-align: right !important;
+  }
+}
+
+/* Responsive Flexbox */
+@media (max-width: 768px) {
+  .flex-column-mobile {
+    flex-direction: column !important;
+  }
+
+  .flex-row-mobile {
+    flex-direction: row !important;
+  }
+
+  .justify-center-mobile {
+    justify-content: center !important;
+  }
+
+  .justify-start-mobile {
+    justify-content: flex-start !important;
+  }
+
+  .align-center-mobile {
+    align-items: center !important;
+  }
+
+  .align-stretch-mobile {
+    align-items: stretch !important;
+  }
+}
+
+/* Touch Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  .btn,
+  .form-input,
+  .form-select,
+  a[role="button"] {
+    min-height: 44px;
+  }
+
+  /* Remove hover effects on touch devices */
+  .btn:hover,
+  .card:hover,
+  .table tr:hover {
+    transform: none;
+    box-shadow: inherit;
+  }
+
+  /* Prevent 300ms click delay */
+  a, button, input, select, textarea {
+    touch-action: manipulation;
+  }
+}
+
+/* Landscape Phone Optimizations */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-content {
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  .sidebar.mobile {
+    width: 250px;
+  }
+}
+
+/* Focus Improvements for Accessibility */
+@media (prefers-reduced-motion: no-preference) {
+  :focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    transition: outline-offset var(--transition-fast);
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .btn {
+    border: 2px solid currentColor;
+  }
+
+  .card,
+  .table {
+    border: 1px solid currentColor;
+  }
+
+  .badge {
+    border: 1px solid currentColor;
+  }
+}

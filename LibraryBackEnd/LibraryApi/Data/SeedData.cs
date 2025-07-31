@@ -218,9 +218,143 @@ namespace LibraryApi.Data
                         MaPhieuMuon = phieuMuon.MaPhieuMuon,
                         MaSach = sach.MaSach
                     });
-                    context.SaveChanges();
-                }
+                                    context.SaveChanges();
+            }
+
+            // Thêm dữ liệu mẫu cho PhieuThu (phí thành viên)
+            if (!context.PhieuThus.Any())
+            {
+                context.PhieuThus.AddRange(
+                    new PhieuThu
+                    {
+                        MaDG = 1,
+                        LoaiThu = "Phí thành viên",
+                        SoTien = 50000,
+                        NgayThu = DateTime.Now.AddDays(-30)
+                    },
+                    new PhieuThu
+                    {
+                        MaDG = 2,
+                        LoaiThu = "Phí thành viên",
+                        SoTien = 75000,
+                        NgayThu = DateTime.Now.AddDays(-25)
+                    },
+                    new PhieuThu
+                    {
+                        MaDG = 3,
+                        LoaiThu = "Phí thành viên",
+                        SoTien = 50000,
+                        NgayThu = DateTime.Now.AddDays(-20)
+                    },
+                    new PhieuThu
+                    {
+                        MaDG = 4,
+                        LoaiThu = "Phí thành viên",
+                        SoTien = 100000,
+                        NgayThu = DateTime.Now.AddDays(-15)
+                    },
+                    new PhieuThu
+                    {
+                        MaDG = 5,
+                        LoaiThu = "Phí thành viên",
+                        SoTien = 60000,
+                        NgayThu = DateTime.Now.AddDays(-10)
+                    }
+                );
+                context.SaveChanges();
+            }
+
+            // Thêm dữ liệu mẫu cho PhieuPhat (phí phạt)
+            if (!context.PhieuPhats.Any())
+            {
+                context.PhieuPhats.AddRange(
+                    new PhieuPhat
+                    {
+                        MaDG = 1,
+                        LoaiPhat = "Trả sách trễ",
+                        SoTien = 10000,
+                        NgayLap = DateTime.Now.AddDays(-28)
+                    },
+                    new PhieuPhat
+                    {
+                        MaDG = 2,
+                        LoaiPhat = "Sách hư hỏng",
+                        SoTien = 25000,
+                        NgayLap = DateTime.Now.AddDays(-22)
+                    },
+                    new PhieuPhat
+                    {
+                        MaDG = 3,
+                        LoaiPhat = "Trả sách trễ",
+                        SoTien = 15000,
+                        NgayLap = DateTime.Now.AddDays(-18)
+                    },
+                    new PhieuPhat
+                    {
+                        MaDG = 4,
+                        LoaiPhat = "Mất sách",
+                        SoTien = 50000,
+                        NgayLap = DateTime.Now.AddDays(-12)
+                    },
+                    new PhieuPhat
+                    {
+                        MaDG = 5,
+                        LoaiPhat = "Trả sách trễ",
+                        SoTien = 8000,
+                        NgayLap = DateTime.Now.AddDays(-5)
+                    }
+                );
+                context.SaveChanges();
+            }
+
+            // Thêm dữ liệu mẫu cho TheThuVien
+            if (!context.TheThuViens.Any())
+            {
+                context.TheThuViens.AddRange(
+                    new TheThuVien
+                    {
+                        MaDG = 1,
+                        LoaiThe = "Thẻ thường",
+                        NgayDK = DateTime.Now.AddDays(-30),
+                        NgayHetHan = DateTime.Now.AddDays(335),
+                        TrangThai = "Hoạt động"
+                    },
+                    new TheThuVien
+                    {
+                        MaDG = 2,
+                        LoaiThe = "Thẻ VIP",
+                        NgayDK = DateTime.Now.AddDays(-25),
+                        NgayHetHan = DateTime.Now.AddDays(340),
+                        TrangThai = "Hoạt động"
+                    },
+                    new TheThuVien
+                    {
+                        MaDG = 3,
+                        LoaiThe = "Thẻ thường",
+                        NgayDK = DateTime.Now.AddDays(-20),
+                        NgayHetHan = DateTime.Now.AddDays(345),
+                        TrangThai = "Hoạt động"
+                    },
+                    new TheThuVien
+                    {
+                        MaDG = 4,
+                        LoaiThe = "Thẻ VIP",
+                        NgayDK = DateTime.Now.AddDays(-15),
+                        NgayHetHan = DateTime.Now.AddDays(350),
+                        TrangThai = "Hoạt động"
+                    },
+                    new TheThuVien
+                    {
+                        MaDG = 5,
+                        LoaiThe = "Thẻ thường",
+                        NgayDK = DateTime.Now.AddDays(-10),
+                        NgayHetHan = DateTime.Now.AddDays(355),
+                        TrangThai = "Hoạt động"
+                    }
+                );
+                context.SaveChanges();
             }
         }
     }
+}
 }

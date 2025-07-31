@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IBaoCaoService, BaoCaoService>();
 
 var app = builder.Build();
 
