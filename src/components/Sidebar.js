@@ -50,19 +50,16 @@ const Sidebar = ({ user, onLogout }) => {
           { path: '/system/settings', icon: <FaCog />, label: 'Cấu hình hệ thống' },
           { path: '/system/backup', icon: <FaDatabase />, label: 'Sao lưu dữ liệu' },
           { path: '/books', icon: <FaBook />, label: 'Quản lý sách' },
-          { path: '/readers', icon: <FaUsers />, label: 'Quản lý độc giả' },
+          { path: '/readers', icon: <FaUsers />, label: 'Quản lý thành viên' },
           { path: '/borrows', icon: <FaExchangeAlt />, label: 'Quản lý mượn trả' },
         ];
       case 'Thủ thư':
         return [
           { path: '/librarian/dashboard', icon: <FaHome />, label: 'Dashboard' },
-          { path: '/librarian/registration', icon: <FaUserPlus />, label: 'Đăng ký thành viên' },
-          { path: '/librarian/borrowing', icon: <FaHandshake />, label: 'Quy trình mượn sách' },
-          { path: '/librarian/returns', icon: <FaUndo />, label: 'Quy trình trả sách' },
           { path: '/librarian/fines', icon: <FaExclamationTriangle />, label: 'Quản lý tiền phạt' },
           { path: '/librarian/reports', icon: <FaFileAlt />, label: 'Báo cáo thư viện' },
           { path: '/books', icon: <FaBook />, label: 'Tìm kiếm sách' },
-          { path: '/readers', icon: <FaUsers />, label: 'Quản lý độc giả' },
+          { path: '/readers', icon: <FaUsers />, label: 'Quản lý thành viên' },
           { path: '/borrows', icon: <FaExchangeAlt />, label: 'Quản lý mượn trả' },
         ];
       case 'Kế toán':
@@ -109,7 +106,7 @@ const Sidebar = ({ user, onLogout }) => {
           { path: '/manager/reports', icon: <FaChartBar />, label: 'Báo cáo tổng hợp' },
           { path: '/manager/approvals', icon: <FaCheckDouble />, label: 'Phê duyệt' },
           { path: '/books', icon: <FaBook />, label: 'Quản lý sách' },
-          { path: '/readers', icon: <FaUsers />, label: 'Quản lý độc giả' },
+          { path: '/readers', icon: <FaUsers />, label: 'Quản lý thành viên' },
           { path: '/borrows', icon: <FaExchangeAlt />, label: 'Quản lý mượn trả' },
         ];
       case 'Độc giả':

@@ -89,7 +89,7 @@ const ReaderProfile = () => {
           </div>
           <div className="profile-info">
             <h2>{profile.name}</h2>
-            <p className="member-id">Mã độc giả: {profile.memberId}</p>
+            <p className="member-id">Mã thành viên: {profile.memberId}</p>
             {getStatusBadge(profile.status)}
           </div>
           <div className="profile-actions">
@@ -246,7 +246,7 @@ const ReaderProfile = () => {
             
             <div className="account-info">
               <div className="info-item">
-                <label className="info-label">Mã độc giả:</label>
+                <label className="info-label">Mã thành viên:</label>
                 <span className="info-value">{profile.memberId}</span>
               </div>
               <div className="info-item">

@@ -21,9 +21,6 @@ import ReaderFines from './pages/reader/ReaderFines';
 
 // Librarian pages
 import LibrarianDashboard from './pages/librarian/LibrarianDashboard';
-import MemberRegistration from './pages/librarian/MemberRegistration';
-import BorrowingProcess from './pages/librarian/BorrowingProcess';
-import ReturnProcess from './pages/librarian/ReturnProcess';
 import FineManagement from './pages/librarian/FineManagement';
 import LibrarianReports from './pages/librarian/LibrarianReports';
 
@@ -253,27 +250,9 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/librarian/dashboard" element={
+                                <Route path="/librarian/dashboard" element={
                   <ProtectedRoute allowedRoles={['Thủ thư']}>
                     <LibrarianDashboard />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/librarian/registration" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
-                    <MemberRegistration />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/librarian/borrowing" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
-                    <BorrowingProcess />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/librarian/returns" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
-                    <ReturnProcess />
                   </ProtectedRoute>
                 } />
                 

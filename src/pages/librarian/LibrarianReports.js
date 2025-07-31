@@ -127,7 +127,7 @@ const LibrarianReports = () => {
           </div>
           <div className="stat-content">
             <div className="stat-value">{reportData.overview?.totalReaders || 0}</div>
-            <div className="stat-label">Tổng độc giả</div>
+            <div className="stat-label">Tổng thành viên</div>
           </div>
         </div>
         <div className="stat-card">
@@ -220,7 +220,7 @@ const LibrarianReports = () => {
               </div>
               <div className="activity-info">
                 <div className="activity-value">{Math.round((reportData.overview?.totalBorrows || 0) / (reportData.overview?.totalReaders || 1) * 100) / 100}</div>
-                <div className="activity-label">Tỷ lệ mượn/độc giả</div>
+                <div className="activity-label">Tỷ lệ mượn/thành viên</div>
               </div>
             </div>
           </div>
@@ -261,7 +261,7 @@ const LibrarianReports = () => {
       </div>
 
       <div className="chart-container">
-        <h3>Top độc giả mượn sách</h3>
+                    <h3>Top thành viên mượn sách</h3>
         <div className="reader-stats">
           {reportData.borrowing?.readerStats?.map((reader, index) => (
             <div key={index} className="reader-item">
@@ -303,7 +303,7 @@ const LibrarianReports = () => {
         <table className="overdue-table">
           <thead>
             <tr>
-              <th>Độc giả</th>
+                              <th>Thành viên</th>
               <th>Sách</th>
               <th>Hạn trả</th>
               <th>Số ngày quá hạn</th>

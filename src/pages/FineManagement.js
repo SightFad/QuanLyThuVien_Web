@@ -49,7 +49,7 @@ const FineManagement = () => {
       status: 'paid',
       reason: 'Trả sách trễ 5 ngày',
       processedBy: 'Thủ thư Nguyễn Thị B',
-      notes: 'Độc giả đã thanh toán đầy đủ'
+              notes: 'Thành viên đã thanh toán đầy đủ'
     },
     {
       id: 'F002',
@@ -65,7 +65,7 @@ const FineManagement = () => {
       status: 'pending',
       reason: 'Sách bị hư hỏng',
       processedBy: 'Thủ thư Lê Văn C',
-      notes: 'Cần liên hệ độc giả để thanh toán'
+              notes: 'Cần liên hệ thành viên để thanh toán'
     },
     {
       id: 'F003',
@@ -81,7 +81,7 @@ const FineManagement = () => {
       status: 'paid',
       reason: 'Mất sách',
       processedBy: 'Thủ thư Phạm Thị D',
-      notes: 'Độc giả đã bồi thường đầy đủ'
+              notes: 'Thành viên đã bồi thường đầy đủ'
     },
     {
       id: 'F004',
@@ -347,7 +347,7 @@ const FineManagement = () => {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên, mã độc giả, tên sách..."
+            placeholder="Tìm kiếm theo tên, mã thành viên, tên sách..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -415,7 +415,7 @@ const FineManagement = () => {
               <thead>
                 <tr>
                   <th>Mã phiếu</th>
-                  <th>Độc giả</th>
+                  <th>Thành viên</th>
                   <th>Sách</th>
                   <th>Loại phạt</th>
                   <th>Số tiền</th>
@@ -507,13 +507,13 @@ const FineManagement = () => {
             <div className="modal-content">
               <div className="detail-grid">
                 <div className="detail-section">
-                  <h3>Thông tin độc giả</h3>
+                  <h3>Thông tin thành viên</h3>
                   <div className="detail-item">
                     <span className="label">Họ tên:</span>
                     <span className="value">{selectedFine.memberName}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="label">Mã độc giả:</span>
+                                          <span className="label">Mã thành viên:</span>
                     <span className="value">{selectedFine.memberId}</span>
                   </div>
                 </div>

@@ -160,7 +160,7 @@ const FineManagement = () => {
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên độc giả, mã độc giả hoặc tên sách..."
+              placeholder="Tìm kiếm theo tên thành viên, mã thành viên hoặc tên sách..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -185,8 +185,8 @@ const FineManagement = () => {
         <table className="fine-table">
           <thead>
             <tr>
-              <th>Mã độc giả</th>
-              <th>Tên độc giả</th>
+                              <th>Mã thành viên</th>
+                <th>Tên thành viên</th>
               <th>Tên sách</th>
               <th>Ngày mượn</th>
               <th>Hạn trả</th>
@@ -260,7 +260,7 @@ const FineManagement = () => {
             <div className="modal-body">
               <div className="payment-info">
                 <div className="info-row">
-                  <label>Độc giả:</label>
+                  <label>Thành viên:</label>
                   <span>{selectedFine.readerName} ({selectedFine.readerId})</span>
                 </div>
                 <div className="info-row">
@@ -321,9 +321,9 @@ const FineManagement = () => {
             <div className="modal-body">
               <div className="detail-grid">
                 <div className="detail-section">
-                  <h4>Thông tin độc giả</h4>
+                  <h4>Thông tin thành viên</h4>
                   <div className="detail-item">
-                    <label>Mã độc giả:</label>
+                                          <label>Mã thành viên:</label>
                     <span>{selectedFine.readerId}</span>
                   </div>
                   <div className="detail-item">

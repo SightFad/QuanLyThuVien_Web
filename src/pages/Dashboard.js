@@ -150,7 +150,7 @@ const Dashboard = () => {
         </div>
         
         <div className="stat-card">
-          <h3>Độc giả đăng ký</h3>
+                      <h3>Thành viên đăng ký</h3>
           <div className="stat-value">{stats.totalReaders.toLocaleString()}</div>
         </div>
         
@@ -175,7 +175,7 @@ const Dashboard = () => {
           <table className="table">
             <thead>
               <tr>
-                <th>Độc giả</th>
+                <th>Thành viên</th>
                 <th>Sách</th>
                 <th>Ngày mượn</th>
                 <th>Ngày trả</th>

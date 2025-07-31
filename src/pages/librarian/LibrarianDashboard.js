@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBook, FaUsers, FaExchangeAlt, FaClock, FaExclamationTriangle } from 'react-icons/fa';
+import { FaBook, FaUsers, FaExchangeAlt, FaClock, FaExclamationTriangle, FaFileAlt } from 'react-icons/fa';
 import './LibrarianDashboard.css';
 
 const LibrarianDashboard = () => {
@@ -127,19 +127,15 @@ const LibrarianDashboard = () => {
         <div className="actions-grid">
           <button className="action-btn">
             <FaBook />
-            <span>Thêm sách mới</span>
+            <span>Tìm kiếm sách</span>
           </button>
           <button className="action-btn">
             <FaUsers />
-            <span>Đăng ký độc giả</span>
+            <span>Quản lý thành viên</span>
           </button>
           <button className="action-btn">
-            <FaExchangeAlt />
-            <span>Xử lý mượn sách</span>
-          </button>
-          <button className="action-btn">
-            <FaClock />
-            <span>Xử lý trả sách</span>
+            <FaExclamationTriangle />
+            <span>Quản lý tiền phạt</span>
           </button>
         </div>
       </div>
@@ -149,31 +145,11 @@ const LibrarianDashboard = () => {
         <div className="activity-list">
           <div className="activity-item">
             <div className="activity-icon">
-              <FaExchangeAlt />
+              <FaExclamationTriangle />
             </div>
             <div className="activity-content">
-              <p className="activity-text">Nguyễn Văn A đã mượn sách "Lập trình Web"</p>
+                              <p className="activity-text">Xử lý tiền phạt cho thành viên Nguyễn Văn A</p>
               <p className="activity-time">2 phút trước</p>
-            </div>
-          </div>
-          
-          <div className="activity-item">
-            <div className="activity-icon">
-              <FaClock />
-            </div>
-            <div className="activity-content">
-              <p className="activity-text">Trần Thị B đã trả sách "Cơ sở dữ liệu"</p>
-              <p className="activity-time">15 phút trước</p>
-            </div>
-          </div>
-          
-          <div className="activity-item">
-            <div className="activity-icon">
-              <FaUsers />
-            </div>
-            <div className="activity-content">
-              <p className="activity-text">Đăng ký độc giả mới: Lê Văn C</p>
-              <p className="activity-time">1 giờ trước</p>
             </div>
           </div>
           
@@ -182,7 +158,17 @@ const LibrarianDashboard = () => {
               <FaBook />
             </div>
             <div className="activity-content">
-              <p className="activity-text">Thêm sách mới: "Machine Learning cơ bản"</p>
+                              <p className="activity-text">Tìm kiếm sách "Cơ sở dữ liệu" cho thành viên</p>
+              <p className="activity-time">15 phút trước</p>
+            </div>
+          </div>
+          
+          <div className="activity-item">
+            <div className="activity-icon">
+              <FaFileAlt />
+            </div>
+            <div className="activity-content">
+              <p className="activity-text">Tạo báo cáo thống kê tháng 12</p>
               <p className="activity-time">2 giờ trước</p>
             </div>
           </div>

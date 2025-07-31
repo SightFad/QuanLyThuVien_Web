@@ -116,7 +116,7 @@ const UserManagement = () => {
       'Quản trị viên': 'badge-danger',
       'Thủ thư': 'badge-primary',
       'Kế toán': 'badge-warning',
-      'Độc giả': 'badge-success'
+              'Thành viên': 'badge-success'
     };
     return <span className={`badge ${roleColors[role] || 'badge-secondary'}`}>{role}</span>;
   };

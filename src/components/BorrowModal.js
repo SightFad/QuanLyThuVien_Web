@@ -115,7 +115,7 @@ const BorrowModal = ({ borrow, onSave, onClose }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Độc giả *</label>
+              <label className="form-label">Thành viên *</label>
               <select
                 name="readerId"
                 value={formData.readerId}
@@ -123,7 +123,7 @@ const BorrowModal = ({ borrow, onSave, onClose }) => {
                 className="form-input"
                 required
               >
-                <option value="">Chọn độc giả</option>
+                                  <option value="">Chọn thành viên</option>
                 {mockReaders.map(reader => (
                   <option key={reader.id} value={reader.id}>
                     {reader.name} (ID: #{reader.id})

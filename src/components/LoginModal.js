@@ -176,9 +176,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
           </button>
         </form>
 
-        <div className="login-modal-footer">
-          <p>Chưa có tài khoản? <button className="link-btn">Đăng ký</button></p>
-        </div>
+
       </div>
     </div>
   );

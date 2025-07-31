@@ -226,7 +226,7 @@ const BorrowManagement = () => {
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên độc giả, tên sách hoặc trạng thái..."
+              placeholder="Tìm kiếm theo tên thành viên, tên sách hoặc trạng thái..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -242,7 +242,7 @@ const BorrowManagement = () => {
             <thead>
               <tr>
                 <th>Mã phiếu</th>
-                <th>Độc giả</th>
+                <th>Thành viên</th>
                 <th>Sách</th>
                 <th>Ngày mượn</th>
                 <th>Hạn trả</th>

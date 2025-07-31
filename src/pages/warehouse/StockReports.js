@@ -41,7 +41,7 @@ const StockReports = () => {
         affectedBooks: 8,
         estimatedLoss: 800000,
         description: '8 cuốn sách bị mất trong quá trình mượn trả, đang điều tra',
-        actions: 'Đang tìm kiếm và liên hệ độc giả'
+        actions: 'Đang tìm kiếm và liên hệ thành viên'
       },
       {
         id: 3,
@@ -83,7 +83,7 @@ const StockReports = () => {
         affectedBooks: 12,
         estimatedLoss: 1200000,
         description: '12 cuốn sách bị mượn quá hạn hơn 6 tháng',
-        actions: 'Đang liên hệ độc giả để thu hồi'
+        actions: 'Đang liên hệ thành viên để thu hồi'
       }
     ];
 
