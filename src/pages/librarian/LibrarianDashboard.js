@@ -125,15 +125,20 @@ const LibrarianDashboard = () => {
       <div className="quick-actions">
         <h2>Thao tác nhanh</h2>
         <div className="actions-grid">
-          <button className="action-btn">
+          <button className="action-btn" onClick={() => window.location.href = '/books'}>
             <FaBook />
             <span>Tìm kiếm sách</span>
           </button>
-          <button className="action-btn">
+          <button className="action-btn" onClick={() => window.location.href = '/readers'}>
             <FaUsers />
             <span>Quản lý thành viên</span>
           </button>
-          <button className="action-btn">
+          <button className="action-btn" onClick={() => window.location.href = '/borrows'}>
+            <FaExchangeAlt />
+            <span>Quản lý mượn trả</span>
+          </button>
+
+          <button className="action-btn" onClick={() => window.location.href = '/librarian/fines'}>
             <FaExclamationTriangle />
             <span>Quản lý tiền phạt</span>
           </button>

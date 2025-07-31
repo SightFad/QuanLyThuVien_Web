@@ -388,93 +388,93 @@ const ReaderSearch = () => {
   };
 
   const loadMockData = () => {
-    const mockBooks = [
-      {
-        id: 1,
+      const mockBooks = [
+        {
+          id: 1,
         title: 'Đắc Nhân Tâm - Nghệ Thuật Đắc Nhân Tâm Và Gây Ảnh Hưởng',
-        author: 'Dale Carnegie',
-        category: 'Kỹ năng sống',
-        publisher: 'NXB Tổng hợp TP.HCM',
-        publishYear: 2019,
-        isbn: '978-604-1-00001-1',
-        available: 3,
-        total: 5,
+          author: 'Dale Carnegie',
+          category: 'Kỹ năng sống',
+          publisher: 'NXB Tổng hợp TP.HCM',
+          publishYear: 2019,
+          isbn: '978-604-1-00001-1',
+          available: 3,
+          total: 5,
         location: 'Kệ A1 - Tầng 1 - Khu vực Kỹ năng sống',
         description: 'Cuốn sách về nghệ thuật đắc nhân tâm, cách ứng xử và giao tiếp hiệu quả trong cuộc sống và công việc. Sách cung cấp những nguyên tắc và phương pháp thực tế để xây dựng mối quan hệ tốt đẹp với mọi người.',
         coverImage: '/images/book-covers/dac-nhan-tam.jpg'
-      },
-      {
-        id: 2,
+        },
+        {
+          id: 2,
         title: 'Nhà Giả Kim - Hành Trình Tìm Kiếm Kho Báu Và Ý Nghĩa Cuộc Sống',
-        author: 'Paulo Coelho',
-        category: 'Tiểu thuyết',
-        publisher: 'NXB Văn học',
-        publishYear: 2020,
-        isbn: '978-604-1-00002-2',
-        available: 1,
-        total: 3,
+          author: 'Paulo Coelho',
+          category: 'Tiểu thuyết',
+          publisher: 'NXB Văn học',
+          publishYear: 2020,
+          isbn: '978-604-1-00002-2',
+          available: 1,
+          total: 3,
         location: 'Kệ B2 - Tầng 1 - Khu vực Văn học nước ngoài',
         description: 'Câu chuyện về hành trình tìm kiếm kho báu và khám phá ý nghĩa thực sự của cuộc sống. Thông qua chuyến phiêu lưu của Santiago, tác giả gửi gắm những bài học sâu sắc về ước mơ, lòng dũng cảm và sự kiên trì.',
         coverImage: '/images/book-covers/nha-gia-kim.jpg'
-      },
-      {
-        id: 3,
+        },
+        {
+          id: 3,
         title: 'Tuổi Trẻ Đáng Giá Bao Nhiêu - Những Trải Nghiệm Và Bài Học Quý Giá',
-        author: 'Rosie Nguyễn',
-        category: 'Kỹ năng sống',
-        publisher: 'NXB Hội nhà văn',
-        publishYear: 2018,
-        isbn: '978-604-1-00003-3',
-        available: 2,
-        total: 4,
+          author: 'Rosie Nguyễn',
+          category: 'Kỹ năng sống',
+          publisher: 'NXB Hội nhà văn',
+          publishYear: 2018,
+          isbn: '978-604-1-00003-3',
+          available: 2,
+          total: 4,
         location: 'Kệ A3 - Tầng 1 - Khu vực Kỹ năng sống',
         description: 'Những trải nghiệm và bài học quý giá cho tuổi trẻ về việc sống có ý nghĩa, theo đuổi đam mê và tạo dựng giá trị cho bản thân. Sách chia sẻ góc nhìn chân thực về cuộc sống và cách vượt qua những thách thức.',
         coverImage: '/images/book-covers/tuoi-tre-dang-gia-bao-nhieu.jpg'
-      },
-      {
-        id: 4,
+        },
+        {
+          id: 4,
         title: 'Cách Nghĩ Để Thành Công - Những Nguyên Tắc Và Phương Pháp Để Đạt Được Thành Công',
-        author: 'Napoleon Hill',
-        category: 'Kinh doanh',
-        publisher: 'NXB Lao động',
-        publishYear: 2021,
-        isbn: '978-604-1-00004-4',
-        available: 4,
-        total: 6,
+          author: 'Napoleon Hill',
+          category: 'Kinh doanh',
+          publisher: 'NXB Lao động',
+          publishYear: 2021,
+          isbn: '978-604-1-00004-4',
+          available: 4,
+          total: 6,
         location: 'Kệ C1 - Tầng 2 - Khu vực Kinh doanh và Quản lý',
         description: 'Những nguyên tắc và phương pháp để đạt được thành công trong cuộc sống và sự nghiệp. Sách phân tích tư duy của những người thành công và đưa ra các bước thực hành cụ thể.',
         coverImage: '/images/book-covers/cach-nghi-de-thanh-cong.jpg'
-      },
-      {
-        id: 5,
+        },
+        {
+          id: 5,
         title: 'Đọc Vị Bất Kỳ Ai - Nghệ Thuật Đọc Hiểu Tâm Lý Và Suy Nghĩ Của Người Khác',
-        author: 'David J. Lieberman',
-        category: 'Tâm lý học',
-        publisher: 'NXB Thế giới',
-        publishYear: 2020,
-        isbn: '978-604-1-00005-5',
-        available: 0,
-        total: 2,
+          author: 'David J. Lieberman',
+          category: 'Tâm lý học',
+          publisher: 'NXB Thế giới',
+          publishYear: 2020,
+          isbn: '978-604-1-00005-5',
+          available: 0,
+          total: 2,
         location: 'Kệ B3 - Tầng 2 - Khu vực Tâm lý học',
         description: 'Nghệ thuật đọc hiểu tâm lý và suy nghĩ của người khác thông qua ngôn ngữ cơ thể, biểu hiện và hành vi. Sách cung cấp các kỹ năng thực tế để hiểu và giao tiếp hiệu quả với mọi người.',
         coverImage: '/images/book-covers/doc-vi-bat-ky-ai.jpg'
-      },
-      {
-        id: 6,
+        },
+        {
+          id: 6,
         title: 'Sapiens: Lược Sử Loài Người - Từ Thời Cổ Đại Đến Kỷ Nguyên Số',
-        author: 'Yuval Noah Harari',
-        category: 'Lịch sử',
-        publisher: 'NXB Thế giới',
-        publishYear: 2021,
-        isbn: '978-604-1-00006-6',
-        available: 2,
-        total: 3,
+          author: 'Yuval Noah Harari',
+          category: 'Lịch sử',
+          publisher: 'NXB Thế giới',
+          publishYear: 2021,
+          isbn: '978-604-1-00006-6',
+          available: 2,
+          total: 3,
         location: 'Kệ D1 - Tầng 2 - Khu vực Lịch sử và Văn hóa',
         description: 'Lịch sử phát triển của loài người từ thời cổ đại đến kỷ nguyên số. Sách đưa ra góc nhìn mới mẻ về sự tiến hóa của con người và những thay đổi lớn lao trong lịch sử nhân loại.',
         coverImage: '/images/book-covers/sapiens.jpg'
-      }
-    ];
-    setBooks(mockBooks);
+        }
+      ];
+      setBooks(mockBooks);
   };
 
   if (loading) {
@@ -496,16 +496,16 @@ const ReaderSearch = () => {
         <form onSubmit={handleSearchSubmit} className="search-form">
           {/* Main search bar with suggestions */}
           <div className="search-bar-container">
-            <div className="search-bar">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
+        <div className="search-bar">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
                 placeholder="Tìm kiếm theo tên sách, tác giả, ISBN, thể loại, nhà xuất bản, vị trí..."
                 value={searchForm.searchTerm}
                 onChange={(e) => handleSearchChange('searchTerm', e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="search-input"
-              />
+            className="search-input"
+          />
               {searchForm.searchTerm && (
                 <button
                   type="button"
@@ -631,22 +631,22 @@ const ReaderSearch = () => {
                     placeholder="Nhập mã ISBN..."
                   />
                 </div>
-              </div>
-              
+        </div>
+
               <div className="form-row">
                 <div className="form-group">
                   <label>Thể loại:</label>
-                  <select
+            <select
                     value={searchForm.theLoai}
                     onChange={(e) => handleSearchChange('theLoai', e.target.value)}
-                  >
-                    {categories.map(category => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
                 <div className="form-group">
                   <label>Năm xuất bản:</label>
                   <select
@@ -675,18 +675,18 @@ const ReaderSearch = () => {
                 </div>
                 <div className="form-group">
                   <label>Trạng thái:</label>
-                  <select
+            <select
                     value={searchForm.trangThai}
                     onChange={(e) => handleSearchChange('trangThai', e.target.value)}
                   >
                     {statusOptions.map(status => (
                       <option key={status} value={status}>
                         {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
             </div>
           )}
         </form>
@@ -738,9 +738,9 @@ const ReaderSearch = () => {
                   <div className="book-header">
                     <h4 className="book-title">{book.title}</h4>
                     {getAvailabilityBadge(book.available, book.total || book.quantity)}
-                  </div>
-                  
-                  <div className="book-info">
+                </div>
+                
+                <div className="book-info">
                     <div className="book-info-item">
                       <FaUser className="book-info-icon" />
                       <div className="book-info-content">
@@ -780,25 +780,25 @@ const ReaderSearch = () => {
                         <span className="book-info-value highlight">{book.isbn}</span>
                       </div>
                     </div>
-                  </div>
+                </div>
 
-                  <div className="book-description">
-                    <p>{book.description}</p>
-                  </div>
+                <div className="book-description">
+                  <p>{book.description}</p>
+                </div>
 
-                  <div className="book-actions">
-                    {book.available > 0 ? (
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleRequestBorrow(book.id)}
-                      >
-                        Yêu cầu mượn
-                      </button>
-                    ) : (
-                      <button className="btn btn-secondary" disabled>
-                        Hết sách
-                      </button>
-                    )}
+                <div className="book-actions">
+                  {book.available > 0 ? (
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleRequestBorrow(book.id)}
+                    >
+                      Yêu cầu mượn
+                    </button>
+                  ) : (
+                    <button className="btn btn-secondary" disabled>
+                      Hết sách
+                    </button>
+                  )}
                   </div>
                 </div>
               </div>

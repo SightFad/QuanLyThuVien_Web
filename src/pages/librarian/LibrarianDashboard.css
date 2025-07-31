@@ -105,6 +105,12 @@
   gap: 15px;
 }
 
+@media (min-width: 1200px) {
+  .actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .action-btn {
   display: flex;
   align-items: center;
