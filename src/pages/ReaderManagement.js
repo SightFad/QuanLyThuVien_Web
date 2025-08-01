@@ -172,10 +172,11 @@ const ReaderManagement = () => {
         });
       } else {
         // Thêm mới
-        await apiRequest('/api/DocGia', {
+        const response = await apiRequest('/api/DocGia', {
           method: "POST",
           body: JSON.stringify(requestData),
         });
+        return response; // Trả về kết quả để hiển thị thông tin tài khoản
       }
       
       await loadReaders();

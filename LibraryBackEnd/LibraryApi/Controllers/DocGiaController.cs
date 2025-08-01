@@ -15,6 +15,56 @@ namespace LibraryApi.Controllers
             _context = context;
         }
 
+        private string GenerateUsername(string hoTen)
+        {
+            // Tạo username từ họ tên: lấy tên cuối + số ngẫu nhiên
+            var nameParts = hoTen.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var lastName = nameParts.Length > 0 ? nameParts[nameParts.Length - 1] : hoTen;
+            
+            // Loại bỏ dấu tiếng Việt và chuyển thành chữ thường
+            var cleanName = RemoveVietnameseAccents(lastName).ToLower();
+            
+            // Thêm số ngẫu nhiên để tránh trùng lặp
+            var random = new Random();
+            var randomNumber = random.Next(100, 999);
+            
+            var username = $"{cleanName}{randomNumber}";
+            
+            // Kiểm tra xem username đã tồn tại chưa
+            var counter = 1;
+            var originalUsername = username;
+            while (_context.NguoiDungs.Any(u => u.TenDangNhap == username))
+            {
+                username = $"{originalUsername}{counter}";
+                counter++;
+            }
+            
+            return username;
+        }
+
+        private string GeneratePassword()
+        {
+            // Tạo mật khẩu mặc định: "docgia" + số ngẫu nhiên
+            var random = new Random();
+            var randomNumber = random.Next(100, 999);
+            return $"docgia{randomNumber}";
+        }
+
+        private string RemoveVietnameseAccents(string text)
+        {
+            // Loại bỏ dấu tiếng Việt
+            var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
+            var stringBuilder = new System.Text.StringBuilder();
+
+            foreach (char c in normalized)
+            {
+                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
+                    stringBuilder.Append(c);
+            }
+
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
         // GET: api/DocGia
         [HttpGet]
         public ActionResult<IEnumerable<DocGia>> GetAll()
@@ -39,15 +89,47 @@ namespace LibraryApi.Controllers
             var docGia = new DocGia
             {
                 HoTen = dto.HoTen,
+                TenDG = dto.HoTen, // Set TenDG same as HoTen
                 Email = dto.Email,
                 SDT = dto.SDT,
                 DiaChi = dto.DiaChi,
                 GioiTinh = dto.GioiTinh,
-                NgaySinh = dto.NgaySinh
+                NgaySinh = dto.NgaySinh,
+                LoaiDocGia = dto.LoaiDocGia ?? "Thuong",
+                CapBac = "Thuong", // Default value
+                MemberStatus = "ChuaThanhToan", // Default value
+                PhiThanhVien = dto.PhiThanhVien,
+                LyDoKhoa = null, // Allow null
+                NgayCapNhat = DateTime.Now
             };
             _context.DocGias.Add(docGia);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetById), new { id = docGia.MaDG }, docGia);
+
+            // Tự động tạo tài khoản đăng nhập cho độc giả
+            var username = GenerateUsername(dto.HoTen);
+            var password = GeneratePassword();
+            
+            var nguoiDung = new NguoiDung
+            {
+                TenDangNhap = username,
+                MatKhau = password,
+                ChucVu = "Độc giả",
+                DocGiaId = docGia.MaDG
+            };
+            _context.NguoiDungs.Add(nguoiDung);
+            _context.SaveChanges();
+
+            // Trả về thông tin tài khoản
+            return CreatedAtAction(nameof(GetById), new { id = docGia.MaDG }, new
+            {
+                docGia,
+                accountInfo = new
+                {
+                    username = username,
+                    password = password,
+                    message = "Tài khoản đăng nhập đã được tạo tự động"
+                }
+            });
         }
 
         // PUT: api/DocGia/5
@@ -58,11 +140,15 @@ namespace LibraryApi.Controllers
             if (docGia == null)
                 return NotFound();
             docGia.HoTen = dto.HoTen;
+            docGia.TenDG = dto.HoTen; // Update TenDG as well
             docGia.Email = dto.Email;
             docGia.SDT = dto.SDT;
             docGia.DiaChi = dto.DiaChi;
             docGia.GioiTinh = dto.GioiTinh;
             docGia.NgaySinh = dto.NgaySinh;
+            docGia.LoaiDocGia = dto.LoaiDocGia;
+            docGia.PhiThanhVien = dto.PhiThanhVien;
+            docGia.NgayCapNhat = DateTime.Now;
             _context.SaveChanges();
             return NoContent();
         }

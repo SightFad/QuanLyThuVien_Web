@@ -111,18 +111,23 @@ const ReaderModal = ({ reader, onSave, onClose }) => {
     try {
       // Transform form data to match the expected format
       const transformedData = {
-        name: formData.hoTen,
+        hoTen: formData.hoTen,
         email: formData.email,
-        phone: formData.soDienThoai,
-        address: formData.diaChiLienHe,
+        sdt: formData.soDienThoai,
+        diaChi: formData.diaChiLienHe,
         gioiTinh: formData.gioiTinh,
         ngaySinh: formData.ngaySinh,
-        status: formData.trangThai,
-        goiDangKy: formData.goiDangKy,
-        ngayDangKy: formData.ngayDangKy
+        loaiDocGia: formData.goiDangKy || 'Thuong',
+        phiThanhVien: getPackagePriceValue(formData.goiDangKy)
       };
 
-      await onSave(transformedData);
+      const result = await onSave(transformedData);
+      
+      // Hiển thị thông tin tài khoản nếu có
+      if (result && result.accountInfo) {
+        alert(`Tạo thành viên thành công!\n\nThông tin tài khoản:\nTên đăng nhập: ${result.accountInfo.username}\nMật khẩu: ${result.accountInfo.password}\n\nVui lòng lưu lại thông tin này để đăng nhập!`);
+      }
+      
       onClose();
     } catch (error) {
       setErrors({ submit: 'Lỗi khi lưu thông tin. Vui lòng thử lại.' });
@@ -137,6 +142,15 @@ const ReaderModal = ({ reader, onSave, onClose }) => {
       case 'vip': return '200.000₫';
       case 'sinhvien': return '50.000₫';
       default: return '';
+    }
+  };
+
+  const getPackagePriceValue = (packageType) => {
+    switch (packageType) {
+      case 'thuong': return 100000;
+      case 'vip': return 200000;
+      case 'sinhvien': return 50000;
+      default: return 0;
     }
   };
 
