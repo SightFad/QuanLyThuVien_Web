@@ -13,6 +13,12 @@
   --input-bg: #ffffff;
   --border-color: #e2e8f0;
   --hover-bg: #f8fafc;
+  
+  /* Layout variables */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 80px;
+  --content-gap: 2rem;
+  --content-padding: 2rem;
 }
 
 /* Mobile Menu Toggle Button */
@@ -47,28 +53,49 @@
   display: flex;
   min-height: 100vh;
   position: relative;
+  background-color: var(--bg-primary);
 }
 
 /* Enhanced responsive behavior for sidebar toggle */
 .main-content {
   flex: 1;
-  padding: 1.5rem 2rem; /* Increased padding for better spacing */
-  background-color: #f8fafc;
+  margin-left: var(--sidebar-width);
+  padding: var(--content-padding);
+  background-color: var(--bg-primary);
   overflow-y: auto;
   min-height: 100vh;
   box-sizing: border-box;
-  margin-left: 0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  width: calc(100vw - 300px); /* Full width minus sidebar */
-  max-width: calc(100vw - 300px); /* Ensure it doesn't exceed available space */
+  width: calc(100vw - var(--sidebar-width));
+  max-width: calc(100vw - var(--sidebar-width));
+  
+  /* Add gap between sidebar and content */
+  position: relative;
+}
+
+.main-content::before {
+  content: '';
+  position: absolute;
+  left: -var(--content-gap);
+  top: 0;
+  bottom: 0;
+  width: var(--content-gap);
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.02));
+  pointer-events: none;
 }
 
 /* When sidebar is collapsed - main content expands */
 .app .main-content.sidebar-collapsed {
-  width: calc(100vw - 80px); /* More space when sidebar is collapsed */
-  max-width: calc(100vw - 80px);
-  padding-left: 3rem; /* More padding when sidebar is collapsed */
-  padding-right: 3rem;
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100vw - var(--sidebar-collapsed-width));
+  max-width: calc(100vw - var(--sidebar-collapsed-width));
+  padding-left: calc(var(--content-padding) + var(--content-gap));
+  padding-right: calc(var(--content-padding) + var(--content-gap));
+}
+
+.app .main-content.sidebar-collapsed::before {
+  left: calc(-var(--content-gap) - (var(--sidebar-width) - var(--sidebar-collapsed-width)));
+  width: calc(var(--content-gap) + (var(--sidebar-width) - var(--sidebar-collapsed-width)));
 }
 
 /* Additional spacing for collapsed sidebar state */
@@ -96,6 +123,50 @@
   width: 100% !important; /* Use full available width */
   margin-left: 0 !important; /* Remove auto margins */
   margin-right: 0 !important;
+}
+
+/* Ensure all page containers use the new responsive layout */
+.main-content .reader-home,
+.main-content .reader-search,
+.main-content .reader-my-books,
+.main-content .reader-reservations,
+.main-content .reader-fines,
+.main-content .reader-history,
+.main-content .reader-profile,
+.main-content .librarian-dashboard,
+.main-content .fine-management,
+.main-content .librarian-reports,
+.main-content .book-status-management,
+.main-content .reservation-management,
+.main-content .violation-management,
+.main-content .book-reservation-management,
+.main-content .accountant-dashboard,
+.main-content .financial-transactions,
+.main-content .purchase-proposals,
+.main-content .purchase-orders,
+.main-content .supplier-management,
+.main-content .financial-reports,
+.main-content .warehouse-dashboard,
+.main-content .inventory-management,
+.main-content .stock-reports,
+.main-content .book-imports,
+.main-content .inventory-checks,
+.main-content .manager-dashboard,
+.main-content .director-dashboard,
+.main-content .technician-dashboard,
+.main-content .modern-dashboard,
+.main-content .book-management,
+.main-content .reader-management,
+.main-content .borrow-management,
+.main-content .user-management,
+.main-content .system-settings,
+.main-content .backup-management {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* Override common container constraints */
@@ -264,14 +335,16 @@
 /* Responsive design for tablets */
 @media (max-width: 1024px) {
   .main-content {
-    width: calc(100vw - 80px); /* Always use collapsed width on tablets */
-    max-width: calc(100vw - 80px);
-    padding: 1.5rem 2rem; /* Balanced padding for tablets */
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100vw - var(--sidebar-collapsed-width));
+    max-width: calc(100vw - var(--sidebar-collapsed-width));
+    padding: 1.5rem 2rem;
   }
   
   .app .main-content.sidebar-collapsed {
-    width: calc(100vw - 80px);
-    max-width: calc(100vw - 80px);
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100vw - var(--sidebar-collapsed-width));
+    max-width: calc(100vw - var(--sidebar-collapsed-width));
     padding: 1.5rem 2rem;
   }
   
@@ -306,14 +379,19 @@
 @media (max-width: 768px) {
   .main-content {
     padding: 1rem;
-    width: 100vw; /* Full width on mobile */
+    width: 100vw;
     max-width: 100vw;
     margin-left: 0;
   }
 
   .app .main-content.sidebar-collapsed {
-    width: 100vw; /* Full width on mobile even when collapsed */
+    width: 100vw;
     max-width: 100vw;
+    margin-left: 0;
+  }
+
+  .main-content::before {
+    display: none;
   }
 
   .stats-grid {
@@ -376,34 +454,34 @@
 /* Better responsive behavior for larger screens */
 @media (min-width: 1200px) {
   .main-content {
-    padding: 2rem 3rem; /* Even more padding on very large screens */
+    padding: 2rem 3rem;
   }
   
   .app .main-content.sidebar-collapsed {
-    padding-left: 4rem; /* More padding when sidebar is collapsed on large screens */
-    padding-right: 4rem;
+    padding-left: calc(3rem + var(--content-gap));
+    padding-right: calc(3rem + var(--content-gap));
   }
 }
 
 @media (min-width: 1400px) {
   .main-content {
-    padding: 2.5rem 4rem; /* More padding for very large screens */
+    padding: 2.5rem 4rem;
   }
   
   .app .main-content.sidebar-collapsed {
-    padding-left: 5rem; /* More padding when sidebar is collapsed on very large screens */
-    padding-right: 5rem;
+    padding-left: calc(4rem + var(--content-gap));
+    padding-right: calc(4rem + var(--content-gap));
   }
 }
 
 @media (min-width: 1600px) {
   .main-content {
-    padding: 3rem 5rem; /* Maximum padding for ultra large screens */
+    padding: 3rem 5rem;
   }
   
   .app .main-content.sidebar-collapsed {
-    padding-left: 6rem; /* Maximum padding when sidebar is collapsed on ultra large screens */
-    padding-right: 6rem;
+    padding-left: calc(5rem + var(--content-gap));
+    padding-right: calc(5rem + var(--content-gap));
   }
 }
 

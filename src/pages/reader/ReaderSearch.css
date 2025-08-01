@@ -1,7 +1,7 @@
 .reader-search {
-  padding-left: 280px;
-  background: #f8fafc;
-  min-height: 100vh;
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
 }
 
 .page-header {

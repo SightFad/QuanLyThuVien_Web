@@ -1,5 +1,7 @@
 .reader-my-books {
-  padding-left: 280px;
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Tab Navigation */

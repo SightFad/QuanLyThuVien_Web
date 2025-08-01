@@ -1,6 +1,8 @@
 /* Fine Management Styles */
 .fine-management {
-  padding: 20px;
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
   background: #f8f9fa;
   min-height: 100vh;
 }

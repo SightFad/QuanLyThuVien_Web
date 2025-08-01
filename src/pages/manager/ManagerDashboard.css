@@ -1,8 +1,8 @@
 /* CSS cho trang ManagerDashboard */
 .manager-dashboard {
-  padding: 24px;
+  /* Remove fixed padding-left to use the new responsive layout */
   width: 100%;
-  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .page-header {

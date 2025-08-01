@@ -1,7 +1,8 @@
 /* CSS cho trang BackupManagement */
 .backup-management {
-  padding: 24px;
+  /* Remove fixed padding-left to use the new responsive layout */
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 

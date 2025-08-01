@@ -1,5 +1,7 @@
 .reader-home {
-  padding-left: 280px;
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
 }
 
 .page-header {
@@ -346,7 +348,7 @@
 
 @media (max-width: 768px) {
   .reader-home {
-    padding-left: 0;
+    /* No fixed padding on mobile - uses the new responsive layout */
   }
   
   .reader-info-card {

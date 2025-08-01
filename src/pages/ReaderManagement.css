@@ -1,10 +1,7 @@
 .reader-management {
-  padding: 2rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  min-height: 100vh;
-  margin-left: 280px;
-  width: calc(100% - 280px);
-  overflow-x: auto;
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
 }
 
 .page-header {

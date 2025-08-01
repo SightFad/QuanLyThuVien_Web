@@ -1,9 +1,7 @@
 .librarian-dashboard {
-  padding: 20px;
-  background-color: #f5f5f5;
-  min-height: 100vh;
-  margin-left: 280px; /* Tránh bị che bởi sidebar */
-  width: calc(100% - 280px); /* Điều chỉnh width */
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
 }
 
 .dashboard-header {

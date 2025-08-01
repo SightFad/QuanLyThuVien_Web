@@ -1,8 +1,6 @@
 /* Modern Dashboard Styles */
 .modern-dashboard {
-  padding: var(--space-6);
-  background: var(--color-background);
-  min-height: 100vh;
+  /* Remove fixed padding-left to use the new responsive layout */
   width: 100%;
   max-width: 100%;
 }

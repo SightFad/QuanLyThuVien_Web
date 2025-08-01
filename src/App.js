@@ -53,6 +53,7 @@ import DirectorDashboard from './pages/director/DirectorDashboard';
 import TechnicianDashboard from './pages/technician/TechnicianDashboard';
 
 import './App.css';
+import './styles/responsive-layout.css';
 
 function App() {
   const [user, setUser] = useState(null);

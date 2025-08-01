@@ -1,7 +1,7 @@
 .technician-dashboard {
-  padding: 2rem;
-  background: #f8f9fa;
-  min-height: 100vh;
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
 }
 
 .dashboard-header {
