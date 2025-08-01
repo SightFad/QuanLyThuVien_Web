@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ModernSidebar from './components/ModernSidebar';
 import LoginModal from './components/LoginModal';
+import AuthTest from './components/AuthTest';
 import ModernDashboard from './pages/ModernDashboard';
 import BookManagement from './pages/BookManagement';
 import ReaderManagement from './pages/ReaderManagement';
@@ -54,6 +55,7 @@ import TechnicianDashboard from './pages/technician/TechnicianDashboard';
 
 import './App.css';
 import './styles/responsive-layout.css';
+import './styles/layout-components.css';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -166,6 +168,8 @@ function App() {
                     )}
                   </ProtectedRoute>
                 } />
+                
+                <Route path="/auth-test" element={<AuthTest />} />
                 
                 <Route path="/admin" element={
                   <ProtectedRoute allowedRoles={['Quản trị viên']}>

@@ -27,13 +27,24 @@ else
 // Add JWT Service
 builder.Services.AddScoped<JwtService>();
 
+// Add other services
+builder.Services.AddScoped<BookProposalService>();
+builder.Services.AddScoped<BookReservationService>();
+builder.Services.AddScoped<BaoCaoService>();
+builder.Services.AddScoped<ViolationService>();
+
 // Add JWT Authentication (simplified for testing)
+var jwtKey = builder.Configuration["Jwt:Key"];
+Console.WriteLine($"JWT Key: {jwtKey}");
+Console.WriteLine($"JWT Key Length: {jwtKey?.Length}");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey)),
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = false
@@ -95,6 +106,12 @@ app.MapControllers();
                         new NguoiDung
                         {
                             TenDangNhap = "reader",
+                            MatKhau = "reader123",
+                            ChucVu = "Độc giả"
+                        },
+                        new NguoiDung
+                        {
+                            TenDangNhap = "reader1",
                             MatKhau = "reader123",
                             ChucVu = "Độc giả"
                         },

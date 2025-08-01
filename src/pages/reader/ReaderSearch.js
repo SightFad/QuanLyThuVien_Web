@@ -373,27 +373,76 @@ const ReaderSearch = () => {
     }
   };
 
-  const handleRequestBorrow = (bookId) => {
-    alert(`Đã gửi yêu cầu mượn sách ID: ${bookId}. Vui lòng chờ xác nhận từ thủ thư.`);
-  };
-
   const handleReserveBook = async (bookId) => {
     try {
       setReserving(prev => ({ ...prev, [bookId]: true }));
       
-      await reservationService.createReservation(bookId);
-      showToast('Đặt trước sách thành công!', 'success');
+      // Lấy thông tin độc giả từ context hoặc localStorage
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const docGiaId = currentUser.maDG || 1; // Fallback cho demo
       
-      // Cập nhật trạng thái sách trong danh sách
-      setBooks(prev => prev.map(book => 
-        book.id === bookId 
-          ? { ...book, hasReservation: true }
-          : book
-      ));
+      // Kiểm tra sách có sẵn không
+      const book = books.find(b => b.id === bookId);
+      if (!book) {
+        showToast('Không tìm thấy thông tin sách', 'error');
+        return;
+      }
+
+      if (book.available > 0) {
+        // Sách có sẵn - Tạo phiếu đặt mượn
+        const result = await reservationService.createBorrowTicket(docGiaId, bookId);
+        showToast(result.message, 'success');
+        
+        // Cập nhật trạng thái sách trong danh sách
+        setBooks(prev => prev.map(book => 
+          book.id === bookId 
+            ? { ...book, available: book.available - 1, hasReservation: true }
+            : book
+        ));
+      } else {
+        // Sách không có sẵn - Tạo đặt trước
+        const result = await reservationService.createReservation(docGiaId, bookId);
+        showToast(result.message, 'success');
+        
+        // Cập nhật trạng thái sách trong danh sách
+        setBooks(prev => prev.map(book => 
+          book.id === bookId 
+            ? { ...book, hasReservation: true }
+            : book
+        ));
+      }
     } catch (error) {
       showToast(error.message, 'error');
     } finally {
       setReserving(prev => ({ ...prev, [bookId]: false }));
+    }
+  };
+
+  // Kiểm tra điều kiện đặt mượn trước khi hiển thị nút
+  const checkBorrowConditions = async (bookId) => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const docGiaId = currentUser.maDG || 1;
+      
+      const result = await reservationService.checkBorrowConditions(docGiaId, bookId);
+      return result.success;
+    } catch (error) {
+      console.error('Lỗi kiểm tra điều kiện:', error);
+      return false;
+    }
+  };
+
+  // Lấy thông tin hàng đợi cho sách
+  const getQueueInfo = async (bookId) => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const docGiaId = currentUser.maDG || 1;
+      
+      const result = await reservationService.getQueueInfo(bookId, docGiaId);
+      return result;
+    } catch (error) {
+      console.error('Lỗi lấy thông tin hàng đợi:', error);
+      return { position: 0, total: 0 };
     }
   };
 
@@ -815,9 +864,11 @@ const ReaderSearch = () => {
                   {book.available > 0 ? (
                     <button
                       className="btn btn-primary"
-                      onClick={() => handleRequestBorrow(book.id)}
+                      onClick={() => handleReserveBook(book.id)}
+                      disabled={reserving[book.id]}
                     >
-                      Yêu cầu mượn
+                      <FaClock />
+                      {reserving[book.id] ? 'Đang đặt trước...' : 'Yêu cầu mượn'}
                     </button>
                   ) : (
                     <div className="book-actions-buttons">

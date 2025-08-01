@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaBook, FaUsers, FaExchangeAlt, FaClock, FaExclamationTriangle, FaFileAlt } from 'react-icons/fa';
-import { apiRequest } from '../../config/api';
+import { authenticatedRequest } from '../../config/api';
 import './LibrarianDashboard.css';
 
 const LibrarianDashboard = () => {
@@ -13,6 +13,7 @@ const LibrarianDashboard = () => {
     todayBorrows: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
@@ -20,17 +21,25 @@ const LibrarianDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const data = await apiRequest('/api/Dashboard/summary');
-      setStats({
-        totalBooks: data.totalBooks || 0,
-        totalReaders: data.totalReaders || 0,
-        booksBorrowed: data.booksBorrowed || 0,
-        booksOverdue: data.booksOverdue || 0,
-        pendingReturns: data.pendingReturns || 0,
-        todayBorrows: data.todayBorrows || 0
-      });
+      setLoading(true);
+      setError('');
+      
+      const data = await authenticatedRequest('/api/Dashboard/summary');
+      
+      if (data) {
+        setStats({
+          totalBooks: data.totalBooks || 0,
+          totalReaders: data.totalReaders || 0,
+          booksBorrowed: data.booksBorrowed || 0,
+          booksOverdue: data.booksOverdue || 0,
+          pendingReturns: data.pendingReturns || 0,
+          todayBorrows: data.todayBorrows || 0
+        });
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setError('Không thể tải dữ liệu dashboard. Vui lòng thử lại.');
+      
       // Fallback data
       setStats({
         totalBooks: 0,

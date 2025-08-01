@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaBook, FaFilter } from 'react-icons/fa';
-import { apiRequest } from '../config/api';
+import { authenticatedRequest } from '../config/api';
 import BookCard from '../components/BookCard';
 import './BookManagement.css';
 
@@ -29,12 +29,17 @@ const BookManagement = () => {
   const fetchBooks = async () => {
     try {
       setLoading(true);
-      const data = await apiRequest('/api/Book');
-      setBooks(data);
-      setFilteredBooks(data);
+      setError('');
+      
+      const data = await authenticatedRequest('/api/Book');
+      
+      if (data) {
+        setBooks(data);
+        setFilteredBooks(data);
+      }
     } catch (err) {
       console.error('Error fetching books:', err);
-      setError('Không thể tải danh sách sách');
+      setError('Không thể tải danh sách sách. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -81,7 +86,7 @@ const BookManagement = () => {
     }
 
     try {
-      await apiRequest(`/api/Book/${bookId}`, { method: 'DELETE' });
+      await authenticatedRequest(`/api/Book/${bookId}`, { method: 'DELETE' });
       fetchBooks();
     } catch (err) {
       alert('Không thể xóa sách');
@@ -90,7 +95,7 @@ const BookManagement = () => {
 
   const handleBorrowBook = async (book) => {
     try {
-      await apiRequest(`/api/Book/${book.maSach}`, {
+      await authenticatedRequest(`/api/Book/${book.maSach}`, {
         method: 'PUT',
         body: JSON.stringify({
           ...book,
@@ -105,7 +110,7 @@ const BookManagement = () => {
 
   const handleReserveBook = async (book) => {
     try {
-      await apiRequest(`/api/Book/${book.maSach}`, {
+      await authenticatedRequest(`/api/Book/${book.maSach}`, {
         method: 'PUT',
         body: JSON.stringify({
           ...book,

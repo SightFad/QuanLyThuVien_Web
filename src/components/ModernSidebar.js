@@ -87,14 +87,9 @@ const ModernSidebar = ({ userRole = 'Admin', onLogout, onToggle, isMobileOpen, o
   };
 
   const getMenuItems = () => {
-    const baseItems = [
-      { path: '/', icon: <FaHome />, label: 'Trang chủ', roles: ['*'] }
-    ];
-
     switch (userRole) {
       case 'Quản trị viên':
         return [
-          ...baseItems,
           { path: '/admin', icon: <FaChartBar />, label: 'Dashboard', roles: ['Quản trị viên'] },
           { path: '/books', icon: <FaBook />, label: 'Quản lý sách', roles: ['Quản trị viên', 'Thủ thư', 'Trưởng thư viện'] },
           { path: '/readers', icon: <FaUsers />, label: 'Quản lý độc giả', roles: ['Quản trị viên', 'Thủ thư', 'Trưởng thư viện'] },
@@ -153,7 +148,6 @@ const ModernSidebar = ({ userRole = 'Admin', onLogout, onToggle, isMobileOpen, o
 
       case 'Trưởng thư viện':
         return [
-          ...baseItems,
           { path: '/manager/dashboard', icon: <FaChartBar />, label: 'Dashboard', roles: ['Trưởng thư viện'] },
           { path: '/manager/reports', icon: <FaChartBar />, label: 'Báo cáo', roles: ['Trưởng thư viện'] },
           { path: '/manager/approvals', icon: <FaCheckCircle />, label: 'Phê duyệt', roles: ['Trưởng thư viện'] }
@@ -161,7 +155,6 @@ const ModernSidebar = ({ userRole = 'Admin', onLogout, onToggle, isMobileOpen, o
 
       case 'Giám đốc':
         return [
-          ...baseItems,
           { path: '/director/dashboard', icon: <FaChartBar />, label: 'Dashboard', roles: ['Giám đốc'] },
           { path: '/books', icon: <FaBook />, label: 'Quản lý sách', roles: ['Giám đốc'] },
           { path: '/readers', icon: <FaUsers />, label: 'Quản lý độc giả', roles: ['Giám đốc'] },
@@ -171,14 +164,13 @@ const ModernSidebar = ({ userRole = 'Admin', onLogout, onToggle, isMobileOpen, o
 
       case 'Kỹ thuật viên':
         return [
-          ...baseItems,
           { path: '/technician/dashboard', icon: <FaChartBar />, label: 'Dashboard', roles: ['Kỹ thuật viên'] },
           { path: '/system/settings', icon: <FaCog />, label: 'Cài đặt hệ thống', roles: ['Kỹ thuật viên'] },
           { path: '/system/backup', icon: <FaDatabase />, label: 'Sao lưu dữ liệu', roles: ['Kỹ thuật viên'] }
         ];
 
       default:
-        return baseItems;
+        return [];
     }
   };
 

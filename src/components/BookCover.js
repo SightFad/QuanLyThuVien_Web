@@ -26,7 +26,8 @@ const BookCover = ({ src, alt, title, className = '' }) => {
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     const initials = title ? title.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2) : 'BK';
     
-    return `data:image/svg+xml;base64,${btoa(`
+    // Use encodeURIComponent to handle Unicode characters properly
+    const svgString = `
       <svg width="200" height="300" xmlns="http://www.w3.org/2000/svg">
         <rect width="200" height="300" fill="${randomColor}"/>
         <text x="100" y="150" font-family="Arial, sans-serif" font-size="48" 
@@ -38,7 +39,11 @@ const BookCover = ({ src, alt, title, className = '' }) => {
           ${title || 'Book Cover'}
         </text>
       </svg>
-    `)}`;
+    `;
+    
+    // Use encodeURIComponent to handle Unicode characters, then btoa
+    const encodedSvg = btoa(unescape(encodeURIComponent(svgString)));
+    return `data:image/svg+xml;base64,${encodedSvg}`;
   };
 
   return (

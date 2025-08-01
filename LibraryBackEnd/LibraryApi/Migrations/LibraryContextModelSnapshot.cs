@@ -18,17 +18,19 @@ namespace LibraryApi.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.7")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("LibraryApi.Models.BaoCao", b =>
                 {
                     b.Property<int>("MaBaoCao")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaBaoCao"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<byte[]>("FilePDF")
                         .IsRequired()
@@ -47,16 +49,17 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("MaBaoCao");
 
-                    b.ToTable("BaoCaos");
+                    b.ToTable("BaoCaos", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.BaoCaoViPham", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("GhiChu")
                         .IsRequired()
@@ -113,7 +116,7 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BaoCaoViPhams");
+                    b.ToTable("BaoCaoViPhams", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.CT_KiemKe", b =>
@@ -145,7 +148,7 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("SachMaSach");
 
-                    b.ToTable("CT_KiemKe");
+                    b.ToTable("CT_KiemKe", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.CT_PhieuMuon", b =>
@@ -160,7 +163,7 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaSach");
 
-                    b.ToTable("CT_PhieuMuons");
+                    b.ToTable("CT_PhieuMuons", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.CT_PhieuTra", b =>
@@ -188,16 +191,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaSach");
 
-                    b.ToTable("CT_PhieuTras");
+                    b.ToTable("CT_PhieuTras", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.ChiTietDeXuatMuaSach", b =>
                 {
                     b.Property<int>("MaChiTiet")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaChiTiet"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("DonGia")
                         .HasColumnType("decimal(18,2)");
@@ -250,16 +254,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaDeXuat");
 
-                    b.ToTable("ChiTietDeXuatMuaSachs");
+                    b.ToTable("ChiTietDeXuatMuaSachs", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.ChiTietPhieuKiemKe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("ChenhLech")
                         .HasColumnType("int");
@@ -291,16 +296,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("PhieuKiemKeId");
 
-                    b.ToTable("ChiTietPhieuKiemKes");
+                    b.ToTable("ChiTietPhieuKiemKes", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.ChiTietPhieuNhapKho", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("DonGia")
                         .HasColumnType("decimal(18,2)");
@@ -328,16 +334,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("PhieuNhapKhoId");
 
-                    b.ToTable("ChiTietPhieuNhapKhos");
+                    b.ToTable("ChiTietPhieuNhapKhos", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.DocGia", b =>
                 {
                     b.Property<int>("MaDG")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDG"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CapBac")
                         .IsRequired()
@@ -414,16 +421,17 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("MaDG");
 
-                    b.ToTable("DocGias");
+                    b.ToTable("DocGias", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.NguoiDung", b =>
                 {
                     b.Property<int>("MaND")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaND"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ChucVu")
                         .IsRequired()
@@ -442,16 +450,17 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("MaND");
 
-                    b.ToTable("NguoiDungs");
+                    b.ToTable("NguoiDungs", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.NhatKyHoatDong", b =>
                 {
                     b.Property<int>("MaNK")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaNK"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("HanhDong")
                         .IsRequired()
@@ -467,16 +476,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaND");
 
-                    b.ToTable("NhatKyHoatDongs");
+                    b.ToTable("NhatKyHoatDongs", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhanHoiNCC", b =>
                 {
                     b.Property<int>("MaPhieu")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieu"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime?>("NgayGiaoDuKien")
                         .HasColumnType("datetime2");
@@ -494,16 +504,17 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("MaPhieu");
 
-                    b.ToTable("PhanHoiNCCs");
+                    b.ToTable("PhanHoiNCCs", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuCapQuyen", b =>
                 {
                     b.Property<int>("MaPhieuQuyen")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuQuyen"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("MaND")
                         .HasColumnType("int");
@@ -519,16 +530,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaND");
 
-                    b.ToTable("PhieuCapQuyens");
+                    b.ToTable("PhieuCapQuyens", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuDatTruoc", b =>
                 {
                     b.Property<int>("MaPhieuDat")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuDat"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("MaDG")
                         .HasColumnType("int");
@@ -549,16 +561,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaSach");
 
-                    b.ToTable("PhieuDatTruocs");
+                    b.ToTable("PhieuDatTruocs", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuDeXuatMuaSach", b =>
                 {
                     b.Property<int>("MaDeXuat")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDeXuat"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("ChiPhiDuKien")
                         .HasColumnType("decimal(18,2)");
@@ -622,16 +635,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("SachMaSach");
 
-                    b.ToTable("PhieuDeXuatMuaSachs");
+                    b.ToTable("PhieuDeXuatMuaSachs", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuGiaHan", b =>
                 {
                     b.Property<int>("MaGiaHan")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaGiaHan"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("GhiChu")
                         .IsRequired()
@@ -690,16 +704,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaSach");
 
-                    b.ToTable("PhieuGiaHans");
+                    b.ToTable("PhieuGiaHans", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuKiemKe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("GhiChu")
                         .HasMaxLength(500)
@@ -731,16 +746,17 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PhieuKiemKes");
+                    b.ToTable("PhieuKiemKes", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuMuon", b =>
                 {
                     b.Property<int>("MaPhieuMuon")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuMuon"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("DocGiaMaDG")
                         .HasColumnType("int");
@@ -781,16 +797,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaDG");
 
-                    b.ToTable("PhieuMuon");
+                    b.ToTable("PhieuMuon", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuNhapKho", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("GhiChu")
                         .HasMaxLength(500)
@@ -825,16 +842,17 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PhieuNhapKhos");
+                    b.ToTable("PhieuNhapKhos", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuPhat", b =>
                 {
                     b.Property<int>("MaPhieuPhat")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuPhat"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("LoaiPhat")
                         .IsRequired()
@@ -853,16 +871,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaDG");
 
-                    b.ToTable("PhieuPhats");
+                    b.ToTable("PhieuPhats", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuThu", b =>
                 {
                     b.Property<int>("MaPhieuThu")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuThu"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("BaoCaoViPhamId")
                         .HasColumnType("int");
@@ -950,16 +969,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("SachMaSach");
 
-                    b.ToTable("PhieuThus");
+                    b.ToTable("PhieuThus", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.PhieuTra", b =>
                 {
                     b.Property<int>("MaPhieuTra")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuTra"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("MaDG")
                         .HasColumnType("int");
@@ -980,16 +1000,17 @@ namespace LibraryApi.Migrations
 
                     b.HasIndex("MaPhieuMuon");
 
-                    b.ToTable("PhieuTras");
+                    b.ToTable("PhieuTras", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.Sach", b =>
                 {
                     b.Property<int>("MaSach")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaSach"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AnhBia")
                         .IsRequired()
@@ -1034,16 +1055,17 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("MaSach");
 
-                    b.ToTable("Saches");
+                    b.ToTable("Saches", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.TheThuVien", b =>
                 {
                     b.Property<int>("MaThe")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaThe"));
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1L)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("LoaiThe")
                         .IsRequired()
@@ -1067,7 +1089,7 @@ namespace LibraryApi.Migrations
                     b.HasIndex("MaDG")
                         .IsUnique();
 
-                    b.ToTable("TheThuViens");
+                    b.ToTable("TheThuViens", (string)null);
                 });
 
             modelBuilder.Entity("LibraryApi.Models.CT_KiemKe", b =>

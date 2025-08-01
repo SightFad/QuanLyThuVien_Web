@@ -1,327 +1,265 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { FaCalendarAlt, FaBook, FaClock, FaCheck, FaTimes, FaSearch, FaFilter, FaSync } from 'react-icons/fa';
-import { usePagination, useToast } from '../../hooks';
-import reservationService from '../../services/reservationService';
+import React, { useState, useEffect } from 'react';
 import { 
-  Button, 
-  Input, 
-  Select, 
-  Table, 
-  Modal, 
-  Card,
-  Badge,
-  Pagination,
-  PageLoading
-} from '../../components/shared';
+  FaClock, 
+  FaCheckCircle, 
+  FaTimes, 
+  FaBook, 
+  FaUser, 
+  FaCalendar,
+  FaMapMarkerAlt,
+  FaTrash,
+  FaEye
+} from 'react-icons/fa';
+import { useToast } from '../../hooks';
+import reservationService from '../../services/reservationService';
 import './ReaderReservations.css';
 
 const ReaderReservations = () => {
   const [reservations, setReservations] = useState([]);
+  const [borrowTickets, setBorrowTickets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState(null);
-  const [cancelling, setCancelling] = useState(false);
+  const [activeTab, setActiveTab] = useState('reservations');
+  const [cancelling, setCancelling] = useState({});
   
   const { showToast } = useToast();
 
-  // Lọc đặt trước theo tìm kiếm và trạng thái
-  const filteredReservations = useMemo(() => {
-    return reservations.filter(reservation => {
-      const matchesSearch = reservation.sach?.tenSach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           reservation.sach?.tacGia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           reservation.sach?.maSach?.toString().includes(searchTerm) ||
-                           reservation.docGia?.hoTen?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = !statusFilter || reservation.trangThai === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
-  }, [reservations, searchTerm, statusFilter]);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  // Phân trang
-  const {
-    currentData: paginatedReservations,
-    currentPage,
-    totalPages,
-    totalItems,
-    itemsPerPage,
-    goToPage
-  } = usePagination(filteredReservations, 10);
-
-  // Cấu hình columns cho Table
-  const columns = useMemo(() => [
-    {
-      key: 'docGia.maDG',
-      title: 'Mã thành viên',
-      width: '120px',
-      render: (_, reservation) => reservation.docGia?.maDG || '-'
-    },
-    {
-      key: 'docGia.hoTen',
-      title: 'Họ tên',
-      width: '150px',
-      render: (_, reservation) => reservation.docGia?.hoTen || '-'
-    },
-    {
-      key: 'sach.maSach',
-      title: 'Mã sách',
-      width: '100px',
-      render: (_, reservation) => reservation.sach?.maSach || '-'
-    },
-    {
-      key: 'sach.tenSach',
-      title: 'Tên sách',
-      width: '250px',
-      render: (_, reservation) => reservation.sach?.tenSach || '-'
-    },
-    {
-      key: 'ngayDat',
-      title: 'Ngày đặt trước',
-      width: '150px',
-      render: (value) => value ? new Date(value).toLocaleDateString('vi-VN') : '-'
-    },
-    {
-      key: 'trangThai',
-      title: 'Trạng thái',
-      width: '150px',
-      render: (value) => {
-        const statusConfig = {
-          'Đang chờ': { label: 'Chờ xử lý', variant: 'warning' },
-          'Đã thông báo': { label: 'Đã thông báo', variant: 'info' },
-          'Đã hủy': { label: 'Đã hủy', variant: 'danger' },
-          'Đã nhận': { label: 'Đã nhận', variant: 'success' }
-        };
-        
-        const config = statusConfig[value] || { label: value, variant: 'default' };
-        return <Badge variant={config.variant}>{config.label}</Badge>;
-      }
-    },
-    {
-      key: 'actions',
-      title: 'Thao tác',
-      width: '120px',
-      render: (_, reservation) => (
-        <div className="action-buttons">
-          {reservation.trangThai === 'Đang chờ' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<FaTimes />}
-              onClick={() => handleCancelReservation(reservation)}
-              title="Hủy đặt trước"
-              className="action-button-cancel"
-            />
-          )}
-        </div>
-      )
-    }
-  ], []);
-
-  // Load dữ liệu đặt trước
-  const loadReservations = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const data = await reservationService.getMyReservations();
-      setReservations(data);
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const docGiaId = currentUser.maDG || 1;
+
+      // Load đặt trước
+      const reservationsData = await reservationService.getMyReservations(docGiaId);
+      setReservations(reservationsData);
+
+      // Load phiếu mượn (cần tạo API riêng)
+      // const borrowData = await borrowService.getMyBorrows(docGiaId);
+      // setBorrowTickets(borrowData);
+
     } catch (error) {
-      showToast(error.message, 'error');
+      showToast('Lỗi khi tải dữ liệu', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  // Hủy đặt trước
-  const handleCancelReservation = (reservation) => {
-    setSelectedReservation(reservation);
-    setShowCancelModal(true);
-  };
-
-  // Xác nhận hủy đặt trước
-  const handleConfirmCancel = async () => {
-    if (!selectedReservation) return;
-
+  const handleCancelReservation = async (reservationId) => {
     try {
-      setCancelling(true);
-      await reservationService.cancelReservation(selectedReservation.id);
-      showToast('Hủy đặt trước thành công', 'success');
-      await loadReservations();
-      setShowCancelModal(false);
-      setSelectedReservation(null);
+      setCancelling(prev => ({ ...prev, [reservationId]: true }));
+      
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const docGiaId = currentUser.maDG || 1;
+
+      const result = await reservationService.cancelReservation(reservationId, docGiaId);
+      showToast(result.message, 'success');
+      
+      // Cập nhật danh sách
+      setReservations(prev => prev.filter(r => r.maPhieuDat !== reservationId));
     } catch (error) {
       showToast(error.message, 'error');
     } finally {
-      setCancelling(false);
+      setCancelling(prev => ({ ...prev, [reservationId]: false }));
     }
   };
 
-  // Đóng modal
-  const handleCloseModal = () => {
-    setShowCancelModal(false);
-    setSelectedReservation(null);
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'Đang chờ':
+        return <span className="badge badge-warning">Đang chờ</span>;
+      case 'Đã xử lý':
+        return <span className="badge badge-success">Đã xử lý</span>;
+      case 'Quá hạn':
+        return <span className="badge badge-danger">Quá hạn</span>;
+      default:
+        return <span className="badge badge-secondary">{status}</span>;
+    }
   };
 
-  // Làm mới dữ liệu
-  const handleRefresh = () => {
-    loadReservations();
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
-
-  // Load dữ liệu khi component mount
-  useEffect(() => {
-    loadReservations();
-  }, []);
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <PageLoading size="lg" text="Đang tải danh sách đặt trước..." />
+      <div className="reader-reservations">
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>Đang tải dữ liệu...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="reader-reservations">
-      {/* Header */}
       <div className="page-header">
-        <div className="header-content">
-          <h1 className="page-title">Phiếu đặt trước sách</h1>
-          <p className="page-subtitle">
-            Quản lý các đặt trước sách của bạn
-          </p>
-        </div>
-        <Button
-          variant="primary"
-          icon={<FaSync />}
-          onClick={handleRefresh}
-          title="Làm mới"
+        <h1 className="page-title">Quản lý đặt mượn sách</h1>
+        <p className="page-subtitle">Theo dõi trạng thái đặt trước và phiếu mượn của bạn</p>
+      </div>
+
+      <div className="tabs">
+        <button 
+          className={`tab ${activeTab === 'reservations' ? 'active' : ''}`}
+          onClick={() => setActiveTab('reservations')}
         >
-          Làm mới
-        </Button>
+          <FaClock />
+          Đặt trước ({reservations.length})
+        </button>
+        <button 
+          className={`tab ${activeTab === 'borrows' ? 'active' : ''}`}
+          onClick={() => setActiveTab('borrows')}
+        >
+          <FaBook />
+          Phiếu mượn ({borrowTickets.length})
+        </button>
       </div>
 
-      {/* Filters */}
-      <Card className="filters-card">
-        <div className="filters-content">
-          <div className="search-filter">
-            <Input
-              placeholder="Tìm kiếm đặt trước..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
+      {activeTab === 'reservations' && (
+        <div className="reservations-section">
+          <h2>Danh sách đặt trước</h2>
           
-          <div className="status-filter">
-            <Select
-              placeholder="Lọc theo trạng thái"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="status-select"
-              options={[
-                { value: '', label: 'Tất cả trạng thái' },
-                { value: 'Đang chờ', label: 'Chờ xử lý' },
-                { value: 'Đã thông báo', label: 'Đã thông báo' },
-                { value: 'Đã nhận', label: 'Đã nhận' },
-                { value: 'Đã hủy', label: 'Đã hủy' }
-              ]}
-            />
-          </div>
+          {reservations.length === 0 ? (
+            <div className="empty-state">
+              <h3>Chưa có đặt trước nào</h3>
+              <p>Bạn chưa đặt trước sách nào. Hãy tìm kiếm và đặt trước sách bạn muốn mượn.</p>
+            </div>
+          ) : (
+            <div className="reservations-grid">
+              {reservations.map((reservation) => (
+                <div key={reservation.maPhieuDat} className="reservation-card">
+                  <div className="reservation-header">
+                    <div className="reservation-status">
+                      {getStatusBadge(reservation.trangThai)}
+                    </div>
+                    <div className="reservation-actions">
+                      {reservation.trangThai === 'Đang chờ' && (
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleCancelReservation(reservation.maPhieuDat)}
+                          disabled={cancelling[reservation.maPhieuDat]}
+                        >
+                          <FaTrash />
+                          {cancelling[reservation.maPhieuDat] ? 'Đang hủy...' : 'Hủy'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="book-info">
+                    <h4 className="book-title">{reservation.sach?.tenSach || 'Không có thông tin'}</h4>
+                    <div className="book-details">
+                      <div className="detail-item">
+                        <FaUser className="detail-icon" />
+                        <span>{reservation.sach?.tacGia || 'N/A'}</span>
+                      </div>
+                      <div className="detail-item">
+                        <FaBook className="detail-icon" />
+                        <span>{reservation.sach?.theLoai || 'N/A'}</span>
+                      </div>
+                      <div className="detail-item">
+                        <FaMapMarkerAlt className="detail-icon" />
+                        <span>{reservation.sach?.viTriLuuTru || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="reservation-details">
+                    <div className="detail-item">
+                      <FaCalendar className="detail-icon" />
+                      <div className="detail-content">
+                        <span className="detail-label">Ngày đặt:</span>
+                        <span className="detail-value">{formatDate(reservation.ngayDat)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {reservation.trangThai === 'Đang chờ' && (
+                    <div className="queue-info">
+                      <p className="queue-message">
+                        <FaClock />
+                        Sách hiện không có sẵn. Bạn sẽ được thông báo khi sách có sẵn.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </Card>
+      )}
 
-      {/* Statistics */}
-      <div className="statistics-grid">
-        <Card className="stat-card">
-          <div className="stat-content">
-            <h3 className="stat-title">Tổng số đặt trước</h3>
-            <p className="stat-value">{reservations.length}</p>
-          </div>
-        </Card>
-        
-        <Card className="stat-card">
-          <div className="stat-content">
-            <h3 className="stat-title">Chờ xử lý</h3>
-            <p className="stat-value stat-value-warning">
-              {reservations.filter(r => r.trangThai === 'Đang chờ').length}
-            </p>
-          </div>
-        </Card>
-        
-        <Card className="stat-card">
-          <div className="stat-content">
-            <h3 className="stat-title">Đã thông báo</h3>
-            <p className="stat-value stat-value-info">
-              {reservations.filter(r => r.trangThai === 'Đã thông báo').length}
-            </p>
-          </div>
-        </Card>
-        
-        <Card className="stat-card">
-          <div className="stat-content">
-            <h3 className="stat-title">Đã nhận</h3>
-            <p className="stat-value stat-value-success">
-              {reservations.filter(r => r.trangThai === 'Đã nhận').length}
-            </p>
-          </div>
-        </Card>
-      </div>
-
-      {/* Reservations Table */}
-      <Card className="table-card">
-        <Table
-          data={paginatedReservations}
-          columns={columns}
-          emptyMessage="Không có đặt trước nào"
-        />
-        {totalPages > 1 && (
-          <div className="table-pagination">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
-            />
-          </div>
-        )}
-      </Card>
-
-      {/* Cancel Confirmation Modal */}
-      <Modal
-        isOpen={showCancelModal}
-        onClose={handleCloseModal}
-        title="Xác nhận hủy đặt trước"
-        size="sm"
-      >
-        {selectedReservation && (
-          <div className="cancel-confirmation">
-            <p>Bạn có chắc chắn muốn hủy đặt trước sách:</p>
-            <div className="book-info">
-              <strong>{selectedReservation.sach?.tenSach}</strong>
-              <p>Tác giả: {selectedReservation.sach?.tacGia}</p>
-              <p>Ngày đặt: {new Date(selectedReservation.ngayDat).toLocaleDateString('vi-VN')}</p>
+      {activeTab === 'borrows' && (
+        <div className="borrows-section">
+          <h2>Phiếu mượn sách</h2>
+          
+          {borrowTickets.length === 0 ? (
+            <div className="empty-state">
+              <h3>Chưa có phiếu mượn nào</h3>
+              <p>Bạn chưa có phiếu mượn sách nào. Hãy tìm kiếm và mượn sách bạn cần.</p>
             </div>
-            
-            <div className="modal-actions">
-              <Button
-                variant="secondary"
-                onClick={handleCloseModal}
-                disabled={cancelling}
-              >
-                Hủy
-              </Button>
-              <Button
-                variant="danger"
-                onClick={handleConfirmCancel}
-                loading={cancelling}
-              >
-                Xác nhận hủy
-              </Button>
+          ) : (
+            <div className="borrows-grid">
+              {borrowTickets.map((borrow) => (
+                <div key={borrow.maPhieuMuon} className="borrow-card">
+                  <div className="borrow-header">
+                    <div className="borrow-status">
+                      {getStatusBadge(borrow.trangThai)}
+                    </div>
+                  </div>
+
+                  <div className="book-info">
+                    <h4 className="book-title">{borrow.sach?.tenSach || 'Không có thông tin'}</h4>
+                    <div className="book-details">
+                      <div className="detail-item">
+                        <FaUser className="detail-icon" />
+                        <span>{borrow.sach?.tacGia || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="borrow-details">
+                    <div className="detail-item">
+                      <FaCalendar className="detail-icon" />
+                      <div className="detail-content">
+                        <span className="detail-label">Ngày mượn:</span>
+                        <span className="detail-value">{formatDate(borrow.ngayMuon)}</span>
+                      </div>
+                    </div>
+                    <div className="detail-item">
+                      <FaCalendar className="detail-icon" />
+                      <div className="detail-content">
+                        <span className="detail-label">Hạn trả:</span>
+                        <span className="detail-value">{formatDate(borrow.hanTra)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {borrow.trangThai === 'borrowed' && (
+                    <div className="borrow-actions">
+                      <button className="btn btn-primary btn-sm">
+                        <FaEye />
+                        Xem chi tiết
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          </div>
-        )}
-      </Modal>
+          )}
+        </div>
+      )}
     </div>
   );
 };

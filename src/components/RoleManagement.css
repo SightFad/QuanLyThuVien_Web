@@ -1,0 +1,516 @@
+.role-management {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.role-management-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.role-management-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.role-management-header p {
+  font-size: 1.125rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.role-management-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Role Overview */
+.role-overview {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  color: white;
+}
+
+.role-overview h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.current-role-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.role-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+}
+
+.role-icon {
+  font-size: 2rem;
+  color: white;
+}
+
+.role-details {
+  flex: 1;
+}
+
+.role-description {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.role-level {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Role Hierarchy */
+.role-hierarchy {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.role-hierarchy h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.hierarchy-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hierarchy-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hierarchy-item:hover {
+  border-color: #667eea;
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+.hierarchy-item.selected {
+  border-color: #667eea;
+  background: #eff6ff;
+}
+
+.hierarchy-level {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.hierarchy-role {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.hierarchy-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.action-btn.manage {
+  background: #3b82f6;
+  color: white;
+}
+
+.action-btn.manage:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+
+.action-btn.perform {
+  background: #10b981;
+  color: white;
+}
+
+.action-btn.perform:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+/* Role Capabilities */
+.role-capabilities {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.role-capabilities h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.capabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.capability-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.capability-card h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.capability-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.capability-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+  color: #374151;
+}
+
+.no-capability {
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Role Permissions */
+.role-permissions {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.role-permissions h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.permissions-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.permission-category {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.permission-category h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.permissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.permission-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.permission-item.granted {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.permission-item.denied {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.permission-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-icon.granted {
+  color: #10b981;
+  font-size: 1rem;
+}
+
+.status-icon.denied {
+  color: #ef4444;
+  font-size: 1rem;
+}
+
+.permission-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.permission-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+}
+
+.permission-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Role Statistics */
+.role-statistics {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.role-statistics h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #667eea;
+  color: white;
+  border-radius: 12px;
+  font-size: 1.25rem;
+}
+
+.stat-content h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Role Icons */
+.role-icon.director {
+  color: #dc2626;
+}
+
+.role-icon.admin {
+  color: #ea580c;
+}
+
+.role-icon.manager {
+  color: #ca8a04;
+}
+
+.role-icon.librarian {
+  color: #16a34a;
+}
+
+.role-icon.accountant {
+  color: #0891b2;
+}
+
+.role-icon.warehouse {
+  color: #7c3aed;
+}
+
+.role-icon.technician {
+  color: #059669;
+}
+
+.role-icon.reader {
+  color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .role-management {
+    padding: 1rem;
+  }
+
+  .role-management-header h2 {
+    font-size: 2rem;
+  }
+
+  .current-role-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hierarchy-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .hierarchy-actions {
+    align-self: flex-end;
+  }
+
+  .capabilities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .permissions-container {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .role-management-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .role-overview {
+    padding: 1.5rem;
+  }
+
+  .role-hierarchy,
+  .role-capabilities,
+  .role-permissions,
+  .role-statistics {
+    padding: 1.5rem;
+  }
+
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hierarchy-item {
+    padding: 0.75rem;
+  }
+
+  .permission-item {
+    padding: 0.75rem;
+  }
+} 

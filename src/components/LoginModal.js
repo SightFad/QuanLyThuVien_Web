@@ -47,8 +47,13 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
         email: data.email
       };
       
+      // Store token and user data
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(userData));
+      
+      console.log('=== Stored Data ===');
+      console.log('Token stored:', !!data.token);
+      console.log('User data stored:', userData);
       
       onLogin(userData);
       onClose();

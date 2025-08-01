@@ -25,11 +25,26 @@ namespace LibraryApi.Controllers
             _logger = logger;
         }
 
+        [HttpGet("test")]
+        [AllowAnonymous]
+        public ActionResult<string> Test()
+        {
+            return Ok("Dashboard controller is working!");
+        }
+
         [HttpGet("summary")]
         public async Task<ActionResult<object>> GetSummary()
         {
             try
             {
+                // Debug authorization
+                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+                _logger.LogInformation($"Authorization header: {authHeader}");
+                
+                var user = User;
+                _logger.LogInformation($"User authenticated: {user.Identity?.IsAuthenticated}");
+                _logger.LogInformation($"User claims: {string.Join(", ", user.Claims.Select(c => $"{c.Type}={c.Value}"))}");
+                
                 var totalBooks = await _context.Saches.CountAsync();
                 var totalMembers = await _context.DocGias.CountAsync();
                 var totalUsers = await _context.NguoiDungs.CountAsync();

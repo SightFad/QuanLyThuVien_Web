@@ -21,6 +21,11 @@ export const apiRequest = async (endpoint, options = {}) => {
   
   const token = localStorage.getItem('token');
   
+  console.log('=== API Request Debug ===');
+  console.log('URL:', url);
+  console.log('Token exists:', !!token);
+  console.log('Token:', token ? token.substring(0, 20) + '...' : 'No token');
+  
   const defaultOptions = {
     headers: {
       'Content-Type': 'application/json',
@@ -33,14 +38,26 @@ export const apiRequest = async (endpoint, options = {}) => {
   const finalOptions = { ...defaultOptions, ...options };
 
   try {
+    console.log('Making request with options:', {
+      method: finalOptions.method || 'GET',
+      headers: finalOptions.headers,
+      body: finalOptions.body ? 'Has body' : 'No body'
+    });
+    
     const response = await fetch(url, finalOptions);
+    
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      console.error('API Error Response:', errorData);
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
     
-    return await response.json();
+    const data = await response.json();
+    console.log('API Response data:', data);
+    return data;
   } catch (error) {
     console.error('API Request Error:', error);
     throw error;
@@ -118,6 +135,66 @@ export const MOCK_DATA = {
       isbn: '978-5-432-10987-6'
     }
   ]
+};
+
+// Check if user is authenticated
+export const isAuthenticated = () => {
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  
+  if (!token || !user) {
+    return false;
+  }
+  
+  // Check if token is expired (basic check)
+  try {
+    const tokenData = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Date.now() / 1000;
+    
+    if (tokenData.exp < currentTime) {
+      console.log('Token expired, clearing authentication');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error parsing token:', error);
+    return false;
+  }
+};
+
+// Handle authentication errors
+export const handleAuthError = (error) => {
+  if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+    console.log('Authentication error detected, clearing tokens');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Redirect to login page
+    window.location.href = '/';
+    return true;
+  }
+  return false;
+};
+
+// Enhanced API request with authentication handling
+export const authenticatedRequest = async (endpoint, options = {}) => {
+  if (!isAuthenticated()) {
+    console.log('User not authenticated, redirecting to login');
+    window.location.href = '/';
+    return;
+  }
+  
+  try {
+    return await apiRequest(endpoint, options);
+  } catch (error) {
+    if (handleAuthError(error)) {
+      return;
+    }
+    throw error;
+  }
 };
 
 export default API_CONFIG; 

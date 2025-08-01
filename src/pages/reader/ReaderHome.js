@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBook, FaClock, FaCheck, FaExclamationTriangle, FaSearch, FaUser, FaCalendar, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaBook, FaClock, FaCheck, FaExclamationTriangle, FaSearch, FaUser, FaCalendar, FaMapMarkerAlt, FaInbox } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import './ReaderHome.css';
 
@@ -98,7 +98,7 @@ const ReaderHome = () => {
 
   if (loading) {
     return (
-      <div className="loading">
+      <div className="loading-container">
         <div className="spinner"></div>
       </div>
     );
@@ -106,70 +106,119 @@ const ReaderHome = () => {
 
   return (
     <div className="reader-home">
+      {/* Enhanced Page Header */}
       <div className="page-header">
-        <h1 className="page-title">Chào mừng, {readerInfo.name}!</h1>
-        <p className="page-subtitle">Quản lý sách và tìm kiếm tài liệu</p>
+        <div className="page-header-content">
+          <h1 className="page-title">Chào mừng, {readerInfo.name}!</h1>
+          <p className="page-subtitle">Quản lý sách và tìm kiếm tài liệu</p>
+        </div>
       </div>
 
-      {/* Reader Info Card */}
-      <div className="reader-info-card">
-        <div className="reader-avatar">
-          <FaUser />
-        </div>
-        <div className="reader-details">
-          <h3>{readerInfo.name}</h3>
-          <p>{readerInfo.email}</p>
-          <p>Thành viên từ: {formatDate(readerInfo.memberSince)}</p>
-        </div>
-        <div className="reader-stats">
-          <div className="stat">
-            <span className="stat-number">{readerInfo.totalBorrows}</span>
-            <span className="stat-label">TỔNG LƯỢT MƯỢN</span>
+      {/* Reader Stats Cards */}
+      <div className="stats-grid">
+        <div className="stat-card" style={{ '--stat-color': '#10b981', '--stat-color-light': '#059669', '--stat-bg': 'rgba(16, 185, 129, 0.1)' }}>
+          <div className="stat-card-header">
+            <div className="stat-icon">
+              <FaBook />
+            </div>
+            <div className="stat-content">
+              <h3>Tổng lượt mượn</h3>
+              <p className="stat-value">{readerInfo.totalBorrows}</p>
+              <p className="stat-subtitle">Sách đã mượn</p>
+            </div>
           </div>
-          <div className="stat">
-            <span className="stat-number">{readerInfo.currentBorrows}</span>
-            <span className="stat-label">ĐANG MƯỢN</span>
+        </div>
+
+        <div className="stat-card" style={{ '--stat-color': '#3b82f6', '--stat-color-light': '#2563eb', '--stat-bg': 'rgba(59, 130, 246, 0.1)' }}>
+          <div className="stat-card-header">
+            <div className="stat-icon">
+              <FaInbox />
+            </div>
+            <div className="stat-content">
+              <h3>Đang mượn</h3>
+              <p className="stat-value">{readerInfo.currentBorrows}</p>
+              <p className="stat-subtitle">Sách hiện tại</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ '--stat-color': '#f59e0b', '--stat-color-light': '#d97706', '--stat-bg': 'rgba(245, 158, 11, 0.1)' }}>
+          <div className="stat-card-header">
+            <div className="stat-icon">
+              <FaCalendar />
+            </div>
+            <div className="stat-content">
+              <h3>Thành viên từ</h3>
+              <p className="stat-value">{formatDate(readerInfo.memberSince)}</p>
+              <p className="stat-subtitle">Ngày đăng ký</p>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="content-grid">
-        {/* Current Borrows */}
+        {/* Current Borrows Section */}
         <div className="content-section">
           <div className="section-header">
             <h2 className="section-title">
               <FaBook /> Sách đang mượn
             </h2>
-            <Link to="/reader/my-books" className="btn btn-primary">
-              Xem tất cả
-            </Link>
+            <div className="section-actions">
+              <Link to="/reader/my-books" className="btn btn-primary">
+                Xem tất cả
+              </Link>
+            </div>
           </div>
           
           {currentBorrows.length > 0 ? (
-            <div className="books-grid">
+            <div className="cards-grid">
               {currentBorrows.map((book) => (
-                <div key={book.id} className="book-card">
-                  <div className="book-info">
-                    <h4>{book.bookTitle}</h4>
-                    <p className="book-author">{book.author}</p>
-                    <p className="book-category">{book.category}</p>
-                    <p className="book-location">{book.location}</p>
-                    <div className="book-dates">
-                      <p>Mượn: {formatDate(book.borrowDate)}</p>
-                      <p>Trả: {formatDate(book.returnDate)}</p>
+                <div key={book.id} className="card">
+                  <div className="card-header">
+                    <div className="card-icon">
+                      <FaBook />
+                    </div>
+                    <div>
+                      <h3 className="card-title">{book.bookTitle}</h3>
+                      <p className="text-muted mb-0">{book.author}</p>
                     </div>
                   </div>
-                  <div className="book-status">
-                    {getStatusBadge(book.status, book.daysLeft)}
-                    <p className="days-left">
-                      {book.daysLeft > 0 ? `Còn ${book.daysLeft} ngày` : `Quá hạn ${Math.abs(book.daysLeft)} ngày`}
-                    </p>
+                  <div className="card-content">
+                    <div className="flex gap-4 mb-3">
+                      <div>
+                        <p className="text-sm text-muted mb-1">Thể loại</p>
+                        <p className="font-medium">{book.category}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted mb-1">Vị trí</p>
+                        <p className="font-medium">{book.location}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4 mb-3">
+                      <div>
+                        <p className="text-sm text-muted mb-1">Ngày mượn</p>
+                        <p className="font-medium">{formatDate(book.borrowDate)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted mb-1">Ngày trả</p>
+                        <p className="font-medium">{formatDate(book.returnDate)}</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      {getStatusBadge(book.status, book.daysLeft)}
+                      <p className="text-sm text-muted">
+                        {book.daysLeft > 0 ? `Còn ${book.daysLeft} ngày` : `Quá hạn ${Math.abs(book.daysLeft)} ngày`}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="empty-state">
+              <div className="empty-state-icon">
+                <FaBook />
+              </div>
               <h3>Bạn chưa mượn sách nào</h3>
               <p>Hãy tìm kiếm và mượn sách mới!</p>
               <Link to="/reader/search" className="btn btn-primary">
@@ -179,68 +228,109 @@ const ReaderHome = () => {
           )}
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions Section */}
         <div className="content-section">
           <div className="section-header">
-            <h2 className="section-title">Thao tác nhanh</h2>
+            <h2 className="section-title">
+              <FaSearch /> Thao tác nhanh
+            </h2>
           </div>
           
-          <div className="quick-actions">
-            <Link to="/reader/search" className="action-card">
-              <FaSearch className="action-icon" />
-              <h3>Tìm kiếm sách</h3>
-              <p>Tìm kiếm sách theo tên, tác giả, thể loại</p>
+          <div className="cards-grid">
+            <Link to="/reader/search" className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="card-header">
+                <div className="card-icon">
+                  <FaSearch />
+                </div>
+                <h3 className="card-title">Tìm kiếm sách</h3>
+              </div>
+              <div className="card-content">
+                <p>Tìm kiếm sách theo tên, tác giả, thể loại</p>
+              </div>
             </Link>
             
-            <Link to="/reader/my-books" className="action-card">
-              <FaBook className="action-icon" />
-              <h3>Sách của tôi</h3>
-              <p>Xem sách đang mượn và lịch sử mượn</p>
+            <Link to="/reader/my-books" className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="card-header">
+                <div className="card-icon">
+                  <FaBook />
+                </div>
+                <h3 className="card-title">Sách của tôi</h3>
+              </div>
+              <div className="card-content">
+                <p>Xem sách đang mượn và lịch sử mượn</p>
+              </div>
             </Link>
             
-            <Link to="/reader/reservations" className="action-card">
-              <FaCalendar className="action-icon" />
-              <h3>Đặt sách</h3>
-              <p>Quản lý sách đã đặt và thông báo</p>
+            <Link to="/reader/reservations" className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="card-header">
+                <div className="card-icon">
+                  <FaCalendar />
+                </div>
+                <h3 className="card-title">Đặt sách</h3>
+              </div>
+              <div className="card-content">
+                <p>Quản lý sách đã đặt và thông báo</p>
+              </div>
             </Link>
             
-            <Link to="/reader/fines" className="action-card">
-              <FaExclamationTriangle className="action-icon" />
-              <h3>Tiền phạt</h3>
-              <p>Xem và thanh toán tiền phạt</p>
+            <Link to="/reader/fines" className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="card-header">
+                <div className="card-icon">
+                  <FaExclamationTriangle />
+                </div>
+                <h3 className="card-title">Tiền phạt</h3>
+              </div>
+              <div className="card-content">
+                <p>Xem và thanh toán tiền phạt</p>
+              </div>
             </Link>
           </div>
         </div>
 
-        {/* Recent Books */}
+        {/* Recent Books Section */}
         <div className="content-section">
           <div className="section-header">
-            <h2 className="section-title">Sách mới</h2>
-            <Link to="/reader/search" className="btn btn-secondary">
-              Xem tất cả
-            </Link>
+            <h2 className="section-title">
+              <FaBook /> Sách mới
+            </h2>
+            <div className="section-actions">
+              <Link to="/reader/search" className="btn btn-secondary">
+                Xem tất cả
+              </Link>
+            </div>
           </div>
           
-          <div className="books-grid">
+          <div className="cards-grid">
             {recentBooks.map((book) => (
-              <div key={book.id} className="book-card">
-                <div className="book-info">
-                  <h4>{book.title}</h4>
-                  <p className="book-author">{book.author}</p>
-                  <p className="book-category">{book.category}</p>
-                  <p className="book-location">{book.location}</p>
+              <div key={book.id} className="card">
+                <div className="card-header">
+                  <div className="card-icon">
+                    <FaBook />
+                  </div>
+                  <div>
+                    <h3 className="card-title">{book.title}</h3>
+                    <p className="text-muted mb-0">{book.author}</p>
+                  </div>
                 </div>
-                <div className="book-actions">
-                  <span className="availability">
-                    {book.available > 0 ? (
-                      <span className="badge badge-success">Có sẵn ({book.available})</span>
-                    ) : (
-                      <span className="badge badge-danger">Hết sách</span>
-                    )}
-                  </span>
-                  <Link to="/reader/search" className="btn btn-primary btn-sm">
-                    Xem chi tiết
-                  </Link>
+                <div className="card-content">
+                  <div className="flex gap-4 mb-3">
+                    <div>
+                      <p className="text-sm text-muted mb-1">Thể loại</p>
+                      <p className="font-medium">{book.category}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted mb-1">Vị trí</p>
+                      <p className="font-medium">{book.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="badge badge-success">
+                      Có sẵn ({book.available}/{book.total})
+                    </span>
+                    <Link to="/reader/search" className="btn btn-primary btn-sm">
+                      Xem chi tiết
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
