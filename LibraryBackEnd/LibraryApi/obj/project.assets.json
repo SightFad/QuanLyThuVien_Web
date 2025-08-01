@@ -5266,23 +5266,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Khoa\\.nuget\\packages\\": {},
-    "D:\\Work_Place\\SQLServer\\SQL_SDK\\NuGetPackages": {}
+    "C:\\Users\\lepha\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
+      "projectUniqueName": "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
       "projectName": "LibraryApi",
-      "projectPath": "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
-      "packagesPath": "C:\\Users\\Khoa\\.nuget\\packages\\",
-      "outputPath": "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\obj\\",
+      "projectPath": "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
+      "packagesPath": "C:\\Users\\lepha\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "D:\\Work_Place\\SQLServer\\SQL_SDK\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Khoa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\lepha\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -5291,7 +5291,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -5370,7 +5369,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.303/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

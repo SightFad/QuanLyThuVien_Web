@@ -144,7 +144,7 @@ const ReaderSearch = () => {
           book.publisher.toLowerCase().includes(searchLower) ||
           book.location.toLowerCase().includes(searchLower) ||
           book.description.toLowerCase().includes(searchLower) ||
-          book.publishYear.toString().includes(searchForm.searchTerm)
+          book.publishYear?.toString().includes(searchForm.searchTerm)
         );
       });
     }
@@ -173,7 +173,7 @@ const ReaderSearch = () => {
     }
 
     if (searchForm.namXuatBan && searchForm.namXuatBan !== 'Tất cả') {
-      filtered = filtered.filter(book => book.publishYear.toString() === searchForm.namXuatBan);
+      filtered = filtered.filter(book => book.publishYear?.toString() === searchForm.namXuatBan);
     }
 
     if (searchForm.nhaXuatBan && searchForm.nhaXuatBan !== 'Tất cả') {
