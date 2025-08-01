@@ -28,17 +28,15 @@ namespace LibraryApi.Controllers
             var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDangNhap == request.Username);
             if (user == null || user.MatKhau != request.Password)
                 return Unauthorized("Sai tên đăng nhập hoặc mật khẩu");
+            
             var token = _jwtService.GenerateToken(user);
-            // Map role cho frontend
-            string mappedRole = user.ChucVu switch
-            {
-                "Admin" => "Quản trị viên",
-                "Librarian" => "Thủ thư",
-                "Accountant" => "Kế toán",
-                "Reader" => "Độc giả",
-                _ => user.ChucVu
-            };
-            return Ok(new { token, username = user.TenDangNhap, role = mappedRole });
+            
+            // Return the role as is since seed data already uses Vietnamese names
+            return Ok(new { 
+                token, 
+                username = user.TenDangNhap, 
+                role = user.ChucVu
+            });
         }
 
         [HttpPost("register")]

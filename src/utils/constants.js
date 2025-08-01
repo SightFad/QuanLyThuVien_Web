@@ -19,9 +19,12 @@ export const API_ENDPOINTS = {
 // User Roles
 export const USER_ROLES = {
   ADMIN: 'Admin',
-  MANAGER: 'Quản lý',
+  DIRECTOR: 'Giám đốc',
+  LIBRARY_MANAGER: 'Trưởng thư viện',
   LIBRARIAN: 'Thủ thư',
   ACCOUNTANT: 'Kế toán',
+  ACCOUNTING_MANAGER: 'Trưởng phòng kế toán',
+  TECHNICIAN: 'Kỹ thuật viên',
   WAREHOUSE: 'Thủ kho',
   READER: 'Độc giả'
 };

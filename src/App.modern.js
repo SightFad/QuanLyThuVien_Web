@@ -26,7 +26,6 @@ const BackupManagement = React.lazy(() => import('./pages/BackupManagement'));
 const ReaderHome = React.lazy(() => import('./pages/reader/ReaderHome'));
 const ReaderSearch = React.lazy(() => import('./pages/reader/ReaderSearch'));
 const ReaderMyBooks = React.lazy(() => import('./pages/reader/ReaderMyBooks'));
-const ReaderHistory = React.lazy(() => import('./pages/reader/ReaderHistory'));
 const ReaderProfile = React.lazy(() => import('./pages/reader/ReaderProfile'));
 const ReaderReservations = React.lazy(() => import('./pages/reader/ReaderReservations'));
 const ReaderFines = React.lazy(() => import('./pages/reader/ReaderFines'));
@@ -71,7 +70,6 @@ const routeConfig = {
     { path: '/reader/search', component: ReaderSearch },
     { path: '/reader/my-books', component: ReaderMyBooks },
     { path: '/reader/reservations', component: ReaderReservations },
-    { path: '/reader/history', component: ReaderHistory },
     { path: '/reader/profile', component: ReaderProfile },
     { path: '/reader/fines', component: ReaderFines },
   ],

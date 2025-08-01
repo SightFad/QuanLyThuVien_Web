@@ -173,6 +173,7 @@ class BookService {
       price: apiBook.giaTien,
       description: apiBook.moTa,
       coverImage: apiBook.anhBia,
+      status: apiBook.trangThai,
       createdAt: apiBook.ngayTao,
       updatedAt: apiBook.ngayCapNhat,
     };
@@ -202,6 +203,7 @@ class BookService {
       giaTien: frontendBook.price,
       moTa: frontendBook.description,
       anhBia: frontendBook.coverImage,
+      trangThai: frontendBook.status,
     };
   }
 }

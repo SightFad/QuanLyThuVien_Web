@@ -8,11 +8,11 @@ import {
   FaTimes,
   FaClock,
 } from "react-icons/fa";
+import { apiRequest } from "../config/api";
 import BorrowModal from "../components/BorrowModal";
 import ReturnModal from "../components/ReturnModal";
 import RenewalModal from "../components/RenewalModal";
 import "./BorrowManagement.css";
-import { mockBorrowData } from "../data/mockData.js";
 
 const BorrowManagement = () => {
   const [borrows, setBorrows] = useState([]);
@@ -26,8 +26,7 @@ const BorrowManagement = () => {
   const [selectedBorrowForRenewal, setSelectedBorrowForRenewal] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const apiUrl =
-    "http://localhost:5280/api/PhieuMuon";
+
 
   const mapBorrowData = (borrow) => ({
     id: borrow.id,
@@ -160,7 +159,7 @@ const BorrowManagement = () => {
   };
 
   // Lưu phiếu mượn
-  const handleSaveBorrow = (borrowData) => {
+  const handleSaveBorrow = async (borrowData) => {
     if (
       !borrowData.readerId ||
       !borrowData.bookId ||
@@ -178,9 +177,9 @@ const BorrowManagement = () => {
 
     const requestData = {
       IdDocGia: borrowData.readerId,
-      TenDocGia: borrowData.readerName, // Thêm dòng này
+      TenDocGia: borrowData.readerName,
       IdSach: borrowData.bookId,
-      TenSach: borrowData.bookTitle, // Thêm dòng này
+      TenSach: borrowData.bookTitle,
       NgayMuon: borrowData.borrowDate,
       HanTra: borrowData.returnDate,
       NgayTra: borrowData.actualReturnDate || null,
@@ -188,122 +187,59 @@ const BorrowManagement = () => {
       GhiChu: borrowData.notes || "",
     };
 
-    if (editingBorrow && editingBorrow.id) {
-      // Cập nhật phiếu mượn hiện tại
-      fetch(`${apiUrl}/${editingBorrow.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...requestData, id: editingBorrow.id }),
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            throw new Error("API không khả dụng");
-          }
-        })
-        .then(() => {
-          setShowModal(false);
-          setEditingBorrow(null);
-          refreshBorrows();
-        })
-        .catch((err) => {
-          console.error("Lỗi khi cập nhật phiếu mượn, sử dụng mock data:", err);
-          // Cập nhật trong mock data
-          const updatedBorrows = borrows.map(b => 
-            b.id === editingBorrow.id 
-              ? mapBorrowData({ ...requestData, id: editingBorrow.id })
-              : b
-          );
-          setBorrows(updatedBorrows);
-          setFilteredBorrows(updatedBorrows);
-          setShowModal(false);
-          setEditingBorrow(null);
-          alert("Đã cập nhật phiếu mượn (sử dụng mock data)");
+    try {
+      if (editingBorrow && editingBorrow.id) {
+        // Cập nhật phiếu mượn hiện tại
+        await apiRequest(`/api/PhieuMuon/${editingBorrow.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ ...requestData, id: editingBorrow.id }),
         });
-    } else {
-      // Thêm phiếu mượn mới
-      fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            throw new Error("API không khả dụng");
-          }
-        })
-        .then(() => {
-          setShowModal(false);
-          setEditingBorrow(null);
-          refreshBorrows();
-        })
-        .catch((err) => {
-          console.error("Lỗi khi thêm phiếu mượn, sử dụng mock data:", err);
-          // Thêm vào mock data
-          const newBorrow = {
-            id: Date.now(),
-            ...requestData
-          };
-          const newBorrowMapped = mapBorrowData(newBorrow);
-          const updatedBorrows = [...borrows, newBorrowMapped];
-          setBorrows(updatedBorrows);
-          setFilteredBorrows(updatedBorrows);
-          setShowModal(false);
-          setEditingBorrow(null);
-          alert("Đã thêm phiếu mượn mới (sử dụng mock data)");
+      } else {
+        // Thêm phiếu mượn mới
+        await apiRequest('/api/PhieuMuon', {
+          method: "POST",
+          body: JSON.stringify(requestData),
         });
+      }
+      
+      setShowModal(false);
+      setEditingBorrow(null);
+      refreshBorrows();
+    } catch (err) {
+      console.error("Lỗi khi lưu phiếu mượn:", err);
+      alert("Có lỗi xảy ra khi lưu phiếu mượn. Vui lòng thử lại.");
     }
   };
 
-  const refreshBorrows = () => {
+  const refreshBorrows = async () => {
     setLoading(true);
-    fetch(apiUrl)
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error("API không khả dụng");
-        }
-      })
-      .then((data) => {
-        const mappedBorrows = data.map(mapBorrowData);
-        setBorrows(mappedBorrows);
-        setFilteredBorrows(mappedBorrows);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Lỗi khi tải phiếu mượn, sử dụng mock data:", err);
-        // Sử dụng mock data khi API không khả dụng
-        const mappedMockData = mockBorrowData.map(mapBorrowData);
-        setBorrows(mappedMockData);
-        setFilteredBorrows(mappedMockData);
-        setLoading(false);
-      });
+    
+    try {
+      const data = await apiRequest('/api/PhieuMuon');
+      const mappedBorrows = data.map(mapBorrowData);
+      setBorrows(mappedBorrows);
+      setFilteredBorrows(mappedBorrows);
+    } catch (err) {
+      console.error("Lỗi khi tải phiếu mượn:", err);
+      // Fallback data khi API không có sẵn
+      setBorrows([]);
+      setFilteredBorrows([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteBorrow = (borrowId) => {
+  const handleDeleteBorrow = async (borrowId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa phiếu mượn này?")) {
-      fetch(`${apiUrl}/${borrowId}`, {
-        method: "DELETE",
-      })
-        .then((res) => {
-          if (res.ok) {
-            refreshBorrows();
-          } else {
-            throw new Error("API không khả dụng");
-          }
-        })
-        .catch((err) => {
-          console.error("Lỗi khi xóa phiếu mượn, sử dụng mock data:", err);
-          // Xóa khỏi mock data
-          const updatedBorrows = borrows.filter(b => b.id !== borrowId);
-          setBorrows(updatedBorrows);
-          setFilteredBorrows(updatedBorrows);
-          alert("Đã xóa phiếu mượn (sử dụng mock data)");
+      try {
+        await apiRequest(`/api/PhieuMuon/${borrowId}`, {
+          method: "DELETE",
         });
+        refreshBorrows();
+      } catch (err) {
+        console.error("Lỗi khi xóa phiếu mượn:", err);
+        alert("Có lỗi xảy ra khi xóa phiếu mượn. Vui lòng thử lại.");
+      }
     }
   };
 

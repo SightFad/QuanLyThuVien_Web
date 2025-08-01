@@ -37,13 +37,15 @@ namespace LibraryApi.Services
             if (!check.Success)
                 return (false, check.Message, null);
             var now = DateTime.Now;
-            var ngayTraDuKien = now.AddDays(soNgayMuon);
+            var hanTra = now.AddDays(soNgayMuon);
             var phieu = new PhieuMuon
             {
                 MaDG = maDG,
                 NgayMuon = now,
-                NgayTraDuKien = ngayTraDuKien,
+                HanTra = hanTra,
+                TrangThai = "borrowed",
                 NguoiLap = "",
+                GhiChu = ghiChu ?? "",
                 CT_PhieuMuons = new List<CT_PhieuMuon>()
             };
             foreach (var maSach in maSachList)

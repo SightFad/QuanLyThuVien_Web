@@ -1,219 +1,471 @@
 import React, { useState, useEffect } from 'react';
-import { FaBook, FaUsers, FaExchangeAlt, FaChartLine } from 'react-icons/fa';
+import { 
+  FaBook, 
+  FaUsers, 
+  FaChartLine, 
+  FaExclamationTriangle,
+  FaMoneyBillWave,
+  FaCalendarAlt,
+  FaClock,
+  FaCheckCircle,
+  FaTimes,
+  FaEye,
+  FaDownload,
+  FaPrint,
+  FaBell,
+  FaSearch,
+  FaFilter,
+  FaSync,
+  FaPlus,
+  FaArrowUp,
+  FaArrowDown,
+  FaChartBar,
+  FaChartPie,
+  FaChartArea
+} from 'react-icons/fa';
+import { useToast } from '../hooks';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    totalBooks: 0,
-    totalReaders: 0,
-    booksBorrowed: 0,
-    booksOverdue: 0
-  });
-
-  const [recentBorrows, setRecentBorrows] = useState([]);
-  const [popularBooks, setPopularBooks] = useState([]);
+  const [statistics, setStatistics] = useState(null);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [topBooks, setTopBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('month');
+  
+  const { showToast } = useToast();
 
-  const apiUrl = "http://localhost:5280/api";
+  // Mock data for demonstration
+  const mockStatistics = {
+    totalBooks: 1250,
+    totalReaders: 450,
+    totalBorrows: 89,
+    totalRevenue: 2500000,
+    overdueBooks: 12,
+    pendingReservations: 8,
+    activeViolations: 5,
+    monthlyGrowth: 15.5,
+    weeklyGrowth: 8.2,
+    dailyGrowth: 2.1
+  };
+
+  const mockRecentActivities = [
+    {
+      id: 1,
+      type: 'borrow',
+      title: 'Nguyễn Văn A mượn sách "Sách Giáo Khoa Toán 12"',
+      time: '2 phút trước',
+      status: 'success',
+      icon: <FaBook />
+    },
+    {
+      id: 2,
+      type: 'return',
+      title: 'Trần Thị B trả sách "Sách Văn Học Việt Nam"',
+      time: '15 phút trước',
+      status: 'success',
+      icon: <FaCheckCircle />
+    },
+    {
+      id: 3,
+      type: 'violation',
+      title: 'Lê Văn D vi phạm trễ hạn trả sách',
+      time: '1 giờ trước',
+      status: 'warning',
+      icon: <FaExclamationTriangle />
+    },
+    {
+      id: 4,
+      type: 'reservation',
+      title: 'Phạm Thị E đặt trước sách "Sách Khoa Học Tự Nhiên"',
+      time: '2 giờ trước',
+      status: 'info',
+      icon: <FaClock />
+    },
+    {
+      id: 5,
+      type: 'revenue',
+      title: 'Thu phí mượn sách: 50,000 VNĐ',
+      time: '3 giờ trước',
+      status: 'success',
+      icon: <FaMoneyBillWave />
+    }
+  ];
+
+  const mockTopBooks = [
+    {
+      id: 1,
+      title: 'Sách Giáo Khoa Toán 12',
+      author: 'Bộ Giáo dục',
+      borrowCount: 25,
+      category: 'Giáo khoa',
+      cover: '/images/book-covers/math12.jpg'
+    },
+    {
+      id: 2,
+      title: 'Sách Văn Học Việt Nam',
+      author: 'Nhiều tác giả',
+      borrowCount: 20,
+      category: 'Văn học',
+      cover: '/images/book-covers/vietnam-literature.jpg'
+    },
+    {
+      id: 3,
+      title: 'Sách Lịch Sử Thế Giới',
+      author: 'Nhiều tác giả',
+      borrowCount: 18,
+      category: 'Lịch sử',
+      cover: '/images/book-covers/world-history.jpg'
+    },
+    {
+      id: 4,
+      title: 'Sách Khoa Học Tự Nhiên',
+      author: 'Nhiều tác giả',
+      borrowCount: 15,
+      category: 'Khoa học',
+      cover: '/images/book-covers/natural-science.jpg'
+    },
+    {
+      id: 5,
+      title: 'Sách Tiếng Anh',
+      author: 'Nhiều tác giả',
+      borrowCount: 12,
+      category: 'Ngoại ngữ',
+      cover: '/images/book-covers/english.jpg'
+    }
+  ];
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        // Fetch summary data
-        const summaryResponse = await fetch(`${apiUrl}/Dashboard/summary`);
-        if (!summaryResponse.ok) throw new Error('Failed to fetch summary data');
-        const summaryData = await summaryResponse.json();
-        
-        setStats({
-          totalBooks: summaryData.totalBooks,
-          totalReaders: summaryData.totalReaders,
-          booksBorrowed: summaryData.booksBorrowed,
-          booksOverdue: summaryData.booksOverdue
-        });
+    loadDashboardData();
+  }, [selectedPeriod]);
 
-        // Fetch recent borrows
-        const borrowsResponse = await fetch(`${apiUrl}/PhieuMuon`);
-        if (!borrowsResponse.ok) throw new Error('Failed to fetch recent borrows');
-        const borrowsData = await borrowsResponse.json();
-        
-        // Get only the last 5 borrows and map them
-        const recentBorrowsData = borrowsData
-          .filter(borrow => borrow.ngayMuon && borrow.hanTra) // Filter out invalid dates
-          .sort((a, b) => new Date(b.ngayMuon) - new Date(a.ngayMuon))
-          .slice(0, 5)
-          .map(borrow => {
-            try {
-              const borrowDate = new Date(borrow.ngayMuon);
-              const returnDate = new Date(borrow.hanTra);
-              
-              // Check if dates are valid
-              if (isNaN(borrowDate.getTime()) || isNaN(returnDate.getTime())) {
-                return null;
-              }
-              
-              return {
-                id: borrow.id,
-                readerName: borrow.docGia?.tenDocGia || borrow.tenDocGia || "",
-                bookTitle: borrow.sach?.tenSach || borrow.tenSach || "",
-                borrowDate: borrowDate.toISOString().split('T')[0],
-                returnDate: returnDate.toISOString().split('T')[0],
-                status: borrow.ngayTra ? 'returned' : 
-                       returnDate < new Date() ? 'overdue' : 'borrowed'
-              };
-            } catch (error) {
-              console.warn('Invalid date in borrow record:', borrow);
-              return null;
-            }
-          })
-          .filter(item => item !== null); // Remove null items
-        
-        setRecentBorrows(recentBorrowsData);
-
-        // Fetch popular books (most borrowed)
-        const booksResponse = await fetch(`${apiUrl}/Sach`);
-        if (!booksResponse.ok) throw new Error('Failed to fetch books');
-        const booksData = await booksResponse.json();
-        
-        // Calculate borrow count for each book from PhieuMuon data
-        const bookBorrowCounts = borrowsData.reduce((acc, borrow) => {
-          const bookId = borrow.maSach || borrow.idSach;
-          if (bookId) {
-            acc[bookId] = (acc[bookId] || 0) + 1;
-          }
-          return acc;
-        }, {});
-
-        // Get top 5 most borrowed books
-        const popularBooksData = booksData
-          .map(book => ({
-            title: book.tenSach,
-            author: book.tacGia,
-            borrows: bookBorrowCounts[book.maSach] || bookBorrowCounts[book.id] || 0
-          }))
-          .sort((a, b) => b.borrows - a.borrows)
-          .slice(0, 5);
-
-        setPopularBooks(popularBooksData);
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        setStatistics(mockStatistics);
+        setRecentActivities(mockRecentActivities);
+        setTopBooks(mockTopBooks);
         setLoading(false);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'borrowed':
-        return <span className="badge badge-info">Đang mượn</span>;
-      case 'returned':
-        return <span className="badge badge-success">Đã trả</span>;
-      case 'overdue':
-        return <span className="badge badge-danger">Quá hạn</span>;
-      default:
-        return <span className="badge badge-secondary">Không xác định</span>;
+      }, 1000);
+    } catch (error) {
+      showToast('Lỗi khi tải dữ liệu dashboard', 'error');
+      setLoading(false);
     }
+  };
+
+  const formatNumber = (num) => {
+    return new Intl.NumberFormat('vi-VN').format(num);
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
+  };
+
+  const getActivityStatusClass = (status) => {
+    const statusClasses = {
+      success: 'activity-success',
+      warning: 'activity-warning',
+      error: 'activity-error',
+      info: 'activity-info'
+    };
+    return statusClasses[status] || 'activity-info';
+  };
+
+  const getGrowthIcon = (growth) => {
+    return growth >= 0 ? <FaArrowUp className="growth-up" /> : <FaArrowDown className="growth-down" />;
+  };
+
+  const getGrowthClass = (growth) => {
+    return growth >= 0 ? 'growth-positive' : 'growth-negative';
   };
 
   if (loading) {
     return (
-      <div className="loading">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-message">
-        <h2>Có lỗi xảy ra</h2>
-        <p>{error}</p>
+      <div className="dashboard">
+        <div className="loading-spinner">Đang tải dashboard...</div>
       </div>
     );
   }
 
   return (
     <div className="dashboard">
-      <div className="page-header">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-subtitle">Tổng quan hệ thống quản lý thư viện</p>
+      {/* Header */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <h1 className="page-title">
+            <FaChartLine />
+            Dashboard Tổng Quan
+          </h1>
+          <p className="page-description">
+            Tổng quan hoạt động hệ thống quản lý thư viện
+          </p>
+        </div>
+        <div className="header-actions">
+          <select 
+            value={selectedPeriod} 
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="period-select"
+          >
+            <option value="today">Hôm nay</option>
+            <option value="week">Tuần này</option>
+            <option value="month">Tháng này</option>
+            <option value="quarter">Quý này</option>
+            <option value="year">Năm nay</option>
+          </select>
+          <button className="btn btn-secondary" onClick={loadDashboardData}>
+            <FaSync />
+            Làm Mới
+          </button>
+        </div>
       </div>
 
+      {/* Statistics Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <h3>Tổng số sách</h3>
-          <div className="stat-value">{stats.totalBooks.toLocaleString()}</div>
-        </div>
-        
-        <div className="stat-card">
-                      <h3>Thành viên đăng ký</h3>
-          <div className="stat-value">{stats.totalReaders.toLocaleString()}</div>
-        </div>
-        
-        <div className="stat-card">
-          <h3>Sách đang mượn</h3>
-          <div className="stat-value">{stats.booksBorrowed.toLocaleString()}</div>
-        </div>
-        
-        <div className="stat-card">
-          <h3>Sách quá hạn</h3>
-          <div className="stat-value">{stats.booksOverdue.toLocaleString()}</div>
-        </div>
-      </div>
-
-      <div className="content-section">
-        <div className="section-header">
-          <h2 className="section-title">Mượn trả gần đây</h2>
-          <button className="btn btn-primary">Xem tất cả</button>
-        </div>
-        
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Thành viên</th>
-                <th>Sách</th>
-                <th>Ngày mượn</th>
-                <th>Ngày trả</th>
-                <th>Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentBorrows.map((borrow) => (
-                <tr key={borrow.id}>
-                  <td>{borrow.readerName}</td>
-                  <td>{borrow.bookTitle}</td>
-                  <td>{borrow.borrowDate}</td>
-                  <td>{borrow.returnDate}</td>
-                  <td>{getStatusBadge(borrow.status)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="section-header">
-        <h2 className="section-title">Sách phổ biến</h2>
-      </div>
-      
-      <div className="popular-books">
-        {popularBooks.map((book, index) => (
-          <div key={index} className="book-item">
-            <div className="book-rank">#{index + 1}</div>
-            <div className="book-info">
-              <h4 className="book-title">{book.title}</h4>
-              <p className="book-author">{book.author}</p>
-            </div>
-            <div className="book-borrows">
-              <span className="borrow-count">{book.borrows} lượt mượn</span>
+          <div className="stat-icon">
+            <FaBook />
+          </div>
+          <div className="stat-content">
+            <h3>Tổng sách</h3>
+            <p className="stat-number">{formatNumber(statistics?.totalBooks || 0)}</p>
+            <div className={`stat-growth ${getGrowthClass(statistics?.monthlyGrowth || 0)}`}>
+              {getGrowthIcon(statistics?.monthlyGrowth || 0)}
+              <span>{Math.abs(statistics?.monthlyGrowth || 0)}%</span>
+              <span className="growth-label">so với tháng trước</span>
             </div>
           </div>
-        ))}
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">
+            <FaUsers />
+          </div>
+          <div className="stat-content">
+            <h3>Độc giả</h3>
+            <p className="stat-number">{formatNumber(statistics?.totalReaders || 0)}</p>
+            <div className={`stat-growth ${getGrowthClass(statistics?.weeklyGrowth || 0)}`}>
+              {getGrowthIcon(statistics?.weeklyGrowth || 0)}
+              <span>{Math.abs(statistics?.weeklyGrowth || 0)}%</span>
+              <span className="growth-label">so với tuần trước</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">
+            <FaChartLine />
+          </div>
+          <div className="stat-content">
+            <h3>Lượt mượn</h3>
+            <p className="stat-number">{formatNumber(statistics?.totalBorrows || 0)}</p>
+            <div className={`stat-growth ${getGrowthClass(statistics?.dailyGrowth || 0)}`}>
+              {getGrowthIcon(statistics?.dailyGrowth || 0)}
+              <span>{Math.abs(statistics?.dailyGrowth || 0)}%</span>
+              <span className="growth-label">so với hôm qua</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">
+            <FaMoneyBillWave />
+          </div>
+          <div className="stat-content">
+            <h3>Doanh thu</h3>
+            <p className="stat-number">{formatCurrency(statistics?.totalRevenue || 0)}</p>
+            <div className={`stat-growth ${getGrowthClass(statistics?.monthlyGrowth || 0)}`}>
+              {getGrowthIcon(statistics?.monthlyGrowth || 0)}
+              <span>{Math.abs(statistics?.monthlyGrowth || 0)}%</span>
+              <span className="growth-label">so với tháng trước</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">
+            <FaExclamationTriangle />
+          </div>
+          <div className="stat-content">
+            <h3>Sách quá hạn</h3>
+            <p className="stat-number">{formatNumber(statistics?.overdueBooks || 0)}</p>
+            <div className="stat-trend">
+              <span className="trend-label">Cần xử lý</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">
+            <FaClock />
+          </div>
+          <div className="stat-content">
+            <h3>Đặt trước chờ</h3>
+            <p className="stat-number">{formatNumber(statistics?.pendingReservations || 0)}</p>
+            <div className="stat-trend">
+              <span className="trend-label">Cần thông báo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts and Analytics */}
+      <div className="charts-section">
+        <div className="chart-container">
+          <div className="chart-header">
+            <h3>Thống kê mượn sách theo tháng</h3>
+            <div className="chart-actions">
+              <button className="btn-icon" title="Xuất biểu đồ">
+                <FaDownload />
+              </button>
+              <button className="btn-icon" title="In biểu đồ">
+                <FaPrint />
+              </button>
+            </div>
+          </div>
+          <div className="chart-placeholder">
+            <FaChartBar className="chart-icon" />
+            <p>Biểu đồ thống kê mượn sách</p>
+            <span>Dữ liệu sẽ được hiển thị ở đây</span>
+          </div>
+        </div>
+
+        <div className="chart-container">
+          <div className="chart-header">
+            <h3>Phân bố sách theo danh mục</h3>
+            <div className="chart-actions">
+              <button className="btn-icon" title="Xuất biểu đồ">
+                <FaDownload />
+              </button>
+              <button className="btn-icon" title="In biểu đồ">
+                <FaPrint />
+              </button>
+            </div>
+          </div>
+          <div className="chart-placeholder">
+            <FaChartPie className="chart-icon" />
+            <p>Biểu đồ phân bố danh mục</p>
+            <span>Dữ liệu sẽ được hiển thị ở đây</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Grid */}
+      <div className="content-grid">
+        {/* Recent Activities */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3>Hoạt động gần đây</h3>
+            <button className="btn btn-outline" onClick={() => showToast('Xem tất cả hoạt động', 'info')}>
+              <FaEye />
+              Xem tất cả
+            </button>
+          </div>
+          <div className="activities-list">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className={`activity-item ${getActivityStatusClass(activity.status)}`}>
+                <div className="activity-icon">
+                  {activity.icon}
+                </div>
+                <div className="activity-content">
+                  <p className="activity-title">{activity.title}</p>
+                  <span className="activity-time">{activity.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Top Books */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3>Sách được mượn nhiều nhất</h3>
+            <button className="btn btn-outline" onClick={() => showToast('Xem chi tiết', 'info')}>
+              <FaEye />
+              Xem chi tiết
+            </button>
+          </div>
+          <div className="top-books-list">
+            {topBooks.map((book, index) => (
+              <div key={book.id} className="book-item">
+                <div className="book-rank">#{index + 1}</div>
+                <div className="book-cover">
+                  <img src={book.cover || '/images/default-book-cover.jpg'} alt={book.title} />
+                </div>
+                <div className="book-info">
+                  <h4 className="book-title">{book.title}</h4>
+                  <p className="book-author">{book.author}</p>
+                  <span className="book-category">{book.category}</span>
+                </div>
+                <div className="book-stats">
+                  <span className="borrow-count">{book.borrowCount} lượt mượn</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3>Thao tác nhanh</h3>
+          </div>
+          <div className="quick-actions">
+            <button className="quick-action-btn" onClick={() => showToast('Thêm sách mới', 'info')}>
+              <FaPlus />
+              <span>Thêm sách</span>
+            </button>
+            <button className="quick-action-btn" onClick={() => showToast('Quản lý mượn trả', 'info')}>
+              <FaBook />
+              <span>Mượn trả</span>
+            </button>
+            <button className="quick-action-btn" onClick={() => showToast('Quản lý độc giả', 'info')}>
+              <FaUsers />
+              <span>Độc giả</span>
+            </button>
+            <button className="quick-action-btn" onClick={() => showToast('Báo cáo', 'info')}>
+              <FaChartBar />
+              <span>Báo cáo</span>
+            </button>
+            <button className="quick-action-btn" onClick={() => showToast('Cài đặt', 'info')}>
+              <FaFilter />
+              <span>Cài đặt</span>
+            </button>
+            <button className="quick-action-btn" onClick={() => showToast('Thông báo', 'info')}>
+              <FaBell />
+              <span>Thông báo</span>
+            </button>
+          </div>
+        </div>
+
+        {/* System Status */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3>Trạng thái hệ thống</h3>
+          </div>
+          <div className="system-status">
+            <div className="status-item">
+              <div className="status-indicator online"></div>
+              <span>Hệ thống hoạt động bình thường</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator online"></div>
+              <span>Cơ sở dữ liệu kết nối ổn định</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator online"></div>
+              <span>Backup tự động hoạt động</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator warning"></div>
+              <span>5 sách cần kiểm tra tình trạng</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

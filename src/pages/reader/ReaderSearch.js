@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaBook, FaUser, FaCalendar, FaMapMarkerAlt, FaTimes, FaFilter, FaImage, FaCog, FaSort } from 'react-icons/fa';
+import { FaSearch, FaBook, FaUser, FaCalendar, FaMapMarkerAlt, FaTimes, FaFilter, FaImage, FaCog, FaSort, FaClock } from 'react-icons/fa';
+import { useToast } from '../../hooks';
+import reservationService from '../../services/reservationService';
 import './ReaderSearch.css';
 
 const ReaderSearch = () => {
@@ -24,6 +26,9 @@ const ReaderSearch = () => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [sortBy, setSortBy] = useState('title');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [reserving, setReserving] = useState({});
+  
+  const { showToast } = useToast();
 
   const categories = [
     'Tất cả',
@@ -370,6 +375,26 @@ const ReaderSearch = () => {
 
   const handleRequestBorrow = (bookId) => {
     alert(`Đã gửi yêu cầu mượn sách ID: ${bookId}. Vui lòng chờ xác nhận từ thủ thư.`);
+  };
+
+  const handleReserveBook = async (bookId) => {
+    try {
+      setReserving(prev => ({ ...prev, [bookId]: true }));
+      
+      await reservationService.createReservation(bookId);
+      showToast('Đặt trước sách thành công!', 'success');
+      
+      // Cập nhật trạng thái sách trong danh sách
+      setBooks(prev => prev.map(book => 
+        book.id === bookId 
+          ? { ...book, hasReservation: true }
+          : book
+      ));
+    } catch (error) {
+      showToast(error.message, 'error');
+    } finally {
+      setReserving(prev => ({ ...prev, [bookId]: false }));
+    }
   };
 
   const getAvailabilityBadge = (available, total) => {
@@ -795,11 +820,24 @@ const ReaderSearch = () => {
                       Yêu cầu mượn
                     </button>
                   ) : (
-                    <button className="btn btn-secondary" disabled>
-                      Hết sách
-                    </button>
+                    <div className="book-actions-buttons">
+                      {book.hasReservation ? (
+                        <button className="btn btn-success" disabled>
+                          <FaClock /> Đã đặt trước
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => handleReserveBook(book.id)}
+                          disabled={reserving[book.id]}
+                        >
+                          <FaClock />
+                          {reserving[book.id] ? 'Đang đặt trước...' : 'Đặt trước'}
+                        </button>
+                      )}
+                    </div>
                   )}
-                  </div>
+                </div>
                 </div>
               </div>
             ))}

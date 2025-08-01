@@ -10,7 +10,7 @@ namespace LibraryApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "RequireAdmin")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly LibraryContext _context;

@@ -98,50 +98,66 @@ namespace LibraryApi.Data
                     new DocGia
                     {
                         HoTen = "Nguyễn Văn A",
+                        TenDG = "Nguyễn Văn A",
                         Email = "nguyenvana@email.com",
                         SDT = "0123456789",
                         DiaChi = "123 Lê Lợi, Q1, TP.HCM",
                         GioiTinh = "Nam",
-                        MemberType = "Sinh viên",
-                        MemberStatus = "Hoạt động",
+                        LoaiDocGia = "HocSinh",
+                        CapBac = "Thuong",
+                        MemberStatus = "DaThanhToan",
                         NgayDangKy = DateTime.Now.AddMonths(-6),
-                        NgayHetHan = DateTime.Now.AddMonths(6)
+                        NgayHetHan = DateTime.Now.AddMonths(6),
+                        PhiThanhVien = 50000,
+                        LyDoKhoa = ""
                     },
                     new DocGia
                     {
                         HoTen = "Trần Thị B",
+                        TenDG = "Trần Thị B",
                         Email = "tranthib@email.com",
                         SDT = "0987654321",
                         DiaChi = "456 Nguyễn Trãi, Q5, TP.HCM",
                         GioiTinh = "Nữ",
-                        MemberType = "Giảng viên",
-                        MemberStatus = "Hoạt động",
+                        LoaiDocGia = "GiaoVien",
+                        CapBac = "Thuong",
+                        MemberStatus = "DaThanhToan",
                         NgayDangKy = DateTime.Now.AddMonths(-12),
-                        NgayHetHan = DateTime.Now.AddMonths(12)
+                        NgayHetHan = DateTime.Now.AddMonths(12),
+                        PhiThanhVien = 0,
+                        LyDoKhoa = ""
                     },
                     new DocGia
                     {
                         HoTen = "Lê Văn C",
+                        TenDG = "Lê Văn C",
                         Email = "levanc@email.com",
                         SDT = "0369852147",
                         DiaChi = "789 Võ Văn Tần, Q3, TP.HCM",
                         GioiTinh = "Nam",
-                        MemberType = "Sinh viên",
-                        MemberStatus = "Hoạt động",
+                        LoaiDocGia = "HocSinh",
+                        CapBac = "Thuong",
+                        MemberStatus = "DaThanhToan",
                         NgayDangKy = DateTime.Now.AddMonths(-3),
-                        NgayHetHan = DateTime.Now.AddMonths(9)
+                        NgayHetHan = DateTime.Now.AddMonths(9),
+                        PhiThanhVien = 50000,
+                        LyDoKhoa = ""
                     },
                     new DocGia
                     {
                         HoTen = "Phạm Thị D",
+                        TenDG = "Phạm Thị D",
                         Email = "phamthid@email.com",
                         SDT = "0521478963",
                         DiaChi = "321 Điện Biên Phủ, Q3, TP.HCM",
                         GioiTinh = "Nữ",
-                        MemberType = "Nhân viên",
-                        MemberStatus = "Hoạt động",
+                        LoaiDocGia = "Thuong",
+                        CapBac = "Thuong",
+                        MemberStatus = "DaThanhToan",
                         NgayDangKy = DateTime.Now.AddMonths(-8),
-                        NgayHetHan = DateTime.Now.AddMonths(4)
+                        NgayHetHan = DateTime.Now.AddMonths(4),
+                        PhiThanhVien = 100000,
+                        LyDoKhoa = ""
                     }
                 );
             }
@@ -190,6 +206,30 @@ namespace LibraryApi.Data
                         TenDangNhap = "reader3",
                         MatKhau = "reader123",
                         ChucVu = "Độc giả"
+                    },
+                    new NguoiDung
+                    {
+                        TenDangNhap = "director",
+                        MatKhau = "director123",
+                        ChucVu = "Giám đốc"
+                    },
+                    new NguoiDung
+                    {
+                        TenDangNhap = "library_manager",
+                        MatKhau = "manager123",
+                        ChucVu = "Trưởng thư viện"
+                    },
+                    new NguoiDung
+                    {
+                        TenDangNhap = "technician",
+                        MatKhau = "tech123",
+                        ChucVu = "Kỹ thuật viên"
+                    },
+                    new NguoiDung
+                    {
+                        TenDangNhap = "accounting_manager",
+                        MatKhau = "acc_manager123",
+                        ChucVu = "Trưởng phòng kế toán"
                     }
                 );
             }
@@ -207,8 +247,10 @@ namespace LibraryApi.Data
                     {
                         MaDG = docGia.MaDG,
                         NgayMuon = DateTime.Now.AddDays(-2),
-                        NgayTraDuKien = DateTime.Now.AddDays(12),
-                        NguoiLap = "admin"
+                        HanTra = DateTime.Now.AddDays(12),
+                        TrangThai = "borrowed",
+                        NguoiLap = "admin",
+                        GhiChu = "Phiếu mượn mẫu"
                     };
                     context.PhieuMuons.Add(phieuMuon);
                     context.SaveChanges(); // Lưu trước để có MaPhieuMuon
@@ -228,37 +270,72 @@ namespace LibraryApi.Data
                     new PhieuThu
                     {
                         MaDG = 1,
-                        LoaiThu = "Phí thành viên",
+                        NgayThu = DateTime.Now.AddDays(-30),
+                        LoaiThu = "PhiThanhVien",
                         SoTien = 50000,
-                        NgayThu = DateTime.Now.AddDays(-30)
+                        HinhThucThanhToan = "TienMat",
+                        GhiChu = "Phí thành viên học sinh",
+                        TrangThai = "DaThu",
+                        NguoiThu = "admin",
+                        LoaiViPham = null,
+                        MaGiaoDich = null,
+                        TenSach = null
                     },
                     new PhieuThu
                     {
                         MaDG = 2,
-                        LoaiThu = "Phí thành viên",
-                        SoTien = 75000,
-                        NgayThu = DateTime.Now.AddDays(-25)
+                        NgayThu = DateTime.Now.AddDays(-25),
+                        LoaiThu = "PhiThanhVien",
+                        SoTien = 0,
+                        HinhThucThanhToan = "TienMat",
+                        GhiChu = "Phí thành viên giáo viên (miễn phí)",
+                        TrangThai = "DaThu",
+                        NguoiThu = "admin",
+                        LoaiViPham = null,
+                        MaGiaoDich = null,
+                        TenSach = null
                     },
                     new PhieuThu
                     {
                         MaDG = 3,
-                        LoaiThu = "Phí thành viên",
+                        NgayThu = DateTime.Now.AddDays(-20),
+                        LoaiThu = "PhiThanhVien",
                         SoTien = 50000,
-                        NgayThu = DateTime.Now.AddDays(-20)
+                        HinhThucThanhToan = "TienMat",
+                        GhiChu = "Phí thành viên học sinh",
+                        TrangThai = "DaThu",
+                        NguoiThu = "admin",
+                        LoaiViPham = null,
+                        MaGiaoDich = null,
+                        TenSach = null
                     },
                     new PhieuThu
                     {
                         MaDG = 4,
-                        LoaiThu = "Phí thành viên",
+                        NgayThu = DateTime.Now.AddDays(-15),
+                        LoaiThu = "PhiThanhVien",
                         SoTien = 100000,
-                        NgayThu = DateTime.Now.AddDays(-15)
+                        HinhThucThanhToan = "TienMat",
+                        GhiChu = "Phí thành viên thường",
+                        TrangThai = "DaThu",
+                        NguoiThu = "admin",
+                        LoaiViPham = null,
+                        MaGiaoDich = null,
+                        TenSach = null
                     },
                     new PhieuThu
                     {
                         MaDG = 5,
-                        LoaiThu = "Phí thành viên",
+                        NgayThu = DateTime.Now.AddDays(-10),
+                        LoaiThu = "PhiThanhVien",
                         SoTien = 60000,
-                        NgayThu = DateTime.Now.AddDays(-10)
+                        HinhThucThanhToan = "TienMat",
+                        GhiChu = "Phí thành viên thường",
+                        TrangThai = "DaThu",
+                        NguoiThu = "admin",
+                        LoaiViPham = null,
+                        MaGiaoDich = null,
+                        TenSach = null
                     }
                 );
                 context.SaveChanges();

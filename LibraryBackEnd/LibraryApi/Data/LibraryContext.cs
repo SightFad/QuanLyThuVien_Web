@@ -11,6 +11,7 @@ namespace LibraryApi.Data
         public DbSet<TheThuVien> TheThuViens { get; set; }
         public DbSet<Sach> Saches { get; set; }
         public DbSet<PhieuMuon> PhieuMuons { get; set; }
+        public DbSet<PhieuMuon> PhieuMus { get; set; } // Alias for compatibility
         public DbSet<CT_PhieuMuon> CT_PhieuMuons { get; set; }
         public DbSet<PhieuTra> PhieuTras { get; set; }
         public DbSet<CT_PhieuTra> CT_PhieuTras { get; set; }
@@ -18,14 +19,17 @@ namespace LibraryApi.Data
         public DbSet<PhieuThu> PhieuThus { get; set; }
         public DbSet<PhieuGiaHan> PhieuGiaHans { get; set; }
         public DbSet<PhieuDatTruoc> PhieuDatTruocs { get; set; }
+        public DbSet<DatTruocSach> DatTruocSaches { get; set; }
         public DbSet<PhieuNhapKho> PhieuNhapKhos { get; set; }
-        public DbSet<CT_PhieuNhapKho> CT_PhieuNhapKhos { get; set; }
+        public DbSet<ChiTietPhieuNhapKho> ChiTietPhieuNhapKhos { get; set; }
         public DbSet<PhieuKiemKe> PhieuKiemKes { get; set; }
-        public DbSet<CT_KiemKe> CT_KiemKes { get; set; }
+        public DbSet<ChiTietPhieuKiemKe> ChiTietPhieuKiemKes { get; set; }
+        public DbSet<BaoCaoViPham> BaoCaoViPhams { get; set; }
         public DbSet<NguoiDung> NguoiDungs { get; set; }
         public DbSet<PhieuCapQuyen> PhieuCapQuyens { get; set; }
         public DbSet<NhatKyHoatDong> NhatKyHoatDongs { get; set; }
         public DbSet<PhieuDeXuatMuaSach> PhieuDeXuatMuaSachs { get; set; }
+        public DbSet<ChiTietDeXuatMuaSach> ChiTietDeXuatMuaSachs { get; set; }
         public DbSet<PhanHoiNCC> PhanHoiNCCs { get; set; }
         public DbSet<BaoCao> BaoCaos { get; set; }
 
@@ -38,8 +42,8 @@ namespace LibraryApi.Data
                 .HasKey(x => new { x.MaPhieuMuon, x.MaSach });
             modelBuilder.Entity<CT_PhieuTra>()
                 .HasKey(x => new { x.MaPhieuTra, x.MaSach });
-            modelBuilder.Entity<CT_PhieuNhapKho>()
-                .HasKey(x => new { x.MaPhieuNhap, x.MaSach });
+            modelBuilder.Entity<ChiTietPhieuNhapKho>()
+                .HasKey(x => x.Id);
             modelBuilder.Entity<CT_KiemKe>()
                 .HasKey(x => new { x.MaPhieuKK, x.MaSach });
 
@@ -52,7 +56,8 @@ namespace LibraryApi.Data
             modelBuilder.Entity<PhieuMuon>()
                 .HasOne(pm => pm.DocGia)
                 .WithMany(dg => dg.PhieuMuons)
-                .HasForeignKey(pm => pm.MaDG);
+                .HasForeignKey(pm => pm.MaDG)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CT_PhieuMuon>()
                 .HasOne(ct => ct.PhieuMuon)
@@ -100,6 +105,10 @@ namespace LibraryApi.Data
                 .HasOne(pg => pg.Sach)
                 .WithMany(s => s.PhieuGiaHans)
                 .HasForeignKey(pg => pg.MaSach);
+            modelBuilder.Entity<PhieuGiaHan>()
+                .HasOne(pg => pg.DocGia)
+                .WithMany(dg => dg.PhieuGiaHans)
+                .HasForeignKey(pg => pg.MaDG);
 
             modelBuilder.Entity<PhieuDatTruoc>()
                 .HasOne(pd => pd.DocGia)
@@ -111,21 +120,18 @@ namespace LibraryApi.Data
                 .HasForeignKey(pd => pd.MaSach);
 
             modelBuilder.Entity<PhieuNhapKho>()
-                .HasMany(pn => pn.CT_PhieuNhapKhos)
+                .HasMany(pn => pn.ChiTietPhieuNhapKho)
                 .WithOne(ct => ct.PhieuNhapKho)
-                .HasForeignKey(ct => ct.MaPhieuNhap);
-            modelBuilder.Entity<CT_PhieuNhapKho>()
-                .HasOne(ct => ct.Sach)
-                .WithMany(s => s.CT_PhieuNhapKhos)
-                .HasForeignKey(ct => ct.MaSach);
+                .HasForeignKey(ct => ct.PhieuNhapKhoId);
+
 
             modelBuilder.Entity<PhieuKiemKe>()
-                .HasMany(pk => pk.CT_KiemKes)
+                .HasMany(pk => pk.ChiTietPhieuKiemKe)
                 .WithOne(ct => ct.PhieuKiemKe)
-                .HasForeignKey(ct => ct.MaPhieuKK);
-            modelBuilder.Entity<CT_KiemKe>()
+                .HasForeignKey(ct => ct.PhieuKiemKeId);
+            modelBuilder.Entity<ChiTietPhieuKiemKe>()
                 .HasOne(ct => ct.Sach)
-                .WithMany(s => s.CT_KiemKes)
+                .WithMany(s => s.ChiTietPhieuKiemKes)
                 .HasForeignKey(ct => ct.MaSach);
 
             modelBuilder.Entity<PhieuCapQuyen>()
@@ -139,9 +145,56 @@ namespace LibraryApi.Data
                 .HasForeignKey(nk => nk.MaND);
 
             modelBuilder.Entity<PhieuDeXuatMuaSach>()
-                .HasOne(dx => dx.Sach)
-                .WithMany(s => s.PhieuDeXuatMuaSachs)
-                .HasForeignKey(dx => dx.MaSach);
+                .HasOne(dx => dx.NguoiDeXuat)
+                .WithMany()
+                .HasForeignKey(dx => dx.MaNguoiDeXuat);
+            modelBuilder.Entity<PhieuDeXuatMuaSach>()
+                .HasOne(dx => dx.NguoiDuyet)
+                .WithMany()
+                .HasForeignKey(dx => dx.MaNguoiDuyet);
+
+            modelBuilder.Entity<ChiTietDeXuatMuaSach>()
+                .HasOne(ct => ct.PhieuDeXuatMuaSach)
+                .WithMany(dx => dx.ChiTietDeXuatMuaSachs)
+                .HasForeignKey(ct => ct.MaDeXuat);
+
+            // Cấu hình cho DatTruocSach
+            modelBuilder.Entity<DatTruocSach>()
+                .HasOne(dt => dt.DocGia)
+                .WithMany()
+                .HasForeignKey(dt => dt.MaDocGia)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DatTruocSach>()
+                .HasOne(dt => dt.Sach)
+                .WithMany()
+                .HasForeignKey(dt => dt.MaSach)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DatTruocSach>()
+                .HasOne(dt => dt.PhieuMuon)
+                .WithMany()
+                .HasForeignKey(dt => dt.MaPhieuMuon)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Cấu hình cho BaoCaoViPham
+            modelBuilder.Entity<BaoCaoViPham>()
+                .HasOne(bv => bv.DocGia)
+                .WithMany()
+                .HasForeignKey(bv => bv.MaDocGia)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BaoCaoViPham>()
+                .HasOne(bv => bv.Sach)
+                .WithMany()
+                .HasForeignKey(bv => bv.MaSach)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BaoCaoViPham>()
+                .HasOne(bv => bv.PhieuMuon)
+                .WithMany()
+                .HasForeignKey(bv => bv.MaPhieuMuon)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

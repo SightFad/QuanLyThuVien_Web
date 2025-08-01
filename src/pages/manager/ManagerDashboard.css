@@ -1,8 +1,8 @@
 /* CSS cho trang ManagerDashboard */
 .manager-dashboard {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .page-header {

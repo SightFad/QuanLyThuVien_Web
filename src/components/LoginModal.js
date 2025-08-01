@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { apiRequest, MOCK_DATA } from '../config/api';
 import './LoginModal.css';
 
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
@@ -27,85 +28,114 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5280/api/Auth/login', {
+      // Thử kết nối với backend
+      const data = await apiRequest('/api/Auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(formData)
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('=== Login Response ===');
-        console.log('Backend data:', data);
-        console.log('Role from backend:', data.role);
-        console.log('Role type:', typeof data.role);
-        console.log('Role length:', data.role?.length);
-        console.log('Role trimmed:', data.role?.trim());
-        console.log('Role trimmed length:', data.role?.trim()?.length);
-        
-        // Map role from backend to frontend
-        let mappedRole = data.role?.trim();
-        console.log('Original role from backend:', mappedRole);
-        if (mappedRole === 'Warehouse') {
-          mappedRole = 'Nhân viên kho sách';
-          console.log('Role mapped from Warehouse to Nhân viên kho sách');
+      console.log('=== Login Response ===');
+      console.log('Backend data:', data);
+      
+      // Map role from backend to frontend
+      let mappedRole = data.role?.trim();
+      console.log('Original role from backend:', mappedRole);
+      
+      const userData = {
+        username: data.username,
+        role: mappedRole,
+        email: data.email
+      };
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      onLogin(userData);
+      onClose();
+      
+      // Redirect based on role
+      console.log('=== Redirect Logic ===');
+      console.log('Checking role:', mappedRole);
+      
+      setTimeout(() => {
+        switch (mappedRole) {
+          case 'Độc giả':
+            navigate('/reader/home');
+            break;
+          case 'Thủ thư':
+            navigate('/librarian/dashboard');
+            break;
+          case 'Kế toán':
+          case 'Nhân viên kế toán':
+            navigate('/accountant/dashboard');
+            break;
+          case 'Nhân viên kho sách':
+          case 'Trưởng kho':
+          case 'warehouse':
+          case 'Warehouse':
+            console.log('Warehouse role detected, navigating to /warehouse/dashboard');
+            navigate('/warehouse/dashboard');
+            break;
+          case 'Trưởng thư viện':
+            navigate('/manager/dashboard');
+            break;
+          case 'Quản trị viên':
+            navigate('/admin');
+            break;
+          default:
+            console.log('No matching role, navigating to /');
+            navigate('/');
         }
-        console.log('Final mapped role:', mappedRole);
-        
-        const userData = {
-          username: data.username,
-          role: mappedRole,
-          email: data.email
-        };
-        
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(userData));
-        
-        onLogin(userData);
-        onClose();
-        
-        // Redirect based on role
-        console.log('=== Redirect Logic ===');
-        console.log('Checking role:', data.role);
-        
-        setTimeout(() => {
-          switch (data.role) {
-            case 'Độc giả':
-              navigate('/reader/home');
-              break;
-            case 'Thủ thư':
-              navigate('/librarian/dashboard');
-              break;
-            case 'Kế toán':
-            case 'Nhân viên kế toán':
-              navigate('/accountant/dashboard');
-              break;
-            case 'Nhân viên kho sách':
-            case 'Trưởng kho':
-            case 'warehouse':
-            case 'Warehouse':
-              console.log('Warehouse role detected, navigating to /warehouse/dashboard');
-              navigate('/warehouse/dashboard');
-              break;
-            case 'Trưởng thư viện':
-              navigate('/manager/dashboard');
-              break;
-            case 'Quản trị viên':
-              navigate('/admin');
-              break;
-            default:
-              console.log('No matching role, navigating to /');
-              navigate('/');
-          }
-        }, 100);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Đăng nhập thất bại');
-      }
+      }, 100);
     } catch (err) {
-      setError('Lỗi kết nối. Vui lòng thử lại.');
+      console.error('Login error:', err);
+      
+      // Fallback: Sử dụng dữ liệu mẫu nếu backend không có sẵn
+      if (err.message.includes('fetch') || err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        console.log('Backend không có sẵn, sử dụng dữ liệu mẫu...');
+        
+        const mockUser = MOCK_DATA.users[formData.username];
+        if (mockUser && formData.password === 'admin123') {
+          const userData = {
+            username: mockUser.username,
+            role: mockUser.role,
+            email: mockUser.email
+          };
+          
+          localStorage.setItem('token', 'mock_token_' + Date.now());
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          onLogin(userData);
+          onClose();
+          
+          // Redirect based on role
+          setTimeout(() => {
+            switch (mockUser.role) {
+              case 'Độc giả':
+                navigate('/reader/home');
+                break;
+              case 'Thủ thư':
+                navigate('/librarian/dashboard');
+                break;
+              case 'Kế toán':
+                navigate('/accountant/dashboard');
+                break;
+              case 'Nhân viên kho sách':
+                navigate('/warehouse/dashboard');
+                break;
+              case 'Quản trị viên':
+                navigate('/admin');
+                break;
+              default:
+                navigate('/');
+            }
+          }, 100);
+        } else {
+          setError('Tên đăng nhập hoặc mật khẩu không đúng');
+        }
+      } else {
+        setError('Lỗi kết nối. Vui lòng thử lại.');
+      }
     } finally {
       setLoading(false);
     }

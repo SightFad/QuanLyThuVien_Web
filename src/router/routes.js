@@ -3,12 +3,12 @@
  */
 import React from 'react';
 import { withLazyLoading } from '../components/LazyRoute';
-import { LoadingSpinner } from '../components/shared';
+import { PageLoading } from '../components/shared';
 
 // Loading fallback component
 const RouteLoading = () => (
   <div className="flex items-center justify-center min-h-screen">
-    <LoadingSpinner size="lg" text="Đang tải trang..." />
+    <PageLoading size="lg" text="Đang tải trang..." />
   </div>
 );
 
@@ -64,11 +64,6 @@ const ReaderMyBooks = withLazyLoading(
   <RouteLoading />
 );
 
-const ReaderHistory = withLazyLoading(
-  () => import('../pages/reader/ReaderHistory'),
-  <RouteLoading />
-);
-
 const ReaderProfile = withLazyLoading(
   () => import('../pages/reader/ReaderProfile'),
   <RouteLoading />
@@ -97,6 +92,21 @@ const LibrarianReports = withLazyLoading(
 
 const ReservationManagement = withLazyLoading(
   () => import('../pages/librarian/ReservationManagement'),
+  <RouteLoading />
+);
+
+const BookReservationManagement = withLazyLoading(
+  () => import('../pages/librarian/BookReservationManagement'),
+  <RouteLoading />
+);
+
+const ViolationManagement = withLazyLoading(
+  () => import('../pages/librarian/ViolationManagement'),
+  <RouteLoading />
+);
+
+const ReportManagement = withLazyLoading(
+  () => import('../pages/librarian/ReportManagement'),
   <RouteLoading />
 );
 
@@ -226,11 +236,6 @@ export const routes = [
     roles: ['Độc giả'],
   },
   {
-    path: '/reader/history',
-    component: ReaderHistory,
-    roles: ['Độc giả'],
-  },
-  {
     path: '/reader/profile',
     component: ReaderProfile,
     roles: ['Độc giả'],
@@ -261,6 +266,21 @@ export const routes = [
   {
     path: '/librarian/reservations',
     component: ReservationManagement,
+    roles: ['Thủ thư'],
+  },
+  {
+    path: '/librarian/book-reservations',
+    component: BookReservationManagement,
+    roles: ['Thủ thư'],
+  },
+  {
+    path: '/librarian/violations',
+    component: ViolationManagement,
+    roles: ['Thủ thư'],
+  },
+  {
+    path: '/librarian/reports-management',
+    component: ReportManagement,
     roles: ['Thủ thư'],
   },
 
@@ -371,7 +391,6 @@ export {
   ReaderHome,
   ReaderSearch,
   ReaderMyBooks,
-  ReaderHistory,
   ReaderProfile,
   ReaderReservations,
   ReaderFines,

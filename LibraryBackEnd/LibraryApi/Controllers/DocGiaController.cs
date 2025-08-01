@@ -88,12 +88,12 @@ namespace LibraryApi.Controllers
                 return NotFound("Không tìm thấy độc giả");
             if (!string.IsNullOrEmpty(docGia.MemberStatus) && docGia.MemberStatus == "DaThanhToan")
                 return BadRequest("Độc giả đã là thành viên");
-            docGia.MemberType = request.MemberType;
+            docGia.LoaiDocGia = request.MemberType;
             docGia.MemberStatus = "ChoXacNhan";
             docGia.NgayDangKy = DateTime.Now;
             // NgayHetHan sẽ được cập nhật khi xác nhận thanh toán
             _context.SaveChanges();
-            return Ok(new { docGia.MaDG, docGia.MemberType, docGia.MemberStatus, docGia.NgayDangKy });
+            return Ok(new { docGia.MaDG, docGia.LoaiDocGia, docGia.MemberStatus, docGia.NgayDangKy });
         }
 
         // POST: api/DocGia/ConfirmMembership
@@ -110,7 +110,7 @@ namespace LibraryApi.Controllers
             // Tính ngày hết hạn: mặc định 1 năm cho mọi gói, có thể thay đổi nếu cần
             docGia.NgayHetHan = DateTime.Now.AddYears(1);
             _context.SaveChanges();
-            return Ok(new { docGia.MaDG, docGia.MemberType, docGia.MemberStatus, docGia.NgayDangKy, docGia.NgayHetHan });
+            return Ok(new { docGia.MaDG, docGia.LoaiDocGia, docGia.MemberStatus, docGia.NgayDangKy, docGia.NgayHetHan });
         }
     }
 }

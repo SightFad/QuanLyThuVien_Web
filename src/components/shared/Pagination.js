@@ -1,7 +1,8 @@
 import React from 'react';
 import { FaChevronLeft, FaChevronRight, FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
-import { usePaginationRange } from '../../hooks';
+import { usePaginationRange } from '../../hooks/usePagination';
 import Button from './Button';
+import './Pagination.css';
 
 /**
  * Shared Pagination Component

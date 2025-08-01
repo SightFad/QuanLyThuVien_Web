@@ -274,5 +274,41 @@ namespace LibraryApi.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        /// <summary>
+        /// Cập nhật trạng thái sách (dành cho thủ thư)
+        /// </summary>
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateBookStatus(int id, [FromBody] UpdateBookStatusDto dto)
+        {
+            try
+            {
+                var book = await _context.Saches.FirstOrDefaultAsync(s => s.MaSach == id);
+                if (book == null)
+                {
+                    return NotFound("Không tìm thấy sách");
+                }
+
+                // Cập nhật trạng thái
+                book.TrangThai = dto.TrangThai;
+                
+                // Lưu thông tin cập nhật
+                await _context.SaveChangesAsync();
+
+                return Ok(new { 
+                    message = "Cập nhật trạng thái sách thành công",
+                    book = new {
+                        book.MaSach,
+                        book.TenSach,
+                        book.TrangThai,
+                        NgayCapNhat = DateTime.Now
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi nội bộ: {ex.Message}");
+            }
+        }
     }
 }

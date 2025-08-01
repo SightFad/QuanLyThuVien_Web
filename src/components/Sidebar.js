@@ -33,7 +33,9 @@ import {
   FaBoxOpen,
   FaCheckDouble,
   FaEye,
-  FaEdit
+  FaEdit,
+  FaBell,
+  FaExclamationCircle
 } from 'react-icons/fa';
 import './Sidebar.css';
 
@@ -58,6 +60,9 @@ const Sidebar = ({ user, onLogout }) => {
           { path: '/librarian/dashboard', icon: <FaHome />, label: 'Dashboard' },
           { path: '/librarian/fines', icon: <FaExclamationTriangle />, label: 'Quản lý tiền phạt' },
           { path: '/librarian/reports', icon: <FaFileAlt />, label: 'Báo cáo thư viện' },
+          { path: '/librarian/book-status', icon: <FaEdit />, label: 'Cập nhật trạng thái sách' },
+          { path: '/librarian/reservations', icon: <FaBell />, label: 'Quản lý đặt trước sách' },
+          { path: '/librarian/violations', icon: <FaExclamationCircle />, label: 'Quản lý sách vi phạm' },
           { path: '/books', icon: <FaBook />, label: 'Tìm kiếm sách' },
           { path: '/readers', icon: <FaUsers />, label: 'Quản lý thành viên' },
           { path: '/borrows', icon: <FaExchangeAlt />, label: 'Quản lý mượn trả' },
@@ -109,6 +114,33 @@ const Sidebar = ({ user, onLogout }) => {
           { path: '/readers', icon: <FaUsers />, label: 'Quản lý thành viên' },
           { path: '/borrows', icon: <FaExchangeAlt />, label: 'Quản lý mượn trả' },
         ];
+      case 'Giám đốc':
+        return [
+          { path: '/director/dashboard', icon: <FaHome />, label: 'Dashboard' },
+          { path: '/director/reports', icon: <FaChartBar />, label: 'Báo cáo tổng hợp' },
+          { path: '/director/approvals', icon: <FaCheckDouble />, label: 'Phê duyệt' },
+          { path: '/director/strategic', icon: <FaFileAlt />, label: 'Chiến lược phát triển' },
+          { path: '/director/budget', icon: <FaMoneyBillWave />, label: 'Quản lý ngân sách' },
+          { path: '/director/staff', icon: <FaUsers />, label: 'Quản lý nhân sự' },
+        ];
+      case 'Trưởng phòng kế toán':
+        return [
+          { path: '/accounting-manager/dashboard', icon: <FaHome />, label: 'Dashboard' },
+          { path: '/accounting-manager/financial-reports', icon: <FaFileInvoiceDollar />, label: 'Báo cáo tài chính' },
+          { path: '/accounting-manager/budget-management', icon: <FaMoneyBillWave />, label: 'Quản lý ngân sách' },
+          { path: '/accounting-manager/approvals', icon: <FaCheckDouble />, label: 'Phê duyệt tài chính' },
+          { path: '/accounting-manager/staff', icon: <FaUsers />, label: 'Quản lý nhân viên' },
+          { path: '/accounting-manager/audit', icon: <FaShieldAlt />, label: 'Kiểm toán' },
+        ];
+      case 'Kỹ thuật viên':
+        return [
+          { path: '/technician/dashboard', icon: <FaHome />, label: 'Dashboard' },
+          { path: '/technician/system-maintenance', icon: <FaCog />, label: 'Bảo trì hệ thống' },
+          { path: '/technician/technical-support', icon: <FaShieldAlt />, label: 'Hỗ trợ kỹ thuật' },
+          { path: '/technician/backup-restore', icon: <FaDatabase />, label: 'Sao lưu & Khôi phục' },
+          { path: '/technician/security', icon: <FaShieldAlt />, label: 'Bảo mật hệ thống' },
+          { path: '/technician/logs', icon: <FaFileAlt />, label: 'Nhật ký hệ thống' },
+        ];
       case 'Độc giả':
         return [
           { path: '/reader/home', icon: <FaHome />, label: 'Trang chủ' },
@@ -126,13 +158,16 @@ const Sidebar = ({ user, onLogout }) => {
   const getRoleDisplayName = (role) => {
           const roleNames = {
         'Quản trị viên': 'System Administrator',
+        'Giám đốc': 'Director',
+        'Trưởng thư viện': 'Library Manager',
         'Thủ thư': 'Librarian',
         'Kế toán': 'Accountant',
+        'Trưởng phòng kế toán': 'Accounting Manager',
+        'Kỹ thuật viên': 'Technician',
         'Nhân viên kế toán': 'Accounting Staff',
         'Nhân viên kho sách': 'Warehouse Staff',
         'Trưởng kho': 'Warehouse Manager',
         'warehouse': 'Warehouse Staff',
-        'Trưởng thư viện': 'Library Manager',
         'Độc giả': 'Reader'
       };
     return roleNames[role] || role;

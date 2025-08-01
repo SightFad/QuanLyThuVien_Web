@@ -1,167 +1,217 @@
-import React, { useState } from 'react';
-import { FaClipboardList, FaPlus, FaCheck, FaTimes, FaExclamationTriangle, FaEye, FaEdit, FaCalendarAlt, FaUser, FaBoxes } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaClipboardList, FaPlus, FaSave, FaPrint, FaTrash, FaEdit, FaEye, FaTimes } from 'react-icons/fa';
+import { useToast } from '../../hooks';
+import inventoryCheckService from '../../services/inventoryCheckService';
 import './InventoryChecks.css';
 
 const InventoryChecks = () => {
-  const [checks, setChecks] = useState([
-    {
-      id: 1,
-      checkCode: 'CHECK-2024-001',
-      checkType: 'Kiểm kê định kỳ',
-      startDate: '2024-01-15',
-      endDate: '2024-01-20',
-      status: 'in_progress',
-      totalBooks: 1250,
-      checkedBooks: 800,
-      discrepancies: 12,
-      assignedTo: 'Nguyễn Văn A',
-      notes: 'Kiểm kê toàn bộ kho sách theo quy định'
-    },
-    {
-      id: 2,
-      checkCode: 'CHECK-2024-002',
-      checkType: 'Kiểm tra hư hỏng',
-      startDate: '2024-01-10',
-      endDate: '2024-01-12',
-      status: 'completed',
-      totalBooks: 500,
-      checkedBooks: 500,
-      discrepancies: 5,
-      assignedTo: 'Trần Thị B',
-      notes: 'Kiểm tra sách hư hỏng và báo cáo'
-    },
-    {
-      id: 3,
-      checkCode: 'CHECK-2024-003',
-      checkType: 'Kiểm kê theo thể loại',
-      startDate: '2024-01-25',
-      endDate: '2024-01-30',
-      status: 'planned',
-      totalBooks: 300,
-      checkedBooks: 0,
-      discrepancies: 0,
-      assignedTo: 'Lê Văn C',
-      notes: 'Kiểm kê sách văn học và tiểu thuyết'
+  const { showToast } = useToast();
+  
+  // Form state
+  const [checkForm, setCheckForm] = useState({
+    kyKiemKe: '',
+    ngayKiemKe: new Date().toISOString().split('T')[0],
+    nhanVienThucHien: ''
+  });
+
+  // Book details table
+  const [bookDetails, setBookDetails] = useState([]);
+  const [currentBook, setCurrentBook] = useState({
+    maSach: '',
+    tenSach: '',
+    soLuongHeThong: 0,
+    soLuongThucTe: 0,
+    chenhLech: 0,
+    ghiChu: ''
+  });
+
+  // UI state
+  const [showForm, setShowForm] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(-1);
+  const [checks, setChecks] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Load checks on component mount
+  useEffect(() => {
+    loadChecks();
+  }, []);
+
+  const loadChecks = async () => {
+    try {
+      setLoading(true);
+      const data = await inventoryCheckService.getAllInventoryChecks();
+      setChecks(data);
+    } catch (error) {
+      showToast('Có lỗi xảy ra khi tải danh sách phiếu kiểm kê', 'error');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
-  const [showNewCheckModal, setShowNewCheckModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
-
-  const filteredChecks = checks.filter(check => 
-    filterStatus === 'all' || check.status === filterStatus
-  );
-
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      planned: { label: 'Đã lên kế hoạch', class: 'planned' },
-      in_progress: { label: 'Đang thực hiện', class: 'in-progress' },
-      completed: { label: 'Hoàn thành', class: 'completed' },
-      cancelled: { label: 'Đã hủy', class: 'cancelled' }
+  // Generate check code
+  useEffect(() => {
+    const generateCheckCode = () => {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const random = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+      return `${year}${month}${day}${random}`;
     };
-    return statusConfig[status] || { label: status, class: 'unknown' };
+
+    if (!checkForm.kyKiemKe) {
+      setCheckForm(prev => ({ ...prev, kyKiemKe: generateCheckCode() }));
+    }
+  }, [checkForm.kyKiemKe]);
+
+  // Calculate discrepancy
+  const calculateDiscrepancy = (systemQty, actualQty) => {
+    return actualQty - systemQty;
   };
 
-  const getProgressPercentage = (checked, total) => {
-    return total > 0 ? Math.round((checked / total) * 100) : 0;
+  // Handle form input changes
+  const handleFormChange = (field, value) => {
+    setCheckForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleCreateCheck = () => {
-    setShowNewCheckModal(true);
+  // Handle book detail changes
+  const handleBookChange = (field, value) => {
+    const updatedBook = { ...currentBook, [field]: value };
+    
+    // Auto calculate discrepancy
+    if (field === 'soLuongHeThong' || field === 'soLuongThucTe') {
+      updatedBook.chenhLech = calculateDiscrepancy(
+        updatedBook.soLuongHeThong, 
+        updatedBook.soLuongThucTe
+      );
+    }
+    
+    setCurrentBook(updatedBook);
   };
 
-  const handleStartCheck = (checkId) => {
-    setChecks(prev => prev.map(check => 
-      check.id === checkId 
-        ? { ...check, status: 'in_progress' }
-        : check
-    ));
+  // Add book to table
+  const addBookToTable = () => {
+    if (!currentBook.maSach || !currentBook.tenSach) {
+      showToast('Vui lòng nhập đầy đủ thông tin sách', 'error');
+      return;
+    }
+
+    if (editingIndex >= 0) {
+      // Update existing book
+      const updatedDetails = [...bookDetails];
+      updatedDetails[editingIndex] = { ...currentBook };
+      setBookDetails(updatedDetails);
+      setEditingIndex(-1);
+    } else {
+      // Add new book
+      setBookDetails(prev => [...prev, { ...currentBook, id: Date.now() }]);
+    }
+
+    // Reset current book
+    setCurrentBook({
+      maSach: '',
+      tenSach: '',
+      soLuongHeThong: 0,
+      soLuongThucTe: 0,
+      chenhLech: 0,
+      ghiChu: ''
+    });
   };
 
-  const handleCompleteCheck = (checkId) => {
-    setChecks(prev => prev.map(check => 
-      check.id === checkId 
-        ? { ...check, status: 'completed', checkedBooks: check.totalBooks }
-        : check
-    ));
+  // Edit book in table
+  const editBook = (index) => {
+    setCurrentBook({ ...bookDetails[index] });
+    setEditingIndex(index);
   };
 
-  const handleCancelCheck = (checkId) => {
-    setChecks(prev => prev.map(check => 
-      check.id === checkId 
-        ? { ...check, status: 'cancelled' }
-        : check
-    ));
+  // Remove book from table
+  const removeBook = (index) => {
+    setBookDetails(prev => prev.filter((_, i) => i !== index));
+    if (editingIndex === index) {
+      setEditingIndex(-1);
+      setCurrentBook({
+        maSach: '',
+        tenSach: '',
+        soLuongHeThong: 0,
+        soLuongThucTe: 0,
+        chenhLech: 0,
+        ghiChu: ''
+      });
+    }
+  };
+
+  // Save check
+  const saveCheck = async () => {
+    if (!checkForm.nhanVienThucHien) {
+      showToast('Vui lòng nhập tên nhân viên thực hiện', 'error');
+      return;
+    }
+
+    if (bookDetails.length === 0) {
+      showToast('Vui lòng thêm ít nhất một sách vào danh sách', 'error');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const checkData = {
+        ...checkForm,
+        chiTietSach: bookDetails
+      };
+
+      await inventoryCheckService.createInventoryCheck(checkData);
+      
+      showToast('Lưu phiếu kiểm kê thành công!', 'success');
+      resetForm();
+      loadChecks(); // Reload the list
+    } catch (error) {
+      showToast('Có lỗi xảy ra khi lưu phiếu kiểm kê', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setCheckForm({
+      kyKiemKe: '',
+      ngayKiemKe: new Date().toISOString().split('T')[0],
+      nhanVienThucHien: ''
+    });
+    setBookDetails([]);
+    setCurrentBook({
+      maSach: '',
+      tenSach: '',
+      soLuongHeThong: 0,
+      soLuongThucTe: 0,
+      chenhLech: 0,
+      ghiChu: ''
+    });
+    setEditingIndex(-1);
+    setShowForm(false);
+  };
+
+  // Format discrepancy
+  const formatDiscrepancy = (discrepancy) => {
+    if (discrepancy === 0) return '0';
+    return discrepancy > 0 ? `+${discrepancy}` : `${discrepancy}`;
   };
 
   return (
     <div className="inventory-checks">
       <div className="page-header">
-        <h1><FaClipboardList /> Quản lý kiểm kê kho</h1>
-        <p>Theo dõi và quản lý các đợt kiểm kê kho sách</p>
+        <h1><FaClipboardList /> Phiếu kiểm kê sách</h1>
+        <p>Quản lý kiểm kê sách trong kho thư viện</p>
       </div>
 
-      <div className="check-stats">
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaClipboardList />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">{checks.length}</div>
-            <div className="stat-label">Tổng đợt kiểm kê</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaBoxes />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">
-              {checks.reduce((sum, check) => sum + check.totalBooks, 0)}
-            </div>
-            <div className="stat-label">Tổng sách cần kiểm</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaCheck />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">
-              {checks.filter(check => check.status === 'completed').length}
-            </div>
-            <div className="stat-label">Đã hoàn thành</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaExclamationTriangle />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">
-              {checks.reduce((sum, check) => sum + check.discrepancies, 0)}
-            </div>
-            <div className="stat-label">Sai lệch phát hiện</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="check-controls">
-        <div className="filter-section">
-          <select 
-            value={filterStatus} 
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="planned">Đã lên kế hoạch</option>
-            <option value="in_progress">Đang thực hiện</option>
-            <option value="completed">Hoàn thành</option>
-            <option value="cancelled">Đã hủy</option>
-          </select>
-        </div>
-
-        <button className="btn-primary" onClick={handleCreateCheck}>
-          <FaPlus /> Tạo đợt kiểm kê mới
+      {!showForm ? (
+        <div className="checks-list">
+          <div className="actions-bar">
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setShowForm(true)}
+            >
+              <FaPlus /> Tạo phiếu kiểm kê mới
         </button>
       </div>
 
@@ -169,199 +219,232 @@ const InventoryChecks = () => {
         <table>
           <thead>
             <tr>
-              <th>Mã kiểm kê</th>
-              <th>Loại kiểm kê</th>
-              <th>Thời gian</th>
-              <th>Tiến độ</th>
-              <th>Sai lệch</th>
-              <th>Người thực hiện</th>
+                  <th>Kỳ kiểm kê</th>
+                  <th>Ngày kiểm kê</th>
+                  <th>Nhân viên thực hiện</th>
+                  <th>Số lượng sách</th>
+                  <th>Số sách chênh lệch</th>
               <th>Trạng thái</th>
-              <th>Ghi chú</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {filteredChecks.map(check => {
-              const statusConfig = getStatusBadge(check.status);
-              const progressPercentage = getProgressPercentage(check.checkedBooks, check.totalBooks);
-              return (
+                {checks.map((check) => (
                 <tr key={check.id}>
+                    <td>{check.kyKiemKe}</td>
+                    <td>{check.ngayKiemKe}</td>
+                    <td>{check.nhanVienThucHien}</td>
+                    <td>{check.chiTietSach?.length || 0}</td>
                   <td>
-                    <strong>{check.checkCode}</strong>
+                      {check.chiTietSach?.filter(book => book.chenhLech !== 0).length || 0}
                   </td>
                   <td>
-                    <div className="check-type">
-                      <span>{check.checkType}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="date-range">
-                      <div className="date-info">
-                        <FaCalendarAlt />
-                        <span>Từ: {check.startDate}</span>
-                      </div>
-                      <div className="date-info">
-                        <FaCalendarAlt />
-                        <span>Đến: {check.endDate}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="progress-section">
-                      <div className="progress-bar">
-                        <div 
-                          className="progress-fill"
-                          style={{ width: `${progressPercentage}%` }}
-                        ></div>
-                      </div>
-                      <div className="progress-text">
-                        {check.checkedBooks}/{check.totalBooks} ({progressPercentage}%)
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="discrepancy-info">
-                      {check.discrepancies > 0 ? (
-                        <span className="discrepancy-badge">
-                          {check.discrepancies} lỗi
-                        </span>
-                      ) : (
-                        <span className="no-discrepancy">Không có</span>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="assignee-info">
-                      <FaUser />
-                      <span>{check.assignedTo}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${statusConfig.class}`}>
-                      {statusConfig.label}
+                      <span className={`status-badge ${check.trangThai}`}>
+                        {check.trangThai === 'pending' ? 'Chờ xử lý' : 
+                         check.trangThai === 'completed' ? 'Hoàn thành' : 
+                         check.trangThai === 'cancelled' ? 'Đã hủy' : check.trangThai}
                     </span>
                   </td>
                   <td>
-                    <div className="notes-cell">
-                      {check.notes}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      {check.status === 'planned' && (
-                        <>
-                          <button 
-                            className="btn-icon success" 
-                            title="Bắt đầu kiểm kê"
-                            onClick={() => handleStartCheck(check.id)}
-                          >
-                            <FaCheck />
-                          </button>
-                          <button 
-                            className="btn-icon danger" 
-                            title="Hủy kiểm kê"
-                            onClick={() => handleCancelCheck(check.id)}
-                          >
-                            <FaTimes />
-                          </button>
-                        </>
-                      )}
-                      {check.status === 'in_progress' && (
-                        <button 
-                          className="btn-icon success" 
-                          title="Hoàn thành kiểm kê"
-                          onClick={() => handleCompleteCheck(check.id)}
-                        >
-                          <FaCheck />
-                        </button>
-                      )}
                       <button className="btn-icon" title="Xem chi tiết">
                         <FaEye />
                       </button>
-                      <button className="btn-icon" title="Chỉnh sửa">
-                        <FaEdit />
+                      <button className="btn-icon" title="In phiếu">
+                        <FaPrint />
                       </button>
-                    </div>
                   </td>
                 </tr>
-              );
-            })}
+                ))}
           </tbody>
         </table>
       </div>
-
-      {filteredChecks.length === 0 && (
-        <div className="empty-state">
-          <FaClipboardList />
-          <p>Không có đợt kiểm kê nào phù hợp</p>
         </div>
-      )}
+      ) : (
+        <div className="check-form">
+          <div className="form-header">
+            <h2>Phiếu kiểm kê sách</h2>
+            <div className="form-actions">
+              <button 
+                className="btn btn-secondary" 
+                onClick={resetForm}
+                disabled={loading}
+              >
+                <FaTimes /> Hủy
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={saveCheck}
+                disabled={loading}
+              >
+                <FaSave /> Lưu kiểm kê
+              </button>
+            </div>
+          </div>
 
-      {/* New Check Modal */}
-      {showNewCheckModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Tạo đợt kiểm kê mới</h2>
-              <button 
-                className="btn-close"
-                onClick={() => setShowNewCheckModal(false)}
-              >
-                <FaTimes />
-              </button>
-            </div>
-            <div className="modal-content">
+          {/* General Information Section */}
+          <div className="form-section">
+            <h3>Thông tin chung</h3>
+            <div className="form-grid">
               <div className="form-group">
-                <label>Loại kiểm kê</label>
-                <select>
-                  <option>Kiểm kê định kỳ</option>
-                  <option>Kiểm tra hư hỏng</option>
-                  <option>Kiểm kê theo thể loại</option>
-                  <option>Kiểm kê đột xuất</option>
-                </select>
+                <label>Kỳ kiểm kê:</label>
+                <input
+                  type="text"
+                  value={checkForm.kyKiemKe}
+                  onChange={(e) => handleFormChange('kyKiemKe', e.target.value)}
+                  placeholder="Mã kỳ kiểm kê tự động"
+                  readOnly
+                />
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Ngày bắt đầu</label>
-                  <input type="date" />
-                </div>
-                <div className="form-group">
-                  <label>Ngày kết thúc</label>
-                  <input type="date" />
-                </div>
-              </div>
+              
               <div className="form-group">
-                <label>Người thực hiện</label>
-                <select>
-                  <option>Nguyễn Văn A</option>
-                  <option>Trần Thị B</option>
-                  <option>Lê Văn C</option>
-                </select>
+                <label>Ngày kiểm kê:</label>
+                <input
+                  type="date"
+                  value={checkForm.ngayKiemKe}
+                  onChange={(e) => handleFormChange('ngayKiemKe', e.target.value)}
+                />
               </div>
+              
               <div className="form-group">
-                <label>Phạm vi kiểm kê</label>
-                <select>
-                  <option>Toàn bộ kho</option>
-                  <option>Theo kệ</option>
-                  <option>Theo thể loại</option>
-                  <option>Theo nhà xuất bản</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Ghi chú</label>
-                <textarea placeholder="Ghi chú về đợt kiểm kê..."></textarea>
+                <label>Nhân viên thực hiện:</label>
+                <input
+                  type="text"
+                  value={checkForm.nhanVienThucHien}
+                  onChange={(e) => handleFormChange('nhanVienThucHien', e.target.value)}
+                  placeholder="Nhập tên nhân viên thực hiện"
+                />
               </div>
             </div>
-            <div className="modal-footer">
+          </div>
+
+          {/* Book Details Section */}
+          <div className="form-section">
+            <h3>Chi tiết sách</h3>
+            
+            {/* Add Book Form */}
+            <div className="add-book-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Mã sách:</label>
+                  <input
+                    type="text"
+                    value={currentBook.maSach}
+                    onChange={(e) => handleBookChange('maSach', e.target.value)}
+                    placeholder="Nhập mã sách"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Tên sách:</label>
+                  <input
+                    type="text"
+                    value={currentBook.tenSach}
+                    onChange={(e) => handleBookChange('tenSach', e.target.value)}
+                    placeholder="Nhập tên sách"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Số lượng hệ thống:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={currentBook.soLuongHeThong}
+                    onChange={(e) => handleBookChange('soLuongHeThong', parseInt(e.target.value) || 0)}
+                    placeholder="SL hệ thống"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Số lượng thực tế:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={currentBook.soLuongThucTe}
+                    onChange={(e) => handleBookChange('soLuongThucTe', parseInt(e.target.value) || 0)}
+                    placeholder="SL thực tế"
+                  />
+              </div>
+                
+              <div className="form-group">
+                  <label>Chênh lệch:</label>
+                  <input
+                    type="text"
+                    value={formatDiscrepancy(currentBook.chenhLech)}
+                    readOnly
+                    className="readonly"
+                  />
+              </div>
+                
+              <div className="form-group">
+                  <label>Ghi chú:</label>
+                  <input
+                    type="text"
+                    value={currentBook.ghiChu}
+                    onChange={(e) => handleBookChange('ghiChu', e.target.value)}
+                    placeholder="Ghi chú (nếu có)"
+                  />
+              </div>
+                
+              <div className="form-group">
+                  <label>&nbsp;</label>
+                  <button 
+                    className="btn btn-success" 
+                    onClick={addBookToTable}
+                  >
+                    <FaPlus /> {editingIndex >= 0 ? 'Cập nhật' : 'Thêm sách'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Book Details Table */}
+            <div className="book-details-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Mã sách</th>
+                    <th>Tên sách</th>
+                    <th>SL hệ thống</th>
+                    <th>SL thực tế</th>
+                    <th>Chênh lệch</th>
+                    <th>Ghi chú</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bookDetails.map((book, index) => (
+                    <tr key={book.id || index}>
+                      <td>{index + 1}</td>
+                      <td>{book.maSach}</td>
+                      <td>{book.tenSach}</td>
+                      <td>{book.soLuongHeThong}</td>
+                      <td>{book.soLuongThucTe}</td>
+                      <td className={book.chenhLech !== 0 ? 'discrepancy' : ''}>
+                        {formatDiscrepancy(book.chenhLech)}
+                      </td>
+                      <td>{book.ghiChu || '...'}</td>
+                      <td>
               <button 
-                className="btn-secondary"
-                onClick={() => setShowNewCheckModal(false)}
+                          className="btn-icon" 
+                          onClick={() => editBook(index)}
+                          title="Sửa"
               >
-                Hủy
+                          <FaEdit />
               </button>
-              <button className="btn-primary">
-                Tạo đợt kiểm kê
+                        <button 
+                          className="btn-icon btn-danger" 
+                          onClick={() => removeBook(index)}
+                          title="Xóa"
+                        >
+                          <FaTrash />
               </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

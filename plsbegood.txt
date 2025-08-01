@@ -1,0 +1,119 @@
+Phòng kế toán:Trưởng phòng kế toán + Nhân viên kế toán
+Phòng dịch vụ độc giả: Trưởng thư viện + Thủ thư
+Kho sách: Trưởng kho + Nhân viên kho
+Phòng công nghệ thông tin: Quản trị viên + Kỹ thuật viên
+mọi chức năng đều lưu lại log để xuất báo cáo
+
+Role: Độc giả
+-Không thể tự đăng ký tài khoản, phải đăng ký thông qua Thủ thư
+-Tuổi phải 16+ mới được đăng ký tài khoản
+-Độc giả có 2 loại: thường(100000đ/năm), VIP(200000đ/năm); học sinh/sinh viên(50000đ/năm, loại thường), giáo viên/giảng viên(miễn phí, loại thường) 
++ Cấp bậc là VIP>thường
++ Độc giả có thể mượn tối đa 5 sách/1 lượt mượn
+//+ VIP sẽ được mượn 1 tháng(có thể gia hạn 1 sách/2 lần, mỗi lần 7 ngày, được gia hạn khi có người đặt trước), còn lại chỉ được mượn 14 ngày(chỉ có thể gia hạn 1 sách/1 lần, gia hạn 7 ngày, không được gia hạn khi có người đặt trước)
+-Chức năng của độc giả:
++ Xem thông tin cá nhân
++ Xem thông tin sách đang mượn, hạn trả,
++ Tìm kiếm sách( tìm được theo tên sách, tên tác giả, mã ISBN, thể loại, nhà xuất bản)
++ Sách sẽ hiển thị ảnh bìa sách, tên sách, tên tác giả, mã ISBN, thể loại, nhà xuất bản, số lượng có sẵn, vị trí trên kệ(đề xuất ưu tiên sách có sẵn, ưu tiên đề xuất hiển thị sách có ≥5 lượt mượn/tháng hoặc ≥3 lượt đặt trước hoặc Sách thuộc danh mục ưu tiên (STEM, bestseller))
++ Độc giả có thể đặt mượn sách thông qua web khi sách có sẵn, và sẽ có hạn tới lấy sách
+++ Nếu số lượng có sẵn hết thì sẽ được xếp vào hàng đợi, khi nào có lại sách sẽ nhận được thông báo từ hệ thống, chỉ được đặt trước tối đa 3 cuốn sách cùng lúc
++ Khi độc giả đặt mượn sách mà quá hạn lấy sách thì phần đó sẽ bị hủy
++ Khi độc giả đặt mượn sách nhưng chưa tới lấy, sách được mượn trực tiếp từ thư viện dẫn tới hết số lượng có sẵn, sẽ gửi thông báo tới độc giả đặt mượn sách và xếp độc giả đặt mượn sách vào hàng đợi
++ Độc giả có thể gia hạn sách nếu như muốn mượn lâu hơn, chỉ gia hạn 1 sách/1 lần, tối đa 7 ngày. Không áp dụng gia hạn nếu sách có người đặt trước, thời gian gia hạn tính từ ngày hết hạn cũ.
+++ Độc giả không được gia hạn sách nếu sách đang mượn quá hạn trả
+++Phân loại mức độ vi phạm: 
++++ Trễ 1-3 ngày: Cảnh báo
++++ Trễ 4-7 ngày: Phạt tiền + Cảnh báo
++++ Trễ > 7 ngày: Khóa tài khoản 30 ngày
++++ Trễ > 1 năm: Hủy thẻ, không thể đăng ký lại
++++ Miễn phí phạt nếu có lý do chính đáng
++ Nếu độc giả trả sách bị hư hoặc mất sách thì đóng phạt 150% giá trị sách
+++ Sách hư hỏng phân thành 3 cấp độ:
++++ Nhẹ (dán lại bìa): Bồi thường 30% giá trị
++++ Vừa (rách trang): Bồi thường 70% giá trị
++++ Nặng (không sử dụng được): Bồi thường 150% giá trị
++ Có thể đóng phí phạt qua tiền mặt hoặc chuyển khoản ngân hàng
+
+Role: Giám đốc
+-Là role không thể thêm/xóa, chỉ có duy nhất 1 giám đốc
+-Có toàn bộ chức năng của các role còn lại
+-Có thể thêm/sửa/xóa các role còn lại
+
+Role: Trưởng thư viện
+-Tài khoản được cấp bởi Giám đốc
+-Chức năng của trưởng thư viện:
++ Có toàn bộ chức năng của thủ thư
++ Xem được hoạt động thay đổi của thủ thư
++ Duyệt đề xuất bổ sung sách và gửi tới kho (Nếu từ chối, phải ghi rõ lý do)
+
+Role: Thủ thư
+-Tài khoản được cấp bởi Quản trị viên
+-Chức năng của thủ thư:
++ Đăng ký tài khoản cho độc giả(đăng ký theo loại) -> Quản lý độc giả
++ Quản lý mượn sách với PHIẾU MƯỢN SÁCH
++ Quản lý trả sách với PHIẾU TRẢ SÁCH
++ Thu phí phạt, thu phí đăng kí tài khoản độc giả bằng PHIẾU THU PHÍ PHẠT -> Quản lý tiền phạt
++ Quản lý chỉ số mượn trả với DANH SÁCH BÁO CÁO SÁCH ĐƯỢC MƯỢN NHIỀU NHẤT THÁNG
++ Quản lý gia hạn sách với PHIẾU GIA HẠN MƯỢN SÁCH
++ Quản lý sách được đặt mượn với PHIẾU ĐẶT TRƯỚC SÁCH
++ Quản lý sách(cập nhật tình trạng sách bằng PHIẾU CẬP NHẬT TRẠNG THÁI SÁCH nếu như có sách hư hỏng hoặc mất)
++ Quản lý sách vi phạm(số sách vi phạm) với DANH SÁCH BÁO CÁO SÁCH TRẢ TRỄ/HƯ HỎNG/MẤT
+++ Phân loại tình trạng:
++++ Tốt: Sách nguyên vẹn, đủ trang, không rách/bẩn.
++++ Hư hỏng:
+++++ Nhẹ (bẩn, gãy gáy): Ghi rõ vị trí hư hỏng.
+++++ Nặng (rách trang, mất nội dung): Yêu cầu bồi thường theo quy định
+++++ Mất: Xác nhận sau 30 ngày tìm kiếm.
++++++ Sách hư hỏng nhẹ → Chuyển kho bảo trì.
++++++ Sách hư hỏng nặng/mất → Lập phiếu bồi thường
++ Đề xuất bằng PHIẾU ĐỀ XUẤT BỔ SUNG SÁCH gửi tới Trưởng thư viện(phải có lý do)(thời gian duyệt là 3 ngày, quá 3 ngày thì tự động hủy, lý do quá hạn duyệt)
++ Xem và xuất các báo cáo liên quan
+
+Role: Quản trị viên
+-Tài khoản mặc định là admin
+-Chức năng: 
++ Có toàn bộ chức năng của kỹ thuật viên
++ Có thể phân quyền người dùng bằng PHIẾU PHÂN QUYỀN NGƯỜI DÙNG
++ Có toàn bộ chức năng của các role còn lại, trừ giám đốc
++ Xem được hoạt động thay đổi của toàn hệ thống
+
+Role: Kỹ thuật viên
+-Tài khoản được cấp bởi Quản trị viên
+-Chức năng: 
++ Cấu hình hệ thống(Thời gian mượn, phí phạt, giới hạn số lượng sách mượn, giới hạn số lượng sách đặt trước, phí thành viên hàng năm)
++ Sao lưu dữ liệu
++ Có toàn bộ chức năng của các role khác, trừ giám đốc và quản trị viên
++ Xem được hoạt động thay đổi của thủ thư, nhân viên kế toán, nhân viên kho
++ Xem và xuất các báo cáo liên quan
+
+Role: Trưởng phòng kế toán
+-Tài khoản được cấp bởi Giám đốc
+-Chức năng của trưởng phòng kế toán:
++ Có toàn bộ chức năng của nhân viên kế toán
++ Duyệt đề xuất bổ sung sách và gửi tới nhà cung cấp (Nếu từ chối, phải ghi rõ lý do)(thời gian duyệt là 3 ngày, quá 3 ngày thì tự động hủy, lý do quá hạn duyệt)
++ Nhà cung cấp phải trả lời trong vòng 48h kể từ khi nhận đơn, nếu quá hạn → Tự động hủy đơn, chuyển sang nhà cung cấp khác, mọi thay đổi giá/ngày giao phải được ghi vào PHIẾU GHI NHẬN PHẢN HỒI NHÀ CUNG CẤP.
++ Xem được hoạt động thay đổi của nhân viên kế toán
+
+Role: Nhân viên kế toán
+-Tài khoản được cấp bởi Quản trị viên
+-Chức năng của nhân viên kế toán:
++ Xét duyệt đơn đề nghị mua sách để gửi đến trưởng phòng kế toán (Nếu từ chối, phải ghi rõ lý do)(thời gian duyệt là 3 ngày, quá 3 ngày thì tự động hủy, lý do quá hạn duyệt)
++ Quản lý đơn mua sách từ nhà cung cấp
++ Quản lý nhà cung cấp
++ Xem và xuất các báo cáo liên quan
++ Quản lý doanh thu với DANH SÁCH BÁO CÁO DOANH THU PHÍ THÀNH VIÊN, DANH SÁCH BÁO CÁO DOANH THU PHÍ PHẠT
+
+Role: Trưởng kho
+-Tài khoản được cấp bởi Giám đốc
+-Chức năng của trưởng kho:
++ Có toàn bộ chức năng của nhân viên kho
++ Duyệt đề xuất bổ sung sách và gửi tới phòng kế toán (Nếu từ chối, phải ghi rõ lý do)(thời gian duyệt là 3 ngày, quá 3 ngày thì tự động hủy, lý do quá hạn duyệt)
++ Xem được hoạt động thay đổi của nhân viên kho
+
+Role: Nhân viên kho
+-Tài khoản được cấp bởi Quản trị viên
+-Chức năng của nhân viên kho:
++ Xét duyệt phiếu đề xuất bổ sung sách và gửi tới Trưởng kho (Nếu từ chối, phải ghi rõ lý do)(thời gian duyệt là 3 ngày, quá 3 ngày thì tự động hủy, lý do quá hạn duyệt)
++ Quản lý kho với PHIẾU NHẬP KHO SÁCH và PHIẾU KIỂM KÊ SÁCH
++ Xem và xuất các báo cáo liên quan

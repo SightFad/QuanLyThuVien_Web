@@ -51,9 +51,9 @@ namespace LibraryApi.Services
                     tt => tt.MaDG,
                     (pt, tt) => new BaoCaoDoanhThuPhiThanhVienDto
                     {
-                        NgayBaoCao = pt.NgayThu ?? DateTime.Now,
+                        NgayBaoCao = pt.NgayThu,
                         LoaiThe = tt.LoaiThe ?? "Không xác định",
-                        ThanhTien = pt.SoTien ?? 0
+                        ThanhTien = pt.SoTien
                     })
                 .ToListAsync();
 
@@ -80,7 +80,7 @@ namespace LibraryApi.Services
                 .Where(pp => pp.NgayLap >= tuNgay && pp.NgayLap <= denNgay)
                 .Select(pp => new BaoCaoDoanhThuPhiPhatDto
                 {
-                    NgayBaoCao = pp.NgayLap ?? DateTime.Now,
+                                            NgayBaoCao = pp.NgayLap ?? DateTime.Now,
                     NguonThu = pp.LoaiPhat ?? "Không xác định",
                     SoLuong = 1, // Mỗi phiếu phạt = 1 lần
                     ThanhTien = pp.SoTien ?? 0

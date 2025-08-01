@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaCalendar, FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { apiRequest } from '../config/api';
 import ReaderModal from '../components/ReaderModal';
 import './ReaderManagement.css';
 
@@ -12,8 +13,6 @@ const ReaderManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const apiUrl = "http://localhost:5280/api/DocGia";
-
   useEffect(() => {
     loadReaders();
   }, []);
@@ -23,12 +22,7 @@ const ReaderManagement = () => {
     setError(null);
     
     try {
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      const data = await apiRequest('/api/DocGia');
       const mappedReaders = data.map((dg) => ({
         id: dg.maDG,
         name: dg.hoTen || 'Chưa cập nhật',
@@ -42,8 +36,8 @@ const ReaderManagement = () => {
         status: dg.trangThai || 'active',
         memberSince: dg.ngayDangKy ? new Date(dg.ngayDangKy).toLocaleDateString('vi-VN') : 
                    dg.ngaySinh ? new Date(dg.ngaySinh).toLocaleDateString('vi-VN') : 'Chưa cập nhật',
-        totalBorrows: Math.floor(Math.random() * 50) + 1,
-        currentBorrows: Math.floor(Math.random() * 5) + 1
+        totalBorrows: dg.totalBorrows || 0,
+        currentBorrows: dg.currentBorrows || 0
       }));
       
       setReaders(mappedReaders);
@@ -145,14 +139,9 @@ const ReaderManagement = () => {
   const handleDeleteReader = async (readerId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa thành viên này?')) {
       try {
-        const response = await fetch(`${apiUrl}/${readerId}`, {
+        await apiRequest(`/api/DocGia/${readerId}`, {
           method: "DELETE",
         });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText);
-        }
         
         await loadReaders();
       } catch (err) {
@@ -177,28 +166,16 @@ const ReaderManagement = () => {
 
       if (editingReader) {
         // Cập nhật
-        const response = await fetch(`${apiUrl}/${editingReader.id}`, {
+        await apiRequest(`/api/DocGia/${editingReader.id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...requestData, maDG: editingReader.id }),
         });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText);
-        }
       } else {
         // Thêm mới
-        const response = await fetch(apiUrl, {
+        await apiRequest('/api/DocGia', {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
         });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText);
-        }
       }
       
       await loadReaders();

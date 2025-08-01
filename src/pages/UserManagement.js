@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaKey } from 'react-icons/fa';
+import { apiRequest, MOCK_DATA } from '../config/api';
 import './UserManagement.css';
 
 const UserManagement = () => {
@@ -11,7 +12,7 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const apiUrl = "http://localhost:5280/api/User";
+
 
   useEffect(() => {
     fetchUsers();
@@ -29,22 +30,21 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-        setFilteredUsers(data);
-      } else {
-        setError('Không thể tải danh sách người dùng');
-      }
+      const data = await apiRequest('/api/User');
+      setUsers(data);
+      setFilteredUsers(data);
     } catch (err) {
-      setError('Lỗi kết nối');
+      console.log('Backend không có sẵn, sử dụng dữ liệu mẫu...');
+      // Sử dụng dữ liệu mẫu nếu backend không có sẵn
+      const mockUsers = Object.entries(MOCK_DATA.users).map(([username, user]) => ({
+        id: Math.random().toString(36).substr(2, 9),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isActive: true
+      }));
+      setUsers(mockUsers);
+      setFilteredUsers(mockUsers);
     } finally {
       setLoading(false);
     }
@@ -66,20 +66,10 @@ const UserManagement = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${apiUrl}/${userId}`, {
+      await apiRequest(`/api/User/${userId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
-
-      if (response.ok) {
-        fetchUsers();
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Không thể xóa người dùng');
-      }
+      fetchUsers();
     } catch (err) {
       alert('Lỗi kết nối');
     }
@@ -90,13 +80,8 @@ const UserManagement = () => {
     if (!newPassword) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${apiUrl}/${userId}/reset-password`, {
+      await apiRequest(`/api/User/${userId}/reset-password`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({ newPassword })
       });
 

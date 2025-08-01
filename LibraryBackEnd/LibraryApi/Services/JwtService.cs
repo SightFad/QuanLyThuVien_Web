@@ -15,8 +15,8 @@ namespace LibraryApi.Services
 
         public JwtService(IConfiguration config)
         {
-            _secret = config["Jwt:Key"];
-            _expDate = config["Jwt:ExpireDays"];
+            _secret = config["Jwt:Key"] ?? throw new ArgumentNullException(nameof(config), "JWT Key is not configured");
+            _expDate = config["Jwt:ExpireDays"] ?? throw new ArgumentNullException(nameof(config), "JWT ExpireDays is not configured");
         }
 
         public string GenerateToken(NguoiDung nguoiDung)

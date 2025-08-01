@@ -1,64 +1,192 @@
-import React, { useState } from 'react';
-import { FaTruck, FaPlus, FaFileAlt, FaCheck, FaTimes, FaBoxes, FaCalendarAlt, FaUser, FaBuilding } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaTruck, FaPlus, FaSave, FaPrint, FaTrash, FaEdit, FaEye, FaTimes } from 'react-icons/fa';
+import { useToast } from '../../hooks';
+import phieuNhapKhoService from '../../services/phieuNhapKhoService';
 import './BookImports.css';
 
 const BookImports = () => {
-  const [imports, setImports] = useState([
-    {
-      id: 1,
-      importCode: 'IMP-2024-001',
-      supplier: 'NXB Giáo dục',
-      totalBooks: 150,
-      totalValue: 15000000,
-      status: 'pending',
-      importDate: '2024-01-15',
-      expectedDelivery: '2024-01-20',
-      actualDelivery: null,
-      notes: 'Sách giáo khoa cho năm học mới'
-    },
-    {
-      id: 2,
-      importCode: 'IMP-2024-002',
-      supplier: 'NXB Trẻ',
-      totalBooks: 80,
-      totalValue: 8000000,
-      status: 'in_transit',
-      importDate: '2024-01-10',
-      expectedDelivery: '2024-01-18',
-      actualDelivery: null,
-      notes: 'Sách văn học và tiểu thuyết'
-    },
-    {
-      id: 3,
-      importCode: 'IMP-2024-003',
-      supplier: 'NXB Kim Đồng',
-      totalBooks: 200,
-      totalValue: 12000000,
-      status: 'completed',
-      importDate: '2024-01-05',
-      expectedDelivery: '2024-01-12',
-      actualDelivery: '2024-01-12',
-      notes: 'Sách thiếu nhi và truyện tranh'
+  const { showToast } = useToast();
+  
+  // Form state
+  const [importForm, setImportForm] = useState({
+    maPhieu: '',
+    ngayNhap: new Date().toISOString().split('T')[0],
+    nhaCungCap: '',
+    ghiChu: ''
+  });
+
+  // Book details table
+  const [bookDetails, setBookDetails] = useState([]);
+  const [currentBook, setCurrentBook] = useState({
+    maSach: '',
+    tenSach: '',
+    soLuong: 1,
+    donGia: 0,
+    thanhTien: 0
+  });
+
+  // UI state
+  const [showForm, setShowForm] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(-1);
+  const [imports, setImports] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Load imports on component mount
+  useEffect(() => {
+    loadImports();
+  }, []);
+
+  const loadImports = async () => {
+    try {
+      setLoading(true);
+      const data = await phieuNhapKhoService.getAllPhieuNhapKho();
+      setImports(data);
+    } catch (error) {
+      showToast('Có lỗi xảy ra khi tải danh sách phiếu nhập kho', 'error');
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const [showNewImportModal, setShowNewImportModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
-
-  const filteredImports = imports.filter(importItem => 
-    filterStatus === 'all' || importItem.status === filterStatus
-  );
-
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: { label: 'Chờ xử lý', class: 'pending' },
-      in_transit: { label: 'Đang vận chuyển', class: 'in-transit' },
-      completed: { label: 'Hoàn thành', class: 'completed' },
-      cancelled: { label: 'Đã hủy', class: 'cancelled' }
-    };
-    return statusConfig[status] || { label: status, class: 'unknown' };
   };
 
+  // Generate import code
+  useEffect(() => {
+    const generateImportCode = () => {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      return `NK-${year}${month}${day}-${random}`;
+    };
+
+    if (!importForm.maPhieu) {
+      setImportForm(prev => ({ ...prev, maPhieu: generateImportCode() }));
+    }
+  }, [importForm.maPhieu]);
+
+  // Calculate total amount
+  const calculateTotal = () => {
+    return bookDetails.reduce((total, book) => total + book.thanhTien, 0);
+  };
+
+  // Handle form input changes
+  const handleFormChange = (field, value) => {
+    setImportForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Handle book detail changes
+  const handleBookChange = (field, value) => {
+    const updatedBook = { ...currentBook, [field]: value };
+    
+    // Auto calculate thanhTien
+    if (field === 'soLuong' || field === 'donGia') {
+      updatedBook.thanhTien = updatedBook.soLuong * updatedBook.donGia;
+    }
+    
+    setCurrentBook(updatedBook);
+  };
+
+  // Add book to table
+  const addBookToTable = () => {
+    if (!currentBook.maSach || !currentBook.tenSach || currentBook.soLuong <= 0) {
+      showToast('Vui lòng nhập đầy đủ thông tin sách', 'error');
+      return;
+    }
+
+    if (editingIndex >= 0) {
+      // Update existing book
+      const updatedDetails = [...bookDetails];
+      updatedDetails[editingIndex] = { ...currentBook };
+      setBookDetails(updatedDetails);
+      setEditingIndex(-1);
+    } else {
+      // Add new book
+      setBookDetails(prev => [...prev, { ...currentBook, id: Date.now() }]);
+    }
+
+    // Reset current book
+    setCurrentBook({
+      maSach: '',
+      tenSach: '',
+      soLuong: 1,
+      donGia: 0,
+      thanhTien: 0
+    });
+  };
+
+  // Edit book in table
+  const editBook = (index) => {
+    setCurrentBook({ ...bookDetails[index] });
+    setEditingIndex(index);
+  };
+
+  // Remove book from table
+  const removeBook = (index) => {
+    setBookDetails(prev => prev.filter((_, i) => i !== index));
+    if (editingIndex === index) {
+      setEditingIndex(-1);
+      setCurrentBook({
+        maSach: '',
+        tenSach: '',
+        soLuong: 1,
+        donGia: 0,
+        thanhTien: 0
+      });
+    }
+  };
+
+  // Save import
+  const saveImport = async () => {
+    if (!importForm.nhaCungCap) {
+      showToast('Vui lòng nhập tên nhà cung cấp', 'error');
+      return;
+    }
+
+    if (bookDetails.length === 0) {
+      showToast('Vui lòng thêm ít nhất một sách vào danh sách', 'error');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const importData = {
+        ...importForm,
+        chiTietSach: bookDetails
+      };
+
+      await phieuNhapKhoService.createPhieuNhapKho(importData);
+      
+      showToast('Lưu phiếu nhập kho thành công!', 'success');
+      resetForm();
+      loadImports(); // Reload the list
+    } catch (error) {
+      showToast('Có lỗi xảy ra khi lưu phiếu nhập kho', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setImportForm({
+      maPhieu: '',
+      ngayNhap: new Date().toISOString().split('T')[0],
+      nhaCungCap: '',
+      ghiChu: ''
+    });
+    setBookDetails([]);
+    setCurrentBook({
+      maSach: '',
+      tenSach: '',
+      soLuong: 1,
+      donGia: 0,
+      thanhTien: 0
+    });
+    setEditingIndex(-1);
+    setShowForm(false);
+  };
+
+  // Format currency
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -66,94 +194,21 @@ const BookImports = () => {
     }).format(amount);
   };
 
-  const handleCreateImport = () => {
-    setShowNewImportModal(true);
-  };
-
-  const handleConfirmImport = (importId) => {
-    setImports(prev => prev.map(imp => 
-      imp.id === importId 
-        ? { ...imp, status: 'completed', actualDelivery: new Date().toISOString().split('T')[0] }
-        : imp
-    ));
-  };
-
-  const handleCancelImport = (importId) => {
-    setImports(prev => prev.map(imp => 
-      imp.id === importId 
-        ? { ...imp, status: 'cancelled' }
-        : imp
-    ));
-  };
-
   return (
     <div className="book-imports">
       <div className="page-header">
-        <h1><FaTruck /> Quản lý nhập sách</h1>
-        <p>Theo dõi và quản lý các đơn nhập sách từ nhà cung cấp</p>
+        <h1><FaTruck /> Phiếu nhập kho sách</h1>
+        <p>Quản lý nhập sách vào kho thư viện</p>
       </div>
 
-      <div className="import-stats">
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaFileAlt />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">{imports.length}</div>
-            <div className="stat-label">Tổng đơn nhập</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaBoxes />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">
-              {imports.reduce((sum, imp) => sum + imp.totalBooks, 0)}
-            </div>
-            <div className="stat-label">Tổng số sách</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaCheck />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">
-              {imports.filter(imp => imp.status === 'completed').length}
-            </div>
-            <div className="stat-label">Đã hoàn thành</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FaTimes />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">
-              {imports.filter(imp => imp.status === 'pending').length}
-            </div>
-            <div className="stat-label">Chờ xử lý</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="import-controls">
-        <div className="filter-section">
-          <select 
-            value={filterStatus} 
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="pending">Chờ xử lý</option>
-            <option value="in_transit">Đang vận chuyển</option>
-            <option value="completed">Hoàn thành</option>
-            <option value="cancelled">Đã hủy</option>
-          </select>
-        </div>
-
-        <button className="btn-primary" onClick={handleCreateImport}>
-          <FaPlus /> Tạo đơn nhập mới
+      {!showForm ? (
+        <div className="imports-list">
+          <div className="actions-bar">
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setShowForm(true)}
+            >
+              <FaPlus /> Tạo phiếu nhập mới
         </button>
       </div>
 
@@ -161,156 +216,233 @@ const BookImports = () => {
         <table>
           <thead>
             <tr>
-              <th>Mã đơn nhập</th>
+                  <th>Mã phiếu</th>
+                  <th>Ngày nhập</th>
               <th>Nhà cung cấp</th>
               <th>Số lượng sách</th>
-              <th>Giá trị</th>
-              <th>Ngày đặt</th>
-              <th>Dự kiến giao</th>
-              <th>Thực tế giao</th>
+                  <th>Tổng tiền</th>
               <th>Trạng thái</th>
-              <th>Ghi chú</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {filteredImports.map(importItem => {
-              const statusConfig = getStatusBadge(importItem.status);
-              return (
+                {imports.map((importItem) => (
                 <tr key={importItem.id}>
-                  <td>
-                    <strong>{importItem.importCode}</strong>
-                  </td>
-                  <td>
-                    <div className="supplier-info">
-                      <FaBuilding />
-                      <span>{importItem.supplier}</span>
-                    </div>
-                  </td>
-                  <td>{importItem.totalBooks} cuốn</td>
-                  <td>{formatCurrency(importItem.totalValue)}</td>
-                  <td>
-                    <div className="date-info">
-                      <FaCalendarAlt />
-                      <span>{importItem.importDate}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="date-info">
-                      <FaCalendarAlt />
-                      <span>{importItem.expectedDelivery}</span>
-                    </div>
-                  </td>
-                  <td>
-                    {importItem.actualDelivery ? (
-                      <div className="date-info">
-                        <FaCalendarAlt />
-                        <span>{importItem.actualDelivery}</span>
-                      </div>
-                    ) : (
-                      <span className="not-delivered">Chưa giao</span>
-                    )}
-                  </td>
-                  <td>
-                    <span className={`status-badge ${statusConfig.class}`}>
-                      {statusConfig.label}
+                    <td>{importItem.maPhieu}</td>
+                    <td>{importItem.ngayNhap}</td>
+                    <td>{importItem.nhaCungCap}</td>
+                    <td>{importItem.chiTietSach?.length || 0}</td>
+                    <td>{formatCurrency(importItem.tongTien || 0)}</td>
+                    <td>
+                      <span className={`status-badge ${importItem.trangThai}`}>
+                        {importItem.trangThai === 'pending' ? 'Chờ xử lý' : 
+                         importItem.trangThai === 'completed' ? 'Hoàn thành' : 
+                         importItem.trangThai === 'cancelled' ? 'Đã hủy' : importItem.trangThai}
                     </span>
                   </td>
                   <td>
-                    <div className="notes-cell">
-                      {importItem.notes}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      {importItem.status === 'pending' && (
-                        <>
-                          <button 
-                            className="btn-icon success" 
-                            title="Xác nhận nhập"
-                            onClick={() => handleConfirmImport(importItem.id)}
-                          >
-                            <FaCheck />
-                          </button>
-                          <button 
-                            className="btn-icon danger" 
-                            title="Hủy đơn"
-                            onClick={() => handleCancelImport(importItem.id)}
-                          >
-                            <FaTimes />
-                          </button>
-                        </>
-                      )}
-                      {importItem.status === 'in_transit' && (
-                        <button 
-                          className="btn-icon success" 
-                          title="Xác nhận đã nhận"
-                          onClick={() => handleConfirmImport(importItem.id)}
-                        >
-                          <FaCheck />
-                        </button>
-                      )}
                       <button className="btn-icon" title="Xem chi tiết">
-                        <FaFileAlt />
+                        <FaEye />
                       </button>
-                    </div>
+                      <button className="btn-icon" title="In phiếu">
+                        <FaPrint />
+                      </button>
                   </td>
                 </tr>
-              );
-            })}
+                ))}
           </tbody>
         </table>
       </div>
-
-      {filteredImports.length === 0 && (
-        <div className="empty-state">
-          <FaTruck />
-          <p>Không có đơn nhập nào phù hợp</p>
         </div>
-      )}
+      ) : (
+        <div className="import-form">
+          <div className="form-header">
+            <h2>Phiếu nhập kho sách</h2>
+            <div className="form-actions">
+              <button 
+                className="btn btn-secondary" 
+                onClick={resetForm}
+                disabled={loading}
+              >
+                <FaTimes /> Hủy
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={saveImport}
+                disabled={loading}
+              >
+                <FaSave /> Lưu phiếu
+              </button>
+            </div>
+          </div>
 
-      {/* New Import Modal */}
-      {showNewImportModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Tạo đơn nhập mới</h2>
-              <button 
-                className="btn-close"
-                onClick={() => setShowNewImportModal(false)}
-              >
-                <FaTimes />
-              </button>
+          {/* General Information Section */}
+          <div className="form-section">
+            <h3>Thông tin chung</h3>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Mã phiếu:</label>
+                <input
+                  type="text"
+                  value={importForm.maPhieu}
+                  onChange={(e) => handleFormChange('maPhieu', e.target.value)}
+                  placeholder="Mã phiếu tự động"
+                  readOnly
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Ngày nhập:</label>
+                <input
+                  type="date"
+                  value={importForm.ngayNhap}
+                  onChange={(e) => handleFormChange('ngayNhap', e.target.value)}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Nhà cung cấp:</label>
+                <input
+                  type="text"
+                  value={importForm.nhaCungCap}
+                  onChange={(e) => handleFormChange('nhaCungCap', e.target.value)}
+                  placeholder="Nhập tên nhà cung cấp"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Ghi chú:</label>
+                <textarea
+                  value={importForm.ghiChu}
+                  onChange={(e) => handleFormChange('ghiChu', e.target.value)}
+                  placeholder="Ghi chú về phiếu nhập"
+                  rows="3"
+                />
+              </div>
             </div>
-            <div className="modal-content">
-              <div className="form-group">
-                <label>Nhà cung cấp</label>
-                <select>
-                  <option>NXB Giáo dục</option>
-                  <option>NXB Trẻ</option>
-                  <option>NXB Kim Đồng</option>
-                  <option>NXB Văn học</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Danh sách sách</label>
-                <textarea placeholder="Nhập danh sách sách cần nhập..."></textarea>
-              </div>
-              <div className="form-group">
-                <label>Ghi chú</label>
-                <textarea placeholder="Ghi chú về đơn nhập..."></textarea>
+          </div>
+
+          {/* Book Details Section */}
+          <div className="form-section">
+            <h3>Chi tiết sách</h3>
+            
+            {/* Add Book Form */}
+            <div className="add-book-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Mã sách:</label>
+                  <input
+                    type="text"
+                    value={currentBook.maSach}
+                    onChange={(e) => handleBookChange('maSach', e.target.value)}
+                    placeholder="Nhập mã sách"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Tên sách:</label>
+                  <input
+                    type="text"
+                    value={currentBook.tenSach}
+                    onChange={(e) => handleBookChange('tenSach', e.target.value)}
+                    placeholder="Nhập tên sách"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Số lượng:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={currentBook.soLuong}
+                    onChange={(e) => handleBookChange('soLuong', parseInt(e.target.value) || 0)}
+                    placeholder="Số lượng"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Đơn giá:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={currentBook.donGia}
+                    onChange={(e) => handleBookChange('donGia', parseInt(e.target.value) || 0)}
+                    placeholder="Đơn giá (VNĐ)"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Thành tiền:</label>
+                  <input
+                    type="text"
+                    value={formatCurrency(currentBook.thanhTien)}
+                    readOnly
+                    className="readonly"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>&nbsp;</label>
+                  <button 
+                    className="btn btn-success" 
+                    onClick={addBookToTable}
+                  >
+                    <FaPlus /> {editingIndex >= 0 ? 'Cập nhật' : 'Thêm sách'}
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="modal-footer">
+
+            {/* Book Details Table */}
+            <div className="book-details-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Mã sách</th>
+                    <th>Tên sách</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bookDetails.map((book, index) => (
+                    <tr key={book.id || index}>
+                      <td>{index + 1}</td>
+                      <td>{book.maSach}</td>
+                      <td>{book.tenSach}</td>
+                      <td>{book.soLuong}</td>
+                      <td>{formatCurrency(book.donGia)}</td>
+                      <td>{formatCurrency(book.thanhTien)}</td>
+                      <td>
               <button 
-                className="btn-secondary"
-                onClick={() => setShowNewImportModal(false)}
+                          className="btn-icon" 
+                          onClick={() => editBook(index)}
+                          title="Sửa"
               >
-                Hủy
+                          <FaEdit />
               </button>
-              <button className="btn-primary">
-                Tạo đơn nhập
+                        <button 
+                          className="btn-icon btn-danger" 
+                          onClick={() => removeBook(index)}
+                          title="Xóa"
+                        >
+                          <FaTrash />
               </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan="5" className="text-right"><strong>Tổng cộng:</strong></td>
+                    <td><strong>{formatCurrency(calculateTotal())}</strong></td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
         </div>

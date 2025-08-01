@@ -1,4 +1,5 @@
 import React from 'react';
+import './Badge.css';
 
 /**
  * Shared Badge Component
@@ -50,6 +51,11 @@ export const StatusBadge = ({ status, ...props }) => {
     borrowed: { variant: 'warning', text: 'Đang mượn' },
     returned: { variant: 'success', text: 'Đã trả' },
     reserved: { variant: 'info', text: 'Đã đặt trước' },
+    // Book status configurations
+    available: { variant: 'success', text: 'Có sẵn' },
+    maintenance: { variant: 'warning', text: 'Bảo trì' },
+    lost: { variant: 'danger', text: 'Mất' },
+    damaged: { variant: 'danger', text: 'Hỏng' },
   };
 
   const config = statusConfig[status] || { variant: 'secondary', text: status };

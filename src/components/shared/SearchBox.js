@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { useDebounce } from '../../hooks';
+import './SearchBox.css';
 
 /**
  * Shared SearchBox Component
