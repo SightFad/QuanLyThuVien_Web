@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaCalendar, FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
-import { apiRequest } from '../config/api';
-import ReaderModal from '../components/ReaderModal';
-import './ReaderManagement.css';
+import React, { useState, useEffect } from "react";
+import {
+  FaPlus,
+  FaSearch,
+  FaEdit,
+  FaTrash,
+  FaUser,
+  FaCalendar,
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import { apiRequest } from "../config/api";
+import ReaderModal from "../components/ReaderModal";
+import "./ReaderManagement.css";
+import { render } from "@testing-library/react";
 
 const ReaderManagement = () => {
   const [readers, setReaders] = useState([]);
   const [filteredReaders, setFilteredReaders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingReader, setEditingReader] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,94 +31,97 @@ const ReaderManagement = () => {
   const loadReaders = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const data = await apiRequest('/api/DocGia');
+      const data = await apiRequest("/api/DocGia");
       const mappedReaders = data.map((dg) => ({
         id: dg.maDG,
-        name: dg.hoTen || 'Chưa cập nhật',
-        email: dg.email || 'Chưa cập nhật',
-        phone: dg.sdt || 'Chưa cập nhật',
-        address: dg.diaChi || 'Chưa cập nhật',
-        gioiTinh: dg.gioiTinh || 'Chưa cập nhật',
+        name: dg.hoTen || "Chưa cập nhật",
+        email: dg.email || "Chưa cập nhật",
+        phone: dg.sdt || "Chưa cập nhật",
+        address: dg.diaChi || "Chưa cập nhật",
+        gioiTinh: dg.gioiTinh || "Chưa cập nhật",
         ngaySinh: dg.ngaySinh,
-        goiDangKy: dg.goiDangKy || 'Chưa cập nhật',
+        goiDangKy: dg.goiDangKy || "Chưa cập nhật",
         ngayDangKy: dg.ngayDangKy,
-        status: dg.trangThai || 'active',
-        memberSince: dg.ngayDangKy ? new Date(dg.ngayDangKy).toLocaleDateString('vi-VN') : 
-                   dg.ngaySinh ? new Date(dg.ngaySinh).toLocaleDateString('vi-VN') : 'Chưa cập nhật',
+        status: dg.trangThai || "active",
+        memberSince: dg.ngayDangKy
+          ? new Date(dg.ngayDangKy).toLocaleDateString("vi-VN")
+          : dg.ngaySinh
+          ? new Date(dg.ngaySinh).toLocaleDateString("vi-VN")
+          : "Chưa cập nhật",
         totalBorrows: dg.totalBorrows || 0,
-        currentBorrows: dg.currentBorrows || 0
+        currentBorrows: dg.currentBorrows || 0,
       }));
-      
+
       setReaders(mappedReaders);
       setFilteredReaders(mappedReaders);
     } catch (err) {
       console.error("Lỗi khi tải thành viên:", err);
       setError("Không thể kết nối đến máy chủ. Đang hiển thị dữ liệu mẫu.");
-      
+
       // Fallback data với đầy đủ thông tin mới
       const fallbackData = [
         {
           id: 1,
-          name: 'Nguyễn Văn A',
-          email: 'nguyenvana@email.com',
-          phone: '0123456789',
-          address: '123 Lê Lợi, Q1, TP.HCM',
-          gioiTinh: 'Nam',
-          ngaySinh: '1990-05-15',
-          goiDangKy: 'thuong',
-          ngayDangKy: '2024-01-15',
-          status: 'active',
-          memberSince: '15/01/2024',
+          name: "Nguyễn Văn A",
+          email: "nguyenvana@email.com",
+          phone: "0123456789",
+          address: "123 Lê Lợi, Q1, TP.HCM",
+          gioiTinh: "Nam",
+          ngaySinh: "1990-05-15",
+          goiDangKy: "thuong",
+          ngayDangKy: "2024-01-15",
+          status: "active",
+          memberSince: "15/01/2024",
           totalBorrows: 25,
-          currentBorrows: 2
+          currentBorrows: 2,
         },
         {
           id: 2,
-          name: 'Trần Thị B',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          address: '456 Nguyễn Huệ, Q3, TP.HCM',
-          gioiTinh: 'Nữ',
-          ngaySinh: '1995-08-20',
-          goiDangKy: 'vip',
-          ngayDangKy: '2024-02-20',
-          status: 'active',
-          memberSince: '20/02/2024',
+          name: "Trần Thị B",
+          email: "tranthib@email.com",
+          phone: "0987654321",
+          address: "456 Nguyễn Huệ, Q3, TP.HCM",
+          gioiTinh: "Nữ",
+          ngaySinh: "1995-08-20",
+          goiDangKy: "vip",
+          ngayDangKy: "2024-02-20",
+          status: "active",
+          memberSince: "20/02/2024",
           totalBorrows: 18,
-          currentBorrows: 1
+          currentBorrows: 1,
         },
         {
           id: 3,
-          name: 'Lê Văn C',
-          email: 'levanc@email.com',
-          phone: '0555666777',
-          address: '789 Võ Văn Tần, Q3, TP.HCM',
-          gioiTinh: 'Nam',
-          ngaySinh: '1992-12-10',
-          goiDangKy: 'sinhvien',
-          ngayDangKy: '2024-03-10',
-          status: 'active',
-          memberSince: '10/03/2024',
+          name: "Lê Văn C",
+          email: "levanc@email.com",
+          phone: "0555666777",
+          address: "789 Võ Văn Tần, Q3, TP.HCM",
+          gioiTinh: "Nam",
+          ngaySinh: "1992-12-10",
+          goiDangKy: "sinhvien",
+          ngayDangKy: "2024-03-10",
+          status: "active",
+          memberSince: "10/03/2024",
           totalBorrows: 32,
-          currentBorrows: 3
+          currentBorrows: 3,
         },
         {
           id: 4,
-          name: 'Phạm Thị D',
-          email: 'phamthid@email.com',
-          phone: '0333444555',
-          address: '321 Điện Biên Phủ, Q3, TP.HCM',
-          gioiTinh: 'Nữ',
-          ngaySinh: '1988-03-05',
-          goiDangKy: 'thuong',
-          ngayDangKy: '2024-04-05',
-          status: 'active',
-          memberSince: '05/04/2024',
+          name: "Phạm Thị D",
+          email: "phamthid@email.com",
+          phone: "0333444555",
+          address: "321 Điện Biên Phủ, Q3, TP.HCM",
+          gioiTinh: "Nữ",
+          ngaySinh: "1988-03-05",
+          goiDangKy: "thuong",
+          ngayDangKy: "2024-04-05",
+          status: "active",
+          memberSince: "05/04/2024",
           totalBorrows: 15,
-          currentBorrows: 0
-        }
+          currentBorrows: 0,
+        },
       ];
       setReaders(fallbackData);
       setFilteredReaders(fallbackData);
@@ -117,11 +131,12 @@ const ReaderManagement = () => {
   };
 
   useEffect(() => {
-    const filtered = readers.filter(reader =>
-      reader.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reader.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reader.phone.includes(searchTerm) ||
-      reader.address.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = readers.filter(
+      (reader) =>
+        reader.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reader.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reader.phone.includes(searchTerm) ||
+        reader.address.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredReaders(filtered);
   }, [searchTerm, readers]);
@@ -137,12 +152,12 @@ const ReaderManagement = () => {
   };
 
   const handleDeleteReader = async (readerId) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa thành viên này?')) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa thành viên này?")) {
       try {
         await apiRequest(`/api/DocGia/${readerId}`, {
           method: "DELETE",
         });
-        
+
         await loadReaders();
       } catch (err) {
         alert("Lỗi khi xóa thành viên: " + err.message);
@@ -153,15 +168,15 @@ const ReaderManagement = () => {
   const handleSaveReader = async (readerData) => {
     try {
       const requestData = {
-        hoTen: readerData.name,
-        email: readerData.email,
-        sdt: readerData.phone,
-        diaChi: readerData.address,
-        gioiTinh: readerData.gioiTinh,
-        ngaySinh: readerData.ngaySinh || null,
-        goiDangKy: readerData.goiDangKy,
-        ngayDangKy: readerData.ngayDangKy,
-        trangThai: readerData.status
+        HoTen: readerData.name,
+        TenDG: readerData.TenDG,
+        Email: readerData.email,
+        SDT: readerData.phone,
+        DiaChi: readerData.address,
+        GioiTinh: readerData.gioiTinh,
+        NgaySinh: readerData.ngaySinh || null,
+        LoaiDocGia: readerData.goiDangKy,
+        PhiThanhVien: readerData.phiThanhVien || 0,
       };
 
       if (editingReader) {
@@ -172,26 +187,37 @@ const ReaderManagement = () => {
         });
       } else {
         // Thêm mới
-        const response = await apiRequest('/api/DocGia', {
+        await apiRequest("/api/DocGia", {
           method: "POST",
           body: JSON.stringify(requestData),
         });
-        return response; // Trả về kết quả để hiển thị thông tin tài khoản
+        // Nếu cần trả về response, xử lý ở ReaderModal hoặc nơi gọi hàm này
       }
-      
+
       await loadReaders();
       setShowModal(false);
       setEditingReader(null);
     } catch (error) {
-      alert("Lỗi khi lưu thông tin thành viên: " + error.message);
+      // Nếu API trả về lỗi xác thực, hiển thị chi tiết
+      if (error.errors) {
+        console.error("API validation errors:", error.errors);
+        alert(
+          "Lỗi xác thực từ máy chủ:\n" +
+            Object.entries(error.errors)
+              .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+              .join("\n")
+        );
+      } else {
+        alert("Lỗi khi lưu thông tin thành viên: " + error.message);
+      }
     }
   };
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'active':
+      case "active":
         return <span className="badge badge-success">Hoạt động</span>;
-      case 'inactive':
+      case "inactive":
         return <span className="badge badge-danger">Không hoạt động</span>;
       default:
         return <span className="badge badge-secondary">Không xác định</span>;
@@ -200,11 +226,11 @@ const ReaderManagement = () => {
 
   const getPackageBadge = (packageType) => {
     switch (packageType) {
-      case 'thuong':
+      case "thuong":
         return <span className="badge badge-info">Thường</span>;
-      case 'vip':
+      case "vip":
         return <span className="badge badge-warning">VIP</span>;
-      case 'sinhvien':
+      case "sinhvien":
         return <span className="badge badge-primary">Sinh viên</span>;
       default:
         return <span className="badge badge-secondary">Chưa cập nhật</span>;
@@ -226,7 +252,9 @@ const ReaderManagement = () => {
     <div className="reader-management">
       <div className="page-header">
         <h1 className="page-title">Quản lý thành viên</h1>
-        <p className="page-subtitle">Quản lý thông tin thành viên trong thư viện</p>
+        <p className="page-subtitle">
+          Quản lý thông tin thành viên trong thư viện
+        </p>
       </div>
 
       {error && (
@@ -272,7 +300,7 @@ const ReaderManagement = () => {
                 <tr key={reader.id}>
                   <td>
                     <div className="member-id">
-                      <strong>#{reader.id.toString().padStart(4, '0')}</strong>
+                      <strong>#{reader.id.toString().padStart(4, "0")}</strong>
                     </div>
                   </td>
                   <td>
@@ -283,21 +311,27 @@ const ReaderManagement = () => {
                       <div className="reader-details">
                         <strong>{reader.name}</strong>
                         <div className="member-details">
-                          <span><FaCalendar /> {reader.gioiTinh}</span>
-                          <span><FaMapMarkerAlt /> {reader.address}</span>
+                          <span>
+                            <FaCalendar /> {reader.gioiTinh}
+                          </span>
+                          <span>
+                            <FaMapMarkerAlt /> {reader.address}
+                          </span>
                         </div>
                       </div>
                     </div>
                   </td>
                   <td>
                     <div className="contact-info">
-                      <div><FaEnvelope /> {reader.email}</div>
-                      <div><FaPhone /> {reader.phone}</div>
+                      <div>
+                        <FaEnvelope /> {reader.email}
+                      </div>
+                      <div>
+                        <FaPhone /> {reader.phone}
+                      </div>
                     </div>
                   </td>
-                  <td>
-                    {getPackageBadge(reader.goiDangKy)}
-                  </td>
+                  <td>{getPackageBadge(reader.goiDangKy)}</td>
                   <td>{reader.memberSince}</td>
                   <td>{getStatusBadge(reader.status)}</td>
                   <td>
@@ -353,4 +387,4 @@ const ReaderManagement = () => {
   );
 };
 
-export default ReaderManagement; 
+export default ReaderManagement;

@@ -93,14 +93,16 @@ namespace LibraryApi.Controllers
                 Email = dto.Email,
                 SDT = dto.SDT,
                 DiaChi = dto.DiaChi,
-                GioiTinh = dto.GioiTinh,
-                NgaySinh = dto.NgaySinh,
+                GioiTinh = dto.GioiTinh,              
                 LoaiDocGia = dto.LoaiDocGia ?? "Thuong",
                 CapBac = "Thuong", // Default value
                 MemberStatus = "ChuaThanhToan", // Default value
+                NgayDangKy = DateTime.Now.AddMonths(-3),
+                NgayHetHan = DateTime.Now.AddMonths(9),
                 PhiThanhVien = dto.PhiThanhVien,
                 LyDoKhoa = null, // Allow null
                 NgayCapNhat = DateTime.Now
+                
             };
             _context.DocGias.Add(docGia);
             _context.SaveChanges();
