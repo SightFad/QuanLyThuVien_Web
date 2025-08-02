@@ -1,9 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { FaBook, FaCalendar, FaClock, FaExclamationTriangle, FaCheck, FaHistory, FaUser, FaMapMarkerAlt } from 'react-icons/fa';
-import './ReaderMyBooks.css';
+import React, { useState, useEffect } from "react";
+import {
+  FaBook,
+  FaCalendar,
+  FaClock,
+  FaExclamationTriangle,
+  FaCheck,
+  FaHistory,
+  FaUser,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import "./ReaderMyBooks.css";
 
 const ReaderMyBooks = () => {
-  const [activeTab, setActiveTab] = useState('current'); // 'current' hoặc 'history'
+  const [activeTab, setActiveTab] = useState("current"); // 'current' hoặc 'history'
   const [myBooks, setMyBooks] = useState([]);
   const [borrowHistory, setBorrowHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,95 +23,95 @@ const ReaderMyBooks = () => {
       const mockMyBooks = [
         {
           id: 1,
-          bookTitle: 'Đắc Nhân Tâm',
-          author: 'Dale Carnegie',
-          category: 'Kỹ năng sống',
-          borrowDate: '2024-01-15',
-          returnDate: '2024-02-15',
+          bookTitle: "Đắc Nhân Tâm",
+          author: "Dale Carnegie",
+          category: "Kỹ năng sống",
+          borrowDate: "2024-01-15",
+          returnDate: "2024-02-15",
           daysLeft: 5,
-          status: 'borrowed',
-          isbn: '978-604-1-00001-1',
-          location: 'Kệ A1'
+          status: "borrowed",
+          isbn: "978-604-1-00001-1",
+          location: "Kệ A1",
         },
         {
           id: 2,
-          bookTitle: 'Nhà Giả Kim',
-          author: 'Paulo Coelho',
-          category: 'Tiểu thuyết',
-          borrowDate: '2024-01-20',
-          returnDate: '2024-02-20',
+          bookTitle: "Nhà Giả Kim",
+          author: "Paulo Coelho",
+          category: "Tiểu thuyết",
+          borrowDate: "2024-01-20",
+          returnDate: "2024-02-20",
           daysLeft: -5,
-          status: 'overdue',
-          isbn: '978-604-1-00002-2',
-          location: 'Kệ A2'
+          status: "overdue",
+          isbn: "978-604-1-00002-2",
+          location: "Kệ A2",
         },
         {
           id: 3,
-          bookTitle: 'Tuổi Trẻ Đáng Giá Bao Nhiêu',
-          author: 'Rosie Nguyễn',
-          category: 'Kỹ năng sống',
-          borrowDate: '2024-01-10',
-          returnDate: '2024-02-10',
+          bookTitle: "Tuổi Trẻ Đáng Giá Bao Nhiêu",
+          author: "Rosie Nguyễn",
+          category: "Kỹ năng sống",
+          borrowDate: "2024-01-10",
+          returnDate: "2024-02-10",
           daysLeft: -2,
-          status: 'overdue',
-          isbn: '978-604-1-00003-3',
-          location: 'Kệ A3'
-        }
+          status: "overdue",
+          isbn: "978-604-1-00003-3",
+          location: "Kệ A3",
+        },
       ];
 
       const mockBorrowHistory = [
         {
           id: 101,
-          bookTitle: 'Cách Nghĩ Để Thành Công',
-          author: 'Napoleon Hill',
-          category: 'Kinh doanh',
-          borrowDate: '2023-12-01',
-          returnDate: '2023-12-15',
-          actualReturnDate: '2023-12-14',
-          status: 'returned',
-          isbn: '978-604-1-00004-4',
-          location: 'Kệ C1',
-          fine: 0
+          bookTitle: "Cách Nghĩ Để Thành Công",
+          author: "Napoleon Hill",
+          category: "Kinh doanh",
+          borrowDate: "2023-12-01",
+          returnDate: "2023-12-15",
+          actualReturnDate: "2023-12-14",
+          status: "returned",
+          isbn: "978-604-1-00004-4",
+          location: "Kệ C1",
+          fine: 0,
         },
         {
           id: 102,
-          bookTitle: 'Đọc Vị Bất Kỳ Ai',
-          author: 'David J. Lieberman',
-          category: 'Tâm lý học',
-          borrowDate: '2023-11-15',
-          returnDate: '2023-11-30',
-          actualReturnDate: '2023-12-05',
-          status: 'returned_late',
-          isbn: '978-604-1-00005-5',
-          location: 'Kệ B3',
-          fine: 75000
+          bookTitle: "Đọc Vị Bất Kỳ Ai",
+          author: "David J. Lieberman",
+          category: "Tâm lý học",
+          borrowDate: "2023-11-15",
+          returnDate: "2023-11-30",
+          actualReturnDate: "2023-12-05",
+          status: "returned_late",
+          isbn: "978-604-1-00005-5",
+          location: "Kệ B3",
+          fine: 75000,
         },
         {
           id: 103,
-          bookTitle: 'Sapiens: Lược Sử Loài Người',
-          author: 'Yuval Noah Harari',
-          category: 'Lịch sử',
-          borrowDate: '2023-10-20',
-          returnDate: '2023-11-05',
-          actualReturnDate: '2023-11-03',
-          status: 'returned',
-          isbn: '978-604-1-00006-6',
-          location: 'Kệ D1',
-          fine: 0
+          bookTitle: "Sapiens: Lược Sử Loài Người",
+          author: "Yuval Noah Harari",
+          category: "Lịch sử",
+          borrowDate: "2023-10-20",
+          returnDate: "2023-11-05",
+          actualReturnDate: "2023-11-03",
+          status: "returned",
+          isbn: "978-604-1-00006-6",
+          location: "Kệ D1",
+          fine: 0,
         },
         {
           id: 104,
-          bookTitle: 'Nghĩ Giàu Làm Giàu',
-          author: 'Napoleon Hill',
-          category: 'Kinh doanh',
-          borrowDate: '2023-09-10',
-          returnDate: '2023-09-25',
-          actualReturnDate: '2023-09-28',
-          status: 'returned_late',
-          isbn: '978-604-1-00007-7',
-          location: 'Kệ C2',
-          fine: 45000
-        }
+          bookTitle: "Nghĩ Giàu Làm Giàu",
+          author: "Napoleon Hill",
+          category: "Kinh doanh",
+          borrowDate: "2023-09-10",
+          returnDate: "2023-09-25",
+          actualReturnDate: "2023-09-28",
+          status: "returned_late",
+          isbn: "978-604-1-00007-7",
+          location: "Kệ C2",
+          fine: 45000,
+        },
       ];
 
       setMyBooks(mockMyBooks);
@@ -112,7 +121,7 @@ const ReaderMyBooks = () => {
   }, []);
 
   const getStatusBadge = (status, daysLeft) => {
-    if (status === 'overdue' || daysLeft < 0) {
+    if (status === "overdue" || daysLeft < 0) {
       return <span className="badge badge-danger">Quá hạn</span>;
     } else if (daysLeft <= 3) {
       return <span className="badge badge-warning">Sắp hạn</span>;
@@ -123,9 +132,9 @@ const ReaderMyBooks = () => {
 
   const getHistoryStatusBadge = (status) => {
     switch (status) {
-      case 'returned':
+      case "returned":
         return <span className="badge badge-success">Đã trả</span>;
-      case 'returned_late':
+      case "returned_late":
         return <span className="badge badge-warning">Trả trễ</span>;
       default:
         return <span className="badge badge-secondary">Không xác định</span>;
@@ -134,14 +143,18 @@ const ReaderMyBooks = () => {
 
   const handleRenewBook = (bookId) => {
     // In a real app, this would send a request to the server
-    alert(`Đã gửi yêu cầu gia hạn sách ID: ${bookId}. Vui lòng chờ xác nhận từ thủ thư.`);
+    alert(
+      `Đã gửi yêu cầu gia hạn sách ID: ${bookId}. Vui lòng chờ xác nhận từ Librarian.`
+    );
   };
 
   const handleReturnBook = (bookId) => {
     // In a real app, this would send a request to the server
-    if (window.confirm('Bạn có chắc chắn muốn trả sách này?')) {
-      setMyBooks(myBooks.filter(book => book.id !== bookId));
-      alert('Đã gửi yêu cầu trả sách. Vui lòng mang sách đến thư viện để hoàn tất.');
+    if (window.confirm("Bạn có chắc chắn muốn trả sách này?")) {
+      setMyBooks(myBooks.filter((book) => book.id !== bookId));
+      alert(
+        "Đã gửi yêu cầu trả sách. Vui lòng mang sách đến thư viện để hoàn tất."
+      );
     }
   };
 
@@ -149,14 +162,14 @@ const ReaderMyBooks = () => {
     if (daysLeft < 0) {
       return `Quá hạn ${Math.abs(daysLeft)} ngày`;
     } else if (daysLeft === 0) {
-      return 'Hạn trả hôm nay';
+      return "Hạn trả hôm nay";
     } else {
       return `Còn ${daysLeft} ngày`;
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
+    return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
   if (loading) {
@@ -177,21 +190,21 @@ const ReaderMyBooks = () => {
       {/* Tab Navigation */}
       <div className="tab-navigation">
         <button
-          className={`tab-button ${activeTab === 'current' ? 'active' : ''}`}
-          onClick={() => setActiveTab('current')}
+          className={`tab-button ${activeTab === "current" ? "active" : ""}`}
+          onClick={() => setActiveTab("current")}
         >
           <FaBook /> Sách đang mượn ({myBooks.length})
         </button>
         <button
-          className={`tab-button ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
+          className={`tab-button ${activeTab === "history" ? "active" : ""}`}
+          onClick={() => setActiveTab("history")}
         >
           <FaHistory /> Lịch sử mượn ({borrowHistory.length})
         </button>
       </div>
 
       {/* Current Books Tab */}
-      {activeTab === 'current' && (
+      {activeTab === "current" && (
         <div className="tab-content">
           {/* Summary Stats for Current Books */}
           {myBooks.length > 0 && (
@@ -199,30 +212,34 @@ const ReaderMyBooks = () => {
               <div className="section-header">
                 <h2 className="section-title">Tóm tắt</h2>
               </div>
-              
+
               <div className="summary-stats">
                 <div className="stat-card">
                   <div className="stat-number">{myBooks.length}</div>
                   <div className="stat-label">Tổng sách đang mượn</div>
                 </div>
-                
+
                 <div className="stat-card">
                   <div className="stat-number">
-                    {myBooks.filter(book => book.daysLeft < 0).length}
+                    {myBooks.filter((book) => book.daysLeft < 0).length}
                   </div>
                   <div className="stat-label">Sách quá hạn</div>
                 </div>
-                
+
                 <div className="stat-card">
                   <div className="stat-number">
-                    {myBooks.filter(book => book.daysLeft <= 3 && book.daysLeft >= 0).length}
+                    {
+                      myBooks.filter(
+                        (book) => book.daysLeft <= 3 && book.daysLeft >= 0
+                      ).length
+                    }
                   </div>
                   <div className="stat-label">Sắp hạn trả</div>
                 </div>
-                
+
                 <div className="stat-card">
                   <div className="stat-number">
-                    {myBooks.filter(book => book.daysLeft > 3).length}
+                    {myBooks.filter((book) => book.daysLeft > 3).length}
                   </div>
                   <div className="stat-label">Bình thường</div>
                 </div>
@@ -240,13 +257,18 @@ const ReaderMyBooks = () => {
             {myBooks.length > 0 ? (
               <div className="books-list">
                 {myBooks.map((book) => (
-                  <div key={book.id} className={`book-item ${book.daysLeft < 0 ? 'overdue' : ''}`}>
+                  <div
+                    key={book.id}
+                    className={`book-item ${
+                      book.daysLeft < 0 ? "overdue" : ""
+                    }`}
+                  >
                     <div className="book-info">
                       <div className="book-header">
                         <h3 className="book-title">{book.bookTitle}</h3>
                         {getStatusBadge(book.status, book.daysLeft)}
                       </div>
-                      
+
                       <div className="book-details">
                         <p className="book-author">
                           <FaUser /> <strong>Tác giả:</strong> {book.author}
@@ -258,20 +280,31 @@ const ReaderMyBooks = () => {
                           <strong>ISBN:</strong> {book.isbn}
                         </p>
                         <p className="book-location">
-                          <FaMapMarkerAlt /> <strong>Vị trí:</strong> {book.location}
+                          <FaMapMarkerAlt /> <strong>Vị trí:</strong>{" "}
+                          {book.location}
                         </p>
                       </div>
 
                       <div className="book-dates">
                         <div className="date-item">
                           <FaCalendar />
-                          <span><strong>Ngày mượn:</strong> {formatDate(book.borrowDate)}</span>
+                          <span>
+                            <strong>Ngày mượn:</strong>{" "}
+                            {formatDate(book.borrowDate)}
+                          </span>
                         </div>
                         <div className="date-item">
                           <FaClock />
-                          <span><strong>Hạn trả:</strong> {formatDate(book.returnDate)}</span>
+                          <span>
+                            <strong>Hạn trả:</strong>{" "}
+                            {formatDate(book.returnDate)}
+                          </span>
                         </div>
-                        <div className={`date-item ${book.daysLeft < 0 ? 'overdue-text' : ''}`}>
+                        <div
+                          className={`date-item ${
+                            book.daysLeft < 0 ? "overdue-text" : ""
+                          }`}
+                        >
                           <FaExclamationTriangle />
                           <span>{getDaysLeftText(book.daysLeft)}</span>
                         </div>
@@ -310,7 +343,7 @@ const ReaderMyBooks = () => {
                 <p>Hãy tìm kiếm và mượn sách mới từ thư viện!</p>
                 <button
                   className="btn btn-primary"
-                  onClick={() => window.location.href = '/reader/search'}
+                  onClick={() => (window.location.href = "/reader/search")}
                 >
                   <FaBook /> Tìm kiếm sách
                 </button>
@@ -321,7 +354,7 @@ const ReaderMyBooks = () => {
       )}
 
       {/* Borrow History Tab */}
-      {activeTab === 'history' && (
+      {activeTab === "history" && (
         <div className="tab-content">
           {/* Summary Stats for History */}
           {borrowHistory.length > 0 && (
@@ -329,30 +362,40 @@ const ReaderMyBooks = () => {
               <div className="section-header">
                 <h2 className="section-title">Thống kê lịch sử</h2>
               </div>
-              
+
               <div className="summary-stats">
                 <div className="stat-card">
                   <div className="stat-number">{borrowHistory.length}</div>
                   <div className="stat-label">Tổng sách đã mượn</div>
                 </div>
-                
+
                 <div className="stat-card">
                   <div className="stat-number">
-                    {borrowHistory.filter(book => book.status === 'returned').length}
+                    {
+                      borrowHistory.filter((book) => book.status === "returned")
+                        .length
+                    }
                   </div>
                   <div className="stat-label">Trả đúng hạn</div>
                 </div>
-                
+
                 <div className="stat-card">
                   <div className="stat-number">
-                    {borrowHistory.filter(book => book.status === 'returned_late').length}
+                    {
+                      borrowHistory.filter(
+                        (book) => book.status === "returned_late"
+                      ).length
+                    }
                   </div>
                   <div className="stat-label">Trả trễ hạn</div>
                 </div>
-                
+
                 <div className="stat-card">
                   <div className="stat-number">
-                    {borrowHistory.reduce((total, book) => total + book.fine, 0).toLocaleString('vi-VN')} VNĐ
+                    {borrowHistory
+                      .reduce((total, book) => total + book.fine, 0)
+                      .toLocaleString("vi-VN")}{" "}
+                    VNĐ
                   </div>
                   <div className="stat-label">Tổng tiền phạt</div>
                 </div>
@@ -370,13 +413,18 @@ const ReaderMyBooks = () => {
             {borrowHistory.length > 0 ? (
               <div className="books-list">
                 {borrowHistory.map((book) => (
-                  <div key={book.id} className={`book-item history-item ${book.status === 'returned_late' ? 'late-return' : ''}`}>
+                  <div
+                    key={book.id}
+                    className={`book-item history-item ${
+                      book.status === "returned_late" ? "late-return" : ""
+                    }`}
+                  >
                     <div className="book-info">
                       <div className="book-header">
                         <h3 className="book-title">{book.bookTitle}</h3>
                         {getHistoryStatusBadge(book.status)}
                       </div>
-                      
+
                       <div className="book-details">
                         <p className="book-author">
                           <FaUser /> <strong>Tác giả:</strong> {book.author}
@@ -388,27 +436,40 @@ const ReaderMyBooks = () => {
                           <strong>ISBN:</strong> {book.isbn}
                         </p>
                         <p className="book-location">
-                          <FaMapMarkerAlt /> <strong>Vị trí:</strong> {book.location}
+                          <FaMapMarkerAlt /> <strong>Vị trí:</strong>{" "}
+                          {book.location}
                         </p>
                       </div>
 
                       <div className="book-dates">
                         <div className="date-item">
                           <FaCalendar />
-                          <span><strong>Ngày mượn:</strong> {formatDate(book.borrowDate)}</span>
+                          <span>
+                            <strong>Ngày mượn:</strong>{" "}
+                            {formatDate(book.borrowDate)}
+                          </span>
                         </div>
                         <div className="date-item">
                           <FaClock />
-                          <span><strong>Hạn trả:</strong> {formatDate(book.returnDate)}</span>
+                          <span>
+                            <strong>Hạn trả:</strong>{" "}
+                            {formatDate(book.returnDate)}
+                          </span>
                         </div>
                         <div className="date-item">
                           <FaCheck />
-                          <span><strong>Ngày trả:</strong> {formatDate(book.actualReturnDate)}</span>
+                          <span>
+                            <strong>Ngày trả:</strong>{" "}
+                            {formatDate(book.actualReturnDate)}
+                          </span>
                         </div>
                         {book.fine > 0 && (
                           <div className="date-item fine-item">
                             <FaExclamationTriangle />
-                            <span><strong>Tiền phạt:</strong> {book.fine.toLocaleString('vi-VN')} VNĐ</span>
+                            <span>
+                              <strong>Tiền phạt:</strong>{" "}
+                              {book.fine.toLocaleString("vi-VN")} VNĐ
+                            </span>
                           </div>
                         )}
                       </div>
@@ -419,7 +480,10 @@ const ReaderMyBooks = () => {
             ) : (
               <div className="empty-state">
                 <h3>Chưa có lịch sử mượn sách</h3>
-                <p>Lịch sử mượn sách sẽ hiển thị ở đây sau khi bạn mượn và trả sách.</p>
+                <p>
+                  Lịch sử mượn sách sẽ hiển thị ở đây sau khi bạn mượn và trả
+                  sách.
+                </p>
               </div>
             )}
           </div>
@@ -429,4 +493,4 @@ const ReaderMyBooks = () => {
   );
 };
 
-export default ReaderMyBooks; 
+export default ReaderMyBooks;

@@ -30,7 +30,7 @@ namespace LibraryApi.Services
             // Mức phạt cơ bản: 10,000 VND/ngày
             decimal baseFine = 10000;
             
-            // Tăng mức phạt theo cấp bậc độc giả
+            // Tăng mức phạt theo cấp bậc Reader
             decimal multiplier = reader.CapBac switch
             {
                 "Sinh viên" => 1.0m,
@@ -63,7 +63,7 @@ namespace LibraryApi.Services
                 _ => 0.5m
             };
 
-            // Hệ số theo cấp bậc độc giả
+            // Hệ số theo cấp bậc Reader
             decimal readerMultiplier = reader.CapBac switch
             {
                 "Sinh viên" => 0.8m,
@@ -87,7 +87,7 @@ namespace LibraryApi.Services
             // Mức phạt cơ bản: 200% giá sách
             decimal baseFine = (book.GiaSach ?? 100000) * 2;
             
-            // Hệ số theo cấp bậc độc giả
+            // Hệ số theo cấp bậc Reader
             decimal readerMultiplier = reader.CapBac switch
             {
                 "Sinh viên" => 1.0m,
@@ -109,7 +109,7 @@ namespace LibraryApi.Services
                 .FirstOrDefaultAsync(d => d.MaDG == readerId);
 
             if (reader == null)
-                return new AccountLockResult { ShouldLock = false, Reason = "Không tìm thấy độc giả" };
+                return new AccountLockResult { ShouldLock = false, Reason = "Không tìm thấy Reader" };
 
             var result = new AccountLockResult();
 
@@ -231,7 +231,7 @@ namespace LibraryApi.Services
             };
         }
 
-        // Lấy danh sách độc giả vi phạm nhiều nhất
+        // Lấy danh sách Reader vi phạm nhiều nhất
         private async Task<List<TopViolatorDto>> GetTopViolators(DateTime? fromDate, DateTime? toDate)
         {
             var query = _context.PhieuThus

@@ -61,7 +61,7 @@ namespace LibraryApi.Services
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
             {
-                return (false, "Độc giả không tồn tại");
+                return (false, "Reader không tồn tại");
             }
 
             if (soLanGiaHan >= docGia.SoLanGiaHanToiDa)
@@ -86,7 +86,7 @@ namespace LibraryApi.Services
 
             if (phieuMuon == null || docGia == null)
             {
-                return (false, "Thông tin phiếu mượn hoặc độc giả không hợp lệ", null);
+                return (false, "Thông tin phiếu mượn hoặc Reader không hợp lệ", null);
             }
 
             // Tính số lần gia hạn đã dùng
@@ -217,7 +217,7 @@ namespace LibraryApi.Services
             }).ToList();
         }
 
-        // Lấy yêu cầu gia hạn theo độc giả
+        // Lấy yêu cầu gia hạn theo Reader
         public async Task<List<PhieuGiaHanDto>> GetRenewalRequestsByReader(int maDG)
         {
             var phieuGiaHans = await _context.PhieuGiaHans

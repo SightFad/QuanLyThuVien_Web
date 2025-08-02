@@ -105,7 +105,7 @@ namespace LibraryApi.Controllers
             _context.DocGias.Add(docGia);
             _context.SaveChanges();
 
-            // Tự động tạo tài khoản đăng nhập cho độc giả
+            // Tự động tạo tài khoản đăng nhập cho Reader
             var username = GenerateUsername(dto.HoTen);
             var password = GeneratePassword();
             
@@ -113,7 +113,7 @@ namespace LibraryApi.Controllers
             {
                 TenDangNhap = username,
                 MatKhau = password,
-                ChucVu = "Độc giả",
+                ChucVu = "Reader",
                 DocGiaId = docGia.MaDG
             };
             _context.NguoiDungs.Add(nguoiDung);
@@ -171,9 +171,9 @@ namespace LibraryApi.Controllers
         {
             var docGia = _context.DocGias.FirstOrDefault(dg => dg.MaDG == request.DocGiaId);
             if (docGia == null)
-                return NotFound("Không tìm thấy độc giả");
+                return NotFound("Không tìm thấy Reader");
             if (!string.IsNullOrEmpty(docGia.MemberStatus) && docGia.MemberStatus == "DaThanhToan")
-                return BadRequest("Độc giả đã là thành viên");
+                return BadRequest("Reader đã là thành viên");
             docGia.LoaiDocGia = request.MemberType;
             docGia.MemberStatus = "ChoXacNhan";
             docGia.NgayDangKy = DateTime.Now;
@@ -188,7 +188,7 @@ namespace LibraryApi.Controllers
         {
             var docGia = _context.DocGias.FirstOrDefault(dg => dg.MaDG == request.DocGiaId);
             if (docGia == null)
-                return NotFound("Không tìm thấy độc giả");
+                return NotFound("Không tìm thấy Reader");
             if (docGia.MemberStatus != "ChoXacNhan")
                 return BadRequest("Yêu cầu không hợp lệ hoặc đã xác nhận");
             docGia.MemberStatus = "DaThanhToan";

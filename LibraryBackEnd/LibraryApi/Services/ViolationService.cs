@@ -132,7 +132,7 @@ namespace LibraryApi.Services
         }
 
         /// <summary>
-        /// Gửi thông báo vi phạm cho độc giả
+        /// Gửi thông báo vi phạm cho Reader
         /// </summary>
         public async Task SendViolationNotification(int violationId)
         {

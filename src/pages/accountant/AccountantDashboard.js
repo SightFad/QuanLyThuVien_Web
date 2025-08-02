@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   FaMoneyBillWave,
   FaChartLine,
@@ -11,9 +11,9 @@ import {
   FaChartBar,
   FaDownload,
   FaPlus,
-  FaEye
-} from 'react-icons/fa';
-import './AccountantDashboard.css';
+  FaEye,
+} from "react-icons/fa";
+import "./AccountantDashboard.css";
 
 const AccountantDashboard = () => {
   const [stats, setStats] = useState({
@@ -26,12 +26,12 @@ const AccountantDashboard = () => {
     totalMembers: 0,
     activeMembers: 0,
     totalBooks: 0,
-    availableBooks: 0
+    availableBooks: 0,
   });
   const [financialData, setFinancialData] = useState({
     income: 0,
     expenses: 0,
-    profit: 0
+    profit: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -52,46 +52,61 @@ const AccountantDashboard = () => {
         totalMembers: 1250,
         activeMembers: 980,
         totalBooks: 8500,
-        availableBooks: 7200
+        availableBooks: 7200,
       };
 
       const mockFinancialData = {
         income: 2500000,
         expenses: 1800000,
-        profit: 700000
+        profit: 700000,
       };
 
       setStats(mockStats);
       setFinancialData(mockFinancialData);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
   const formatNumber = (number) => {
-    return new Intl.NumberFormat('vi-VN').format(number);
+    return new Intl.NumberFormat("vi-VN").format(number);
   };
 
-  const StatCard = ({ icon, title, value, color, subtitle, isCurrency = false, isNumber = false }) => (
+  const StatCard = ({
+    icon,
+    title,
+    value,
+    color,
+    subtitle,
+    isCurrency = false,
+    isNumber = false,
+  }) => (
     <div className="stat-card" style={{ borderLeftColor: color }}>
-      <div className="stat-icon" style={{ backgroundColor: `${color}15`, color }}>
+      <div
+        className="stat-icon"
+        style={{ backgroundColor: `${color}15`, color }}
+      >
         {icon}
       </div>
       <div className="stat-content">
         <h3 className="stat-title">{title}</h3>
         <p className="stat-value">
-          {isCurrency ? formatCurrency(value) : isNumber ? formatNumber(value) : value}
+          {isCurrency
+            ? formatCurrency(value)
+            : isNumber
+            ? formatNumber(value)
+            : value}
         </p>
         {subtitle && <p className="stat-subtitle">{subtitle}</p>}
       </div>
@@ -101,23 +116,17 @@ const AccountantDashboard = () => {
   const OverviewCard = ({ title, value, type, description, icon }) => (
     <div className={`overview-card ${type}`}>
       <div className="overview-header">
-        <div className="overview-icon">
-          {icon}
-        </div>
+        <div className="overview-icon">{icon}</div>
         <h3>{title}</h3>
       </div>
-      <div className={`overview-amount ${type}`}>
-        {formatCurrency(value)}
-      </div>
+      <div className={`overview-amount ${type}`}>{formatCurrency(value)}</div>
       <p className="overview-description">{description}</p>
     </div>
   );
 
   const QuickActionCard = ({ icon, title, description, onClick }) => (
     <button className="quick-action-card" onClick={onClick}>
-      <div className="action-icon">
-        {icon}
-      </div>
+      <div className="action-icon">{icon}</div>
       <div className="action-content">
         <h4>{title}</h4>
         <p>{description}</p>
@@ -127,13 +136,12 @@ const AccountantDashboard = () => {
 
   const TransactionItem = ({ type, title, amount, time, icon }) => (
     <div className="transaction-item">
-      <div className={`transaction-icon ${type}`}>
-        {icon}
-      </div>
+      <div className={`transaction-icon ${type}`}>{icon}</div>
       <div className="transaction-content">
         <p className="transaction-title">{title}</p>
         <p className={`transaction-amount ${type}`}>
-          {type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(amount))}
+          {type === "income" ? "+" : "-"}
+          {formatCurrency(Math.abs(amount))}
         </p>
         <p className="transaction-time">{time}</p>
       </div>
@@ -153,7 +161,7 @@ const AccountantDashboard = () => {
     <div className="accountant-dashboard">
       <div className="dashboard-header">
         <div className="header-content">
-          <h1>Dashboard - Kế toán</h1>
+          <h1>Dashboard - Accountant</h1>
           <p>Quản lý tài chính và thu chi thư viện</p>
         </div>
         <div className="header-actions">
@@ -267,25 +275,25 @@ const AccountantDashboard = () => {
                 icon={<FaReceipt />}
                 title="Tạo hóa đơn"
                 description="Tạo hóa đơn mới cho thành viên"
-                onClick={() => console.log('Create invoice')}
+                onClick={() => console.log("Create invoice")}
               />
               <QuickActionCard
                 icon={<FaMoneyBillWave />}
                 title="Thu phí mượn"
                 description="Xử lý thanh toán phí mượn sách"
-                onClick={() => console.log('Collect fees')}
+                onClick={() => console.log("Collect fees")}
               />
               <QuickActionCard
                 icon={<FaExclamationTriangle />}
                 title="Xử lý tiền phạt"
                 description="Quản lý tiền phạt quá hạn"
-                onClick={() => console.log('Process fines')}
+                onClick={() => console.log("Process fines")}
               />
               <QuickActionCard
                 icon={<FaChartBar />}
                 title="Báo cáo tài chính"
                 description="Xem báo cáo chi tiết"
-                onClick={() => console.log('View reports')}
+                onClick={() => console.log("View reports")}
               />
             </div>
           </div>
@@ -302,8 +310,12 @@ const AccountantDashboard = () => {
                 </div>
                 <div className="secondary-stat-content">
                   <h4>Tổng thành viên</h4>
-                  <p className="secondary-stat-value">{formatNumber(stats.totalMembers)}</p>
-                  <p className="secondary-stat-subtitle">Đang hoạt động: {formatNumber(stats.activeMembers)}</p>
+                  <p className="secondary-stat-value">
+                    {formatNumber(stats.totalMembers)}
+                  </p>
+                  <p className="secondary-stat-subtitle">
+                    Đang hoạt động: {formatNumber(stats.activeMembers)}
+                  </p>
                 </div>
               </div>
 
@@ -313,8 +325,12 @@ const AccountantDashboard = () => {
                 </div>
                 <div className="secondary-stat-content">
                   <h4>Tổng sách</h4>
-                  <p className="secondary-stat-value">{formatNumber(stats.totalBooks)}</p>
-                  <p className="secondary-stat-subtitle">Có sẵn: {formatNumber(stats.availableBooks)}</p>
+                  <p className="secondary-stat-value">
+                    {formatNumber(stats.totalBooks)}
+                  </p>
+                  <p className="secondary-stat-subtitle">
+                    Có sẵn: {formatNumber(stats.availableBooks)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -376,4 +392,4 @@ const AccountantDashboard = () => {
   );
 };
 
-export default AccountantDashboard; 
+export default AccountantDashboard;

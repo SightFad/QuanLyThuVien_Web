@@ -112,9 +112,9 @@ const UserManagement = () => {
 
   const getRoleBadge = (role) => {
     const roleColors = {
-      "Quản trị viên": "badge-danger",
-      "Thủ thư": "badge-primary",
-      "Kế toán": "badge-warning",
+      Admin: "badge-danger",
+      Librarian: "badge-primary",
+      Accountant: "badge-warning",
       "Thành viên": "badge-success",
     };
     return (

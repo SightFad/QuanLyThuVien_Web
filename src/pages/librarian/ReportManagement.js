@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  FaChartBar, 
-  FaChartLine, 
-  FaChartPie, 
-  FaFileAlt, 
-  FaPrint, 
-  FaDownload, 
+import React, { useState, useEffect } from "react";
+import {
+  FaChartBar,
+  FaChartLine,
+  FaChartPie,
+  FaFileAlt,
+  FaPrint,
+  FaDownload,
   FaCalendarAlt,
   FaMoneyBillWave,
   FaExclamationTriangle,
@@ -20,85 +20,89 @@ import {
   FaTrash,
   FaCheckCircle,
   FaTimes,
-  FaClock
-} from 'react-icons/fa';
-import { useToast } from '../../hooks';
-import './ReportManagement.css';
+  FaClock,
+} from "react-icons/fa";
+import { useToast } from "../../hooks";
+import "./ReportManagement.css";
 
 const ReportManagement = () => {
   const [reports, setReports] = useState([]);
   const [filteredReports, setFilteredReports] = useState([]);
   const [statistics, setStatistics] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [reportTypeFilter, setReportTypeFilter] = useState('all');
-  const [dateRange, setDateRange] = useState({ fromDate: '', toDate: '' });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [reportTypeFilter, setReportTypeFilter] = useState("all");
+  const [dateRange, setDateRange] = useState({ fromDate: "", toDate: "" });
   const [selectedReport, setSelectedReport] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   const { showToast } = useToast();
 
   // Form states for creating new report
   const [newReport, setNewReport] = useState({
-    loaiBaoCao: '',
-    tieuDe: '',
-    noiDung: '',
-    ngayTao: new Date().toISOString().split('T')[0],
-    nguoiTao: '',
-    trangThai: 'Chờ duyệt'
+    loaiBaoCao: "",
+    tieuDe: "",
+    noiDung: "",
+    ngayTao: new Date().toISOString().split("T")[0],
+    nguoiTao: "",
+    trangThai: "Chờ duyệt",
   });
 
   // Mock data for demonstration
   const mockReports = [
     {
       id: 1,
-      loaiBaoCao: 'Báo cáo doanh thu',
-      tieuDe: 'Báo cáo doanh thu tháng 1/2024',
-      noiDung: 'Tổng doanh thu: 15,000,000 VNĐ\nSố lượng sách mượn: 150 cuốn\nSố lượng độc giả: 45 người',
-      ngayTao: '2024-01-31',
-      nguoiTao: 'Thủ thư Nguyễn Thị A',
-      trangThai: 'Đã duyệt',
-      nguoiDuyet: 'Quản lý Trần Văn B',
-      ngayDuyet: '2024-02-01',
-      ghiChu: 'Báo cáo chính xác'
+      loaiBaoCao: "Báo cáo doanh thu",
+      tieuDe: "Báo cáo doanh thu tháng 1/2024",
+      noiDung:
+        "Tổng doanh thu: 15,000,000 VNĐ\nSố lượng sách mượn: 150 cuốn\nSố lượng Reader: 45 người",
+      ngayTao: "2024-01-31",
+      nguoiTao: "Librarian Nguyễn Thị A",
+      trangThai: "Đã duyệt",
+      nguoiDuyet: "Quản lý Trần Văn B",
+      ngayDuyet: "2024-02-01",
+      ghiChu: "Báo cáo chính xác",
     },
     {
       id: 2,
-      loaiBaoCao: 'Báo cáo vi phạm',
-      tieuDe: 'Báo cáo vi phạm tháng 1/2024',
-      noiDung: 'Tổng số vi phạm: 8 vụ\n- Trễ hạn trả sách: 5 vụ\n- Hư hỏng sách: 2 vụ\n- Mất sách: 1 vụ',
-      ngayTao: '2024-01-31',
-      nguoiTao: 'Thủ thư Lê Văn C',
-      trangThai: 'Chờ duyệt',
+      loaiBaoCao: "Báo cáo vi phạm",
+      tieuDe: "Báo cáo vi phạm tháng 1/2024",
+      noiDung:
+        "Tổng số vi phạm: 8 vụ\n- Trễ hạn trả sách: 5 vụ\n- Hư hỏng sách: 2 vụ\n- Mất sách: 1 vụ",
+      ngayTao: "2024-01-31",
+      nguoiTao: "Librarian Lê Văn C",
+      trangThai: "Chờ duyệt",
       nguoiDuyet: null,
       ngayDuyet: null,
-      ghiChu: ''
+      ghiChu: "",
     },
     {
       id: 3,
-      loaiBaoCao: 'Báo cáo thống kê',
-      tieuDe: 'Báo cáo thống kê sách mượn nhiều nhất',
-      noiDung: 'Top 5 sách được mượn nhiều nhất:\n1. Sách Giáo Khoa Toán 12 - 25 lượt\n2. Sách Văn Học Việt Nam - 20 lượt\n3. Sách Lịch Sử Thế Giới - 18 lượt\n4. Sách Khoa Học Tự Nhiên - 15 lượt\n5. Sách Tiếng Anh - 12 lượt',
-      ngayTao: '2024-01-30',
-      nguoiTao: 'Thủ thư Phạm Thị D',
-      trangThai: 'Đã duyệt',
-      nguoiDuyet: 'Quản lý Trần Văn B',
-      ngayDuyet: '2024-01-31',
-      ghiChu: 'Thống kê hữu ích'
+      loaiBaoCao: "Báo cáo thống kê",
+      tieuDe: "Báo cáo thống kê sách mượn nhiều nhất",
+      noiDung:
+        "Top 5 sách được mượn nhiều nhất:\n1. Sách Giáo Khoa Toán 12 - 25 lượt\n2. Sách Văn Học Việt Nam - 20 lượt\n3. Sách Lịch Sử Thế Giới - 18 lượt\n4. Sách Khoa Học Tự Nhiên - 15 lượt\n5. Sách Tiếng Anh - 12 lượt",
+      ngayTao: "2024-01-30",
+      nguoiTao: "Librarian Phạm Thị D",
+      trangThai: "Đã duyệt",
+      nguoiDuyet: "Quản lý Trần Văn B",
+      ngayDuyet: "2024-01-31",
+      ghiChu: "Thống kê hữu ích",
     },
     {
       id: 4,
-      loaiBaoCao: 'Báo cáo doanh thu',
-      tieuDe: 'Báo cáo doanh thu tháng 12/2023',
-      noiDung: 'Tổng doanh thu: 12,500,000 VNĐ\nSố lượng sách mượn: 120 cuốn\nSố lượng độc giả: 38 người',
-      ngayTao: '2023-12-31',
-      nguoiTao: 'Thủ thư Nguyễn Thị A',
-      trangThai: 'Đã duyệt',
-      nguoiDuyet: 'Quản lý Trần Văn B',
-      ngayDuyet: '2024-01-02',
-      ghiChu: 'Doanh thu tăng so với tháng trước'
-    }
+      loaiBaoCao: "Báo cáo doanh thu",
+      tieuDe: "Báo cáo doanh thu tháng 12/2023",
+      noiDung:
+        "Tổng doanh thu: 12,500,000 VNĐ\nSố lượng sách mượn: 120 cuốn\nSố lượng Reader: 38 người",
+      ngayTao: "2023-12-31",
+      nguoiTao: "Librarian Nguyễn Thị A",
+      trangThai: "Đã duyệt",
+      nguoiDuyet: "Quản lý Trần Văn B",
+      ngayDuyet: "2024-01-02",
+      ghiChu: "Doanh thu tăng so với tháng trước",
+    },
   ];
 
   useEffect(() => {
@@ -120,7 +124,7 @@ const ReportManagement = () => {
         setLoading(false);
       }, 1000);
     } catch (error) {
-      showToast('Lỗi khi tải danh sách báo cáo', 'error');
+      showToast("Lỗi khi tải danh sách báo cáo", "error");
       setLoading(false);
     }
   };
@@ -129,15 +133,23 @@ const ReportManagement = () => {
     try {
       const stats = {
         totalReports: mockReports.length,
-        pendingReports: mockReports.filter(r => r.trangThai === 'Chờ duyệt').length,
-        approvedReports: mockReports.filter(r => r.trangThai === 'Đã duyệt').length,
-        revenueReports: mockReports.filter(r => r.loaiBaoCao === 'Báo cáo doanh thu').length,
-        violationReports: mockReports.filter(r => r.loaiBaoCao === 'Báo cáo vi phạm').length,
-        statisticsReports: mockReports.filter(r => r.loaiBaoCao === 'Báo cáo thống kê').length
+        pendingReports: mockReports.filter((r) => r.trangThai === "Chờ duyệt")
+          .length,
+        approvedReports: mockReports.filter((r) => r.trangThai === "Đã duyệt")
+          .length,
+        revenueReports: mockReports.filter(
+          (r) => r.loaiBaoCao === "Báo cáo doanh thu"
+        ).length,
+        violationReports: mockReports.filter(
+          (r) => r.loaiBaoCao === "Báo cáo vi phạm"
+        ).length,
+        statisticsReports: mockReports.filter(
+          (r) => r.loaiBaoCao === "Báo cáo thống kê"
+        ).length,
       };
       setStatistics(stats);
     } catch (error) {
-      showToast('Lỗi khi tải thống kê', 'error');
+      showToast("Lỗi khi tải thống kê", "error");
     }
   };
 
@@ -146,21 +158,24 @@ const ReportManagement = () => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(report =>
-        report.tieuDe?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.nguoiTao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.loaiBaoCao?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (report) =>
+          report.tieuDe?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          report.nguoiTao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          report.loaiBaoCao?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by report type
-    if (reportTypeFilter !== 'all') {
-      filtered = filtered.filter(report => report.loaiBaoCao === reportTypeFilter);
+    if (reportTypeFilter !== "all") {
+      filtered = filtered.filter(
+        (report) => report.loaiBaoCao === reportTypeFilter
+      );
     }
 
     // Filter by date range
     if (dateRange.fromDate && dateRange.toDate) {
-      filtered = filtered.filter(report => {
+      filtered = filtered.filter((report) => {
         const reportDate = new Date(report.ngayTao);
         const fromDate = new Date(dateRange.fromDate);
         const toDate = new Date(dateRange.toDate);
@@ -178,79 +193,91 @@ const ReportManagement = () => {
         id: reports.length + 1,
         nguoiDuyet: null,
         ngayDuyet: null,
-        ghiChu: ''
+        ghiChu: "",
       };
 
       setReports([newReportData, ...reports]);
       setShowCreateModal(false);
       resetNewReportForm();
-      showToast('Đã tạo báo cáo thành công!', 'success');
+      showToast("Đã tạo báo cáo thành công!", "success");
     } catch (error) {
-      showToast('Lỗi khi tạo báo cáo', 'error');
+      showToast("Lỗi khi tạo báo cáo", "error");
     }
   };
 
   const handleApproveReport = async (reportId) => {
     try {
-      setReports(prev => 
-        prev.map(r => 
-          r.id === reportId 
-            ? { 
-                ...r, 
-                trangThai: 'Đã duyệt',
-                ngayDuyet: new Date().toISOString().split('T')[0],
-                nguoiDuyet: 'Quản lý hiện tại',
-                ghiChu: 'Báo cáo đã được duyệt'
+      setReports((prev) =>
+        prev.map((r) =>
+          r.id === reportId
+            ? {
+                ...r,
+                trangThai: "Đã duyệt",
+                ngayDuyet: new Date().toISOString().split("T")[0],
+                nguoiDuyet: "Quản lý hiện tại",
+                ghiChu: "Báo cáo đã được duyệt",
               }
             : r
         )
       );
-      showToast('Đã duyệt báo cáo thành công!', 'success');
+      showToast("Đã duyệt báo cáo thành công!", "success");
     } catch (error) {
-      showToast('Lỗi khi duyệt báo cáo', 'error');
+      showToast("Lỗi khi duyệt báo cáo", "error");
     }
   };
 
   const handleRejectReport = async (reportId) => {
     try {
-      setReports(prev => 
-        prev.map(r => 
-          r.id === reportId 
-            ? { 
-                ...r, 
-                trangThai: 'Từ chối',
-                ngayDuyet: new Date().toISOString().split('T')[0],
-                nguoiDuyet: 'Quản lý hiện tại',
-                ghiChu: 'Báo cáo bị từ chối'
+      setReports((prev) =>
+        prev.map((r) =>
+          r.id === reportId
+            ? {
+                ...r,
+                trangThai: "Từ chối",
+                ngayDuyet: new Date().toISOString().split("T")[0],
+                nguoiDuyet: "Quản lý hiện tại",
+                ghiChu: "Báo cáo bị từ chối",
               }
             : r
         )
       );
-      showToast('Đã từ chối báo cáo!', 'success');
+      showToast("Đã từ chối báo cáo!", "success");
     } catch (error) {
-      showToast('Lỗi khi từ chối báo cáo', 'error');
+      showToast("Lỗi khi từ chối báo cáo", "error");
     }
   };
 
   const resetNewReportForm = () => {
     setNewReport({
-      loaiBaoCao: '',
-      tieuDe: '',
-      noiDung: '',
-      ngayTao: new Date().toISOString().split('T')[0],
-      nguoiTao: '',
-      trangThai: 'Chờ duyệt'
+      loaiBaoCao: "",
+      tieuDe: "",
+      noiDung: "",
+      ngayTao: new Date().toISOString().split("T")[0],
+      nguoiTao: "",
+      trangThai: "Chờ duyệt",
     });
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'Chờ duyệt': { class: 'status-pending', icon: <FaClock />, text: 'Chờ duyệt' },
-      'Đã duyệt': { class: 'status-approved', icon: <FaCheckCircle />, text: 'Đã duyệt' },
-      'Từ chối': { class: 'status-rejected', icon: <FaTimes />, text: 'Từ chối' }
+      "Chờ duyệt": {
+        class: "status-pending",
+        icon: <FaClock />,
+        text: "Chờ duyệt",
+      },
+      "Đã duyệt": {
+        class: "status-approved",
+        icon: <FaCheckCircle />,
+        text: "Đã duyệt",
+      },
+      "Từ chối": {
+        class: "status-rejected",
+        icon: <FaTimes />,
+        text: "Từ chối",
+      },
     };
 
-    const config = statusConfig[status] || statusConfig['Chờ duyệt'];
+    const config = statusConfig[status] || statusConfig["Chờ duyệt"];
     return (
       <span className={`status-badge ${config.class}`}>
         {config.icon} {config.text}
@@ -260,26 +287,26 @@ const ReportManagement = () => {
 
   const getReportTypeIcon = (type) => {
     const iconConfig = {
-      'Báo cáo doanh thu': <FaMoneyBillWave />,
-      'Báo cáo vi phạm': <FaExclamationTriangle />,
-      'Báo cáo thống kê': <FaChartBar />
+      "Báo cáo doanh thu": <FaMoneyBillWave />,
+      "Báo cáo vi phạm": <FaExclamationTriangle />,
+      "Báo cáo thống kê": <FaChartBar />,
     };
     return iconConfig[type] || <FaFileAlt />;
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('vi-VN');
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
   const exportReport = (reportId) => {
     // Implement export functionality
-    showToast('Đang xuất báo cáo...', 'info');
+    showToast("Đang xuất báo cáo...", "info");
   };
 
   const printReport = (reportId) => {
     // Implement print functionality
-    showToast('Đang in báo cáo...', 'info');
+    showToast("Đang in báo cáo...", "info");
   };
 
   if (loading) {
@@ -304,7 +331,10 @@ const ReportManagement = () => {
           </p>
         </div>
         <div className="header-actions">
-          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowCreateModal(true)}
+          >
             <FaPlus />
             Tạo Báo Cáo
           </button>
@@ -391,8 +421,8 @@ const ReportManagement = () => {
         </div>
 
         <div className="filters">
-          <select 
-            value={reportTypeFilter} 
+          <select
+            value={reportTypeFilter}
             onChange={(e) => setReportTypeFilter(e.target.value)}
           >
             <option value="all">Tất cả loại báo cáo</option>
@@ -406,14 +436,18 @@ const ReportManagement = () => {
           <input
             type="date"
             value={dateRange.fromDate}
-            onChange={(e) => setDateRange(prev => ({ ...prev, fromDate: e.target.value }))}
+            onChange={(e) =>
+              setDateRange((prev) => ({ ...prev, fromDate: e.target.value }))
+            }
             placeholder="Từ ngày"
           />
           <span>đến</span>
           <input
             type="date"
             value={dateRange.toDate}
-            onChange={(e) => setDateRange(prev => ({ ...prev, toDate: e.target.value }))}
+            onChange={(e) =>
+              setDateRange((prev) => ({ ...prev, toDate: e.target.value }))
+            }
             placeholder="Đến ngày"
           />
         </div>
@@ -453,8 +487,8 @@ const ReportManagement = () => {
                 <td>{getStatusBadge(report.trangThai)}</td>
                 <td>
                   <div className="action-buttons">
-                    <button 
-                      className="btn-icon" 
+                    <button
+                      className="btn-icon"
                       title="Xem chi tiết"
                       onClick={() => {
                         setSelectedReport(report);
@@ -463,18 +497,18 @@ const ReportManagement = () => {
                     >
                       <FaEye />
                     </button>
-                    
-                    {report.trangThai === 'Chờ duyệt' && (
+
+                    {report.trangThai === "Chờ duyệt" && (
                       <>
-                        <button 
-                          className="btn-icon btn-success" 
+                        <button
+                          className="btn-icon btn-success"
                           title="Duyệt báo cáo"
                           onClick={() => handleApproveReport(report.id)}
                         >
                           <FaCheckCircle />
                         </button>
-                        <button 
-                          className="btn-icon btn-danger" 
+                        <button
+                          className="btn-icon btn-danger"
                           title="Từ chối báo cáo"
                           onClick={() => handleRejectReport(report.id)}
                         >
@@ -482,23 +516,23 @@ const ReportManagement = () => {
                         </button>
                       </>
                     )}
-                    
-                    <button 
-                      className="btn-icon" 
+
+                    <button
+                      className="btn-icon"
                       title="Xuất báo cáo"
                       onClick={() => exportReport(report.id)}
                     >
                       <FaDownload />
                     </button>
-                    
-                    <button 
-                      className="btn-icon" 
+
+                    <button
+                      className="btn-icon"
                       title="In báo cáo"
                       onClick={() => printReport(report.id)}
                     >
                       <FaPrint />
                     </button>
-                    
+
                     <button className="btn-icon" title="Chỉnh sửa">
                       <FaEdit />
                     </button>
@@ -519,7 +553,7 @@ const ReportManagement = () => {
           <div className="modal">
             <div className="modal-header">
               <h2>Tạo Báo Cáo Mới</h2>
-              <button 
+              <button
                 className="btn-close"
                 onClick={() => setShowCreateModal(false)}
               >
@@ -532,7 +566,12 @@ const ReportManagement = () => {
                   <label>Loại báo cáo:</label>
                   <select
                     value={newReport.loaiBaoCao}
-                    onChange={(e) => setNewReport(prev => ({ ...prev, loaiBaoCao: e.target.value }))}
+                    onChange={(e) =>
+                      setNewReport((prev) => ({
+                        ...prev,
+                        loaiBaoCao: e.target.value,
+                      }))
+                    }
                   >
                     <option value="">Chọn loại báo cáo</option>
                     <option value="Báo cáo doanh thu">Báo cáo doanh thu</option>
@@ -540,58 +579,75 @@ const ReportManagement = () => {
                     <option value="Báo cáo thống kê">Báo cáo thống kê</option>
                   </select>
                 </div>
-                
+
                 <div className="form-group">
                   <label>Tiêu đề:</label>
                   <input
                     type="text"
                     value={newReport.tieuDe}
-                    onChange={(e) => setNewReport(prev => ({ ...prev, tieuDe: e.target.value }))}
+                    onChange={(e) =>
+                      setNewReport((prev) => ({
+                        ...prev,
+                        tieuDe: e.target.value,
+                      }))
+                    }
                     placeholder="Nhập tiêu đề báo cáo"
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label>Người tạo:</label>
                   <input
                     type="text"
                     value={newReport.nguoiTao}
-                    onChange={(e) => setNewReport(prev => ({ ...prev, nguoiTao: e.target.value }))}
+                    onChange={(e) =>
+                      setNewReport((prev) => ({
+                        ...prev,
+                        nguoiTao: e.target.value,
+                      }))
+                    }
                     placeholder="Nhập tên người tạo"
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label>Ngày tạo:</label>
                   <input
                     type="date"
                     value={newReport.ngayTao}
-                    onChange={(e) => setNewReport(prev => ({ ...prev, ngayTao: e.target.value }))}
+                    onChange={(e) =>
+                      setNewReport((prev) => ({
+                        ...prev,
+                        ngayTao: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
-              
+
               <div className="form-group">
                 <label>Nội dung báo cáo:</label>
                 <textarea
                   value={newReport.noiDung}
-                  onChange={(e) => setNewReport(prev => ({ ...prev, noiDung: e.target.value }))}
+                  onChange={(e) =>
+                    setNewReport((prev) => ({
+                      ...prev,
+                      noiDung: e.target.value,
+                    }))
+                  }
                   placeholder="Nhập nội dung báo cáo..."
                   rows="8"
                 />
               </div>
             </div>
             <div className="modal-footer">
-              <button 
+              <button
                 className="btn btn-secondary"
                 onClick={() => setShowCreateModal(false)}
               >
                 Hủy
               </button>
-              <button 
-                className="btn btn-primary"
-                onClick={handleCreateReport}
-              >
+              <button className="btn btn-primary" onClick={handleCreateReport}>
                 Tạo báo cáo
               </button>
             </div>
@@ -605,7 +661,7 @@ const ReportManagement = () => {
           <div className="modal">
             <div className="modal-header">
               <h2>Chi Tiết Báo Cáo</h2>
-              <button 
+              <button
                 className="btn-close"
                 onClick={() => setShowDetailModal(false)}
               >
@@ -633,11 +689,15 @@ const ReportManagement = () => {
                   </div>
                   <div className="detail-row">
                     <span className="label">Ngày tạo:</span>
-                    <span className="value">{formatDate(selectedReport.ngayTao)}</span>
+                    <span className="value">
+                      {formatDate(selectedReport.ngayTao)}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="label">Trạng thái:</span>
-                    <span className="value">{getStatusBadge(selectedReport.trangThai)}</span>
+                    <span className="value">
+                      {getStatusBadge(selectedReport.trangThai)}
+                    </span>
                   </div>
                 </div>
 
@@ -650,7 +710,9 @@ const ReportManagement = () => {
                     </div>
                     <div className="detail-row">
                       <span className="label">Ngày duyệt:</span>
-                      <span className="value">{formatDate(selectedReport.ngayDuyet)}</span>
+                      <span className="value">
+                        {formatDate(selectedReport.ngayDuyet)}
+                      </span>
                     </div>
                     {selectedReport.ghiChu && (
                       <div className="detail-row">
@@ -670,20 +732,20 @@ const ReportManagement = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button 
+              <button
                 className="btn btn-secondary"
                 onClick={() => setShowDetailModal(false)}
               >
                 Đóng
               </button>
-              <button 
+              <button
                 className="btn btn-primary"
                 onClick={() => exportReport(selectedReport.id)}
               >
                 <FaDownload />
                 Xuất báo cáo
               </button>
-              <button 
+              <button
                 className="btn btn-outline"
                 onClick={() => printReport(selectedReport.id)}
               >
@@ -698,4 +760,4 @@ const ReportManagement = () => {
   );
 };
 
-export default ReportManagement; 
+export default ReportManagement;

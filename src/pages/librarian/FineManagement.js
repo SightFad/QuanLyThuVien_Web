@@ -1,38 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { FaSearch, FaEye, FaMoneyBillWave, FaFileAlt, FaFilter, FaPrint, FaCalculator, FaLock, FaUnlock, FaPlus, FaChartBar } from 'react-icons/fa';
-import { fineService } from '../../services/fineService';
-import { useToast } from '../../hooks';
-import './FineManagement.css';
+import React, { useState, useEffect } from "react";
+import {
+  FaSearch,
+  FaEye,
+  FaMoneyBillWave,
+  FaFileAlt,
+  FaFilter,
+  FaPrint,
+  FaCalculator,
+  FaLock,
+  FaUnlock,
+  FaPlus,
+  FaChartBar,
+} from "react-icons/fa";
+import { fineService } from "../../services/fineService";
+import { useToast } from "../../hooks";
+import "./FineManagement.css";
 
 const FineManagement = () => {
   const [fines, setFines] = useState([]);
   const [filteredFines, setFilteredFines] = useState([]);
   const [statistics, setStatistics] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [violationTypeFilter, setViolationTypeFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [violationTypeFilter, setViolationTypeFilter] = useState("all");
   const [selectedFine, setSelectedFine] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showStatisticsModal, setShowStatisticsModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState({ fromDate: null, toDate: null });
-  
+
   const { showToast } = useToast();
 
   // Form states for creating new fine
   const [newFine, setNewFine] = useState({
-    maDG: '',
-    loaiViPham: '',
-    maSach: '',
-    tenSach: '',
+    maDG: "",
+    loaiViPham: "",
+    maSach: "",
+    tenSach: "",
     soTien: 0,
-    hinhThucThanhToan: 'TienMat',
-    ghiChu: '',
+    hinhThucThanhToan: "TienMat",
+    ghiChu: "",
     soNgayTre: 0,
-    maPhieuMuon: '',
-    maBaoCaoViPham: '',
-    maGiaoDich: ''
+    maPhieuMuon: "",
+    maBaoCaoViPham: "",
+    maGiaoDich: "",
   });
 
   useEffect(() => {
@@ -51,7 +63,7 @@ const FineManagement = () => {
       setFines(data);
       setFilteredFines(data);
     } catch (error) {
-      showToast('Lỗi khi tải danh sách phạt tiền', 'error');
+      showToast("Lỗi khi tải danh sách phạt tiền", "error");
     } finally {
       setLoading(false);
     }
@@ -59,10 +71,13 @@ const FineManagement = () => {
 
   const loadStatistics = async () => {
     try {
-      const stats = await fineService.getStatistics(dateRange.fromDate, dateRange.toDate);
+      const stats = await fineService.getStatistics(
+        dateRange.fromDate,
+        dateRange.toDate
+      );
       setStatistics(stats);
     } catch (error) {
-      showToast('Lỗi khi tải thống kê', 'error');
+      showToast("Lỗi khi tải thống kê", "error");
     }
   };
 
@@ -71,22 +86,25 @@ const FineManagement = () => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(fine =>
-        fine.tenDG?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fine.maDG?.toString().includes(searchTerm) ||
-        fine.tenSach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fine.maPhieuThu?.toString().includes(searchTerm)
+      filtered = filtered.filter(
+        (fine) =>
+          fine.tenDG?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          fine.maDG?.toString().includes(searchTerm) ||
+          fine.tenSach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          fine.maPhieuThu?.toString().includes(searchTerm)
       );
     }
 
     // Filter by status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(fine => fine.trangThai === statusFilter);
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((fine) => fine.trangThai === statusFilter);
     }
 
     // Filter by violation type
-    if (violationTypeFilter !== 'all') {
-      filtered = filtered.filter(fine => fine.loaiViPham === violationTypeFilter);
+    if (violationTypeFilter !== "all") {
+      filtered = filtered.filter(
+        (fine) => fine.loaiViPham === violationTypeFilter
+      );
     }
 
     setFilteredFines(filtered);
@@ -99,13 +117,13 @@ const FineManagement = () => {
 
   const confirmPayment = async () => {
     try {
-      await fineService.processPayment(selectedFine.maPhieuThu, 'Thủ thư');
-      showToast('Thanh toán phạt tiền thành công', 'success');
+      await fineService.processPayment(selectedFine.maPhieuThu, "Librarian");
+      showToast("Thanh toán phạt tiền thành công", "success");
       setShowPaymentModal(false);
       loadFines();
       loadStatistics();
     } catch (error) {
-      showToast('Lỗi khi xử lý thanh toán', 'error');
+      showToast("Lỗi khi xử lý thanh toán", "error");
     }
   };
 
@@ -113,56 +131,59 @@ const FineManagement = () => {
     try {
       const fineData = {
         ...newFine,
-        nguoiThu: 'Thủ thư',
-        ngayThu: new Date().toISOString()
+        nguoiThu: "Librarian",
+        ngayThu: new Date().toISOString(),
       };
 
       await fineService.createFine(fineData);
-      showToast('Tạo phiếu phạt tiền thành công', 'success');
+      showToast("Tạo phiếu phạt tiền thành công", "success");
       setShowCreateModal(false);
       resetNewFineForm();
       loadFines();
       loadStatistics();
     } catch (error) {
-      showToast('Lỗi khi tạo phiếu phạt tiền', 'error');
+      showToast("Lỗi khi tạo phiếu phạt tiền", "error");
     }
   };
 
   const resetNewFineForm = () => {
     setNewFine({
-      maDG: '',
-      loaiViPham: '',
-      maSach: '',
-      tenSach: '',
+      maDG: "",
+      loaiViPham: "",
+      maSach: "",
+      tenSach: "",
       soTien: 0,
-      hinhThucThanhToan: 'TienMat',
-      ghiChu: '',
+      hinhThucThanhToan: "TienMat",
+      ghiChu: "",
       soNgayTre: 0,
-      maPhieuMuon: '',
-      maBaoCaoViPham: '',
-      maGiaoDich: ''
+      maPhieuMuon: "",
+      maBaoCaoViPham: "",
+      maGiaoDich: "",
     });
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'ChuaThu': { text: 'Chưa thanh toán', class: 'badge-warning' },
-      'DaThu': { text: 'Đã thanh toán', class: 'badge-success' },
-      'Huy': { text: 'Đã hủy', class: 'badge-danger' }
+      ChuaThu: { text: "Chưa thanh toán", class: "badge-warning" },
+      DaThu: { text: "Đã thanh toán", class: "badge-success" },
+      Huy: { text: "Đã hủy", class: "badge-danger" },
     };
 
-    const config = statusConfig[status] || { text: status, class: 'badge-secondary' };
+    const config = statusConfig[status] || {
+      text: status,
+      class: "badge-secondary",
+    };
     return <span className={`badge ${config.class}`}>{config.text}</span>;
   };
 
   const getViolationTypeBadge = (type) => {
     const typeConfig = {
-      'Trả trễ': { text: 'Trả trễ', class: 'badge-warning' },
-      'Hư hỏng': { text: 'Hư hỏng', class: 'badge-danger' },
-      'Mất': { text: 'Mất sách', class: 'badge-dark' }
+      "Trả trễ": { text: "Trả trễ", class: "badge-warning" },
+      "Hư hỏng": { text: "Hư hỏng", class: "badge-danger" },
+      Mất: { text: "Mất sách", class: "badge-dark" },
     };
 
-    const config = typeConfig[type] || { text: type, class: 'badge-secondary' };
+    const config = typeConfig[type] || { text: type, class: "badge-secondary" };
     return <span className={`badge ${config.class}`}>{config.text}</span>;
   };
 
@@ -172,13 +193,13 @@ const FineManagement = () => {
 
   const getUnpaidFines = () => {
     return filteredFines
-      .filter(fine => fine.trangThai === 'ChuaThu')
+      .filter((fine) => fine.trangThai === "ChuaThu")
       .reduce((total, fine) => total + fine.soTien, 0);
   };
 
   const exportToExcel = () => {
     // Implement export functionality
-    showToast('Tính năng xuất Excel đang được phát triển', 'info');
+    showToast("Tính năng xuất Excel đang được phát triển", "info");
   };
 
   if (loading) {
@@ -194,14 +215,14 @@ const FineManagement = () => {
       <div className="page-header">
         <h1>Quản lý phạt tiền</h1>
         <div className="header-actions">
-          <button 
-            className="btn btn-primary" 
+          <button
+            className="btn btn-primary"
             onClick={() => setShowStatisticsModal(true)}
           >
             <FaChartBar /> Thống kê
           </button>
-          <button 
-            className="btn btn-success" 
+          <button
+            className="btn btn-success"
             onClick={() => setShowCreateModal(true)}
           >
             <FaPlus /> Tạo phiếu phạt
@@ -246,7 +267,9 @@ const FineManagement = () => {
             <FaUnlock />
           </div>
           <div className="stat-content">
-            <h3>{filteredFines.filter(f => f.trangThai === 'DaThu').length}</h3>
+            <h3>
+              {filteredFines.filter((f) => f.trangThai === "DaThu").length}
+            </h3>
             <p>Đã thanh toán</p>
           </div>
         </div>
@@ -258,7 +281,7 @@ const FineManagement = () => {
           <FaSearch />
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên, mã độc giả, tên sách..."
+            placeholder="Tìm kiếm theo tên, mã Reader, tên sách..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -293,7 +316,7 @@ const FineManagement = () => {
           <thead>
             <tr>
               <th>Mã phiếu</th>
-              <th>Độc giả</th>
+              <th>Reader</th>
               <th>Loại vi phạm</th>
               <th>Sách vi phạm</th>
               <th>Số tiền</th>
@@ -330,7 +353,7 @@ const FineManagement = () => {
                     {fineService.formatFineAmount(fine.soTien)}
                   </strong>
                 </td>
-                <td>{new Date(fine.ngayThu).toLocaleDateString('vi-VN')}</td>
+                <td>{new Date(fine.ngayThu).toLocaleDateString("vi-VN")}</td>
                 <td>{getStatusBadge(fine.trangThai)}</td>
                 <td>
                   <div className="action-buttons">
@@ -341,7 +364,7 @@ const FineManagement = () => {
                     >
                       <FaEye />
                     </button>
-                    {fine.trangThai === 'ChuaThu' && (
+                    {fine.trangThai === "ChuaThu" && (
                       <button
                         className="btn btn-sm btn-success"
                         onClick={() => handlePayment(fine)}
@@ -368,14 +391,27 @@ const FineManagement = () => {
             </div>
             <div className="modal-body">
               <div className="payment-details">
-                <p><strong>Độc giả:</strong> {selectedFine.tenDG}</p>
-                <p><strong>Sách:</strong> {selectedFine.tenSach}</p>
-                <p><strong>Loại vi phạm:</strong> {fineService.getViolationTypeText(selectedFine.loaiViPham)}</p>
-                <p><strong>Số tiền:</strong> {fineService.formatFineAmount(selectedFine.soTien)}</p>
+                <p>
+                  <strong>Reader:</strong> {selectedFine.tenDG}
+                </p>
+                <p>
+                  <strong>Sách:</strong> {selectedFine.tenSach}
+                </p>
+                <p>
+                  <strong>Loại vi phạm:</strong>{" "}
+                  {fineService.getViolationTypeText(selectedFine.loaiViPham)}
+                </p>
+                <p>
+                  <strong>Số tiền:</strong>{" "}
+                  {fineService.formatFineAmount(selectedFine.soTien)}
+                </p>
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setShowPaymentModal(false)}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowPaymentModal(false)}
+              >
                 Hủy
               </button>
               <button className="btn btn-success" onClick={confirmPayment}>
@@ -397,19 +433,23 @@ const FineManagement = () => {
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Mã độc giả *</label>
+                  <label>Mã Reader *</label>
                   <input
                     type="text"
                     value={newFine.maDG}
-                    onChange={(e) => setNewFine({...newFine, maDG: e.target.value})}
-                    placeholder="Nhập mã độc giả"
+                    onChange={(e) =>
+                      setNewFine({ ...newFine, maDG: e.target.value })
+                    }
+                    placeholder="Nhập mã Reader"
                   />
                 </div>
                 <div className="form-group">
                   <label>Loại vi phạm *</label>
                   <select
                     value={newFine.loaiViPham}
-                    onChange={(e) => setNewFine({...newFine, loaiViPham: e.target.value})}
+                    onChange={(e) =>
+                      setNewFine({ ...newFine, loaiViPham: e.target.value })
+                    }
                   >
                     <option value="">Chọn loại vi phạm</option>
                     <option value="Trả trễ">Trả trễ</option>
@@ -422,7 +462,9 @@ const FineManagement = () => {
                   <input
                     type="text"
                     value={newFine.maSach}
-                    onChange={(e) => setNewFine({...newFine, maSach: e.target.value})}
+                    onChange={(e) =>
+                      setNewFine({ ...newFine, maSach: e.target.value })
+                    }
                     placeholder="Nhập mã sách"
                   />
                 </div>
@@ -431,7 +473,9 @@ const FineManagement = () => {
                   <input
                     type="text"
                     value={newFine.tenSach}
-                    onChange={(e) => setNewFine({...newFine, tenSach: e.target.value})}
+                    onChange={(e) =>
+                      setNewFine({ ...newFine, tenSach: e.target.value })
+                    }
                     placeholder="Nhập tên sách"
                   />
                 </div>
@@ -440,7 +484,12 @@ const FineManagement = () => {
                   <input
                     type="number"
                     value={newFine.soTien}
-                    onChange={(e) => setNewFine({...newFine, soTien: parseFloat(e.target.value) || 0})}
+                    onChange={(e) =>
+                      setNewFine({
+                        ...newFine,
+                        soTien: parseFloat(e.target.value) || 0,
+                      })
+                    }
                     placeholder="Nhập số tiền phạt"
                   />
                 </div>
@@ -449,7 +498,12 @@ const FineManagement = () => {
                   <input
                     type="number"
                     value={newFine.soNgayTre}
-                    onChange={(e) => setNewFine({...newFine, soNgayTre: parseInt(e.target.value) || 0})}
+                    onChange={(e) =>
+                      setNewFine({
+                        ...newFine,
+                        soNgayTre: parseInt(e.target.value) || 0,
+                      })
+                    }
                     placeholder="Số ngày trễ (nếu có)"
                   />
                 </div>
@@ -457,7 +511,12 @@ const FineManagement = () => {
                   <label>Hình thức thanh toán</label>
                   <select
                     value={newFine.hinhThucThanhToan}
-                    onChange={(e) => setNewFine({...newFine, hinhThucThanhToan: e.target.value})}
+                    onChange={(e) =>
+                      setNewFine({
+                        ...newFine,
+                        hinhThucThanhToan: e.target.value,
+                      })
+                    }
                   >
                     <option value="TienMat">Tiền mặt</option>
                     <option value="ChuyenKhoan">Chuyển khoản</option>
@@ -468,7 +527,9 @@ const FineManagement = () => {
                   <input
                     type="text"
                     value={newFine.maGiaoDich}
-                    onChange={(e) => setNewFine({...newFine, maGiaoDich: e.target.value})}
+                    onChange={(e) =>
+                      setNewFine({ ...newFine, maGiaoDich: e.target.value })
+                    }
                     placeholder="Mã giao dịch (nếu chuyển khoản)"
                   />
                 </div>
@@ -476,7 +537,9 @@ const FineManagement = () => {
                   <label>Ghi chú</label>
                   <textarea
                     value={newFine.ghiChu}
-                    onChange={(e) => setNewFine({...newFine, ghiChu: e.target.value})}
+                    onChange={(e) =>
+                      setNewFine({ ...newFine, ghiChu: e.target.value })
+                    }
                     placeholder="Nhập ghi chú..."
                     rows="3"
                   />
@@ -484,7 +547,10 @@ const FineManagement = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowCreateModal(false)}
+              >
                 Hủy
               </button>
               <button className="btn btn-primary" onClick={handleCreateFine}>
@@ -508,9 +574,18 @@ const FineManagement = () => {
                 <div className="stat-item">
                   <h4>Tổng quan</h4>
                   <p>Tổng phiếu phạt: {statistics.totalFines}</p>
-                  <p>Tổng tiền: {fineService.formatFineAmount(statistics.totalAmount)}</p>
-                  <p>Đã thanh toán: {fineService.formatFineAmount(statistics.paidAmount)}</p>
-                  <p>Chưa thanh toán: {fineService.formatFineAmount(statistics.unpaidAmount)}</p>
+                  <p>
+                    Tổng tiền:{" "}
+                    {fineService.formatFineAmount(statistics.totalAmount)}
+                  </p>
+                  <p>
+                    Đã thanh toán:{" "}
+                    {fineService.formatFineAmount(statistics.paidAmount)}
+                  </p>
+                  <p>
+                    Chưa thanh toán:{" "}
+                    {fineService.formatFineAmount(statistics.unpaidAmount)}
+                  </p>
                 </div>
                 <div className="stat-item">
                   <h4>Theo loại vi phạm</h4>
@@ -519,14 +594,20 @@ const FineManagement = () => {
                   <p>Mất sách: {statistics.lostFines} phiếu</p>
                 </div>
                 <div className="stat-item full-width">
-                  <h4>Top độc giả vi phạm nhiều nhất</h4>
+                  <h4>Top Reader vi phạm nhiều nhất</h4>
                   <div className="top-violators">
                     {statistics.topViolators?.map((violator, index) => (
                       <div key={violator.maDG} className="violator-item">
                         <span className="rank">#{index + 1}</span>
                         <span className="name">{violator.tenDG}</span>
-                        <span className="violations">{violator.violationCount} lần</span>
-                        <span className="amount">{fineService.formatFineAmount(violator.totalFineAmount)}</span>
+                        <span className="violations">
+                          {violator.violationCount} lần
+                        </span>
+                        <span className="amount">
+                          {fineService.formatFineAmount(
+                            violator.totalFineAmount
+                          )}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -534,7 +615,10 @@ const FineManagement = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setShowStatisticsModal(false)}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowStatisticsModal(false)}
+              >
                 Đóng
               </button>
             </div>
@@ -545,4 +629,4 @@ const FineManagement = () => {
   );
 };
 
-export default FineManagement; 
+export default FineManagement;

@@ -1,117 +1,153 @@
-import React, { Suspense, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import ModernSidebar from './components/ModernSidebar';
-import ModernDashboard from './pages/ModernDashboard';
-import { PageLoading } from './components/shared';
-import './index.css';
+import React, { Suspense, useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import ModernSidebar from "./components/ModernSidebar";
+import ModernDashboard from "./pages/ModernDashboard";
+import { PageLoading } from "./components/shared";
+import "./index.css";
 
 // Mock user data - replace with real authentication
 const mockUser = {
   id: 1,
-  name: 'Nguyễn Văn A',
-  email: 'nguyenvana@email.com',
-  role: 'Admin', // Admin, Độc giả, Thủ thư, Kế toán, Thủ kho, Quản lý
-  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
+  name: "Nguyễn Văn A",
+  email: "nguyenvana@email.com",
+  role: "Admin", // Admin, Reader, Librarian, Accountant, Thủ kho
+  avatar:
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
 };
 
 // Lazy load components for better performance
-const BookManagement = React.lazy(() => import('./pages/BookManagement'));
-const ReaderManagement = React.lazy(() => import('./pages/ReaderManagement'));
-const BorrowManagement = React.lazy(() => import('./pages/BorrowManagement'));
-const UserManagement = React.lazy(() => import('./pages/UserManagement'));
-const SystemSettings = React.lazy(() => import('./pages/SystemSettings'));
-const BackupManagement = React.lazy(() => import('./pages/BackupManagement'));
+const BookManagement = React.lazy(() => import("./pages/BookManagement"));
+const ReaderManagement = React.lazy(() => import("./pages/ReaderManagement"));
+const BorrowManagement = React.lazy(() => import("./pages/BorrowManagement"));
+const UserManagement = React.lazy(() => import("./pages/UserManagement"));
+const SystemSettings = React.lazy(() => import("./pages/SystemSettings"));
+const BackupManagement = React.lazy(() => import("./pages/BackupManagement"));
 
 // Reader pages
-const ReaderHome = React.lazy(() => import('./pages/reader/ReaderHome'));
-const ReaderSearch = React.lazy(() => import('./pages/reader/ReaderSearch'));
-const ReaderMyBooks = React.lazy(() => import('./pages/reader/ReaderMyBooks'));
-const ReaderProfile = React.lazy(() => import('./pages/reader/ReaderProfile'));
-const ReaderReservations = React.lazy(() => import('./pages/reader/ReaderReservations'));
-const ReaderFines = React.lazy(() => import('./pages/reader/ReaderFines'));
+const ReaderHome = React.lazy(() => import("./pages/reader/ReaderHome"));
+const ReaderSearch = React.lazy(() => import("./pages/reader/ReaderSearch"));
+const ReaderMyBooks = React.lazy(() => import("./pages/reader/ReaderMyBooks"));
+const ReaderProfile = React.lazy(() => import("./pages/reader/ReaderProfile"));
+const ReaderReservations = React.lazy(() =>
+  import("./pages/reader/ReaderReservations")
+);
+const ReaderFines = React.lazy(() => import("./pages/reader/ReaderFines"));
 
 // Librarian pages
-const LibrarianDashboard = React.lazy(() => import('./pages/librarian/LibrarianDashboard'));
-const LibrarianReports = React.lazy(() => import('./pages/librarian/LibrarianReports'));
-const ReservationManagement = React.lazy(() => import('./pages/librarian/ReservationManagement'));
+const LibrarianDashboard = React.lazy(() =>
+  import("./pages/librarian/LibrarianDashboard")
+);
+const LibrarianReports = React.lazy(() =>
+  import("./pages/librarian/LibrarianReports")
+);
+const ReservationManagement = React.lazy(() =>
+  import("./pages/librarian/ReservationManagement")
+);
 
 // Accountant pages
-const AccountantDashboard = React.lazy(() => import('./pages/accountant/AccountantDashboard'));
-const FinancialTransactions = React.lazy(() => import('./pages/accountant/FinancialTransactions'));
-const PurchaseProposals = React.lazy(() => import('./pages/accountant/PurchaseProposals'));
-const PurchaseOrders = React.lazy(() => import('./pages/accountant/PurchaseOrders'));
-const SupplierManagement = React.lazy(() => import('./pages/accountant/SupplierManagement'));
-const FinancialReports = React.lazy(() => import('./pages/accountant/FinancialReports'));
+const AccountantDashboard = React.lazy(() =>
+  import("./pages/accountant/AccountantDashboard")
+);
+const FinancialTransactions = React.lazy(() =>
+  import("./pages/accountant/FinancialTransactions")
+);
+const PurchaseProposals = React.lazy(() =>
+  import("./pages/accountant/PurchaseProposals")
+);
+const PurchaseOrders = React.lazy(() =>
+  import("./pages/accountant/PurchaseOrders")
+);
+const SupplierManagement = React.lazy(() =>
+  import("./pages/accountant/SupplierManagement")
+);
+const FinancialReports = React.lazy(() =>
+  import("./pages/accountant/FinancialReports")
+);
 
 // Manager pages
-const ManagerDashboard = React.lazy(() => import('./pages/manager/ManagerDashboard'));
-const ManagerApprovals = React.lazy(() => import('./pages/manager/ManagerApprovals'));
+const ManagerDashboard = React.lazy(() =>
+  import("./pages/manager/ManagerDashboard")
+);
+const ManagerApprovals = React.lazy(() =>
+  import("./pages/manager/ManagerApprovals")
+);
 
 // Warehouse pages
-const WarehouseDashboard = React.lazy(() => import('./pages/warehouse/WarehouseDashboard'));
-const InventoryManagement = React.lazy(() => import('./pages/warehouse/InventoryManagement'));
-const StockReports = React.lazy(() => import('./pages/warehouse/StockReports'));
-const BookImports = React.lazy(() => import('./pages/warehouse/BookImports'));
-const InventoryChecks = React.lazy(() => import('./pages/warehouse/InventoryChecks'));
+const WarehouseDashboard = React.lazy(() =>
+  import("./pages/warehouse/WarehouseDashboard")
+);
+const InventoryManagement = React.lazy(() =>
+  import("./pages/warehouse/InventoryManagement")
+);
+const StockReports = React.lazy(() => import("./pages/warehouse/StockReports"));
+const BookImports = React.lazy(() => import("./pages/warehouse/BookImports"));
+const InventoryChecks = React.lazy(() =>
+  import("./pages/warehouse/InventoryChecks")
+);
 
 // Route configurations by role
 const routeConfig = {
-  'Admin': [
-    { path: '/', component: ModernDashboard, exact: true },
-    { path: '/books', component: BookManagement },
-    { path: '/readers', component: ReaderManagement },
-    { path: '/borrows', component: BorrowManagement },
-    { path: '/users', component: UserManagement },
-    { path: '/settings', component: SystemSettings },
-    { path: '/backup', component: BackupManagement },
+  Admin: [
+    { path: "/", component: ModernDashboard, exact: true },
+    { path: "/books", component: BookManagement },
+    { path: "/readers", component: ReaderManagement },
+    { path: "/borrows", component: BorrowManagement },
+    { path: "/users", component: UserManagement },
+    { path: "/settings", component: SystemSettings },
+    { path: "/backup", component: BackupManagement },
   ],
-  'Độc giả': [
-    { path: '/reader', component: ReaderHome, exact: true },
-    { path: '/reader/search', component: ReaderSearch },
-    { path: '/reader/my-books', component: ReaderMyBooks },
-    { path: '/reader/reservations', component: ReaderReservations },
-    { path: '/reader/profile', component: ReaderProfile },
-    { path: '/reader/fines', component: ReaderFines },
+  Reader: [
+    { path: "/reader", component: ReaderHome, exact: true },
+    { path: "/reader/search", component: ReaderSearch },
+    { path: "/reader/my-books", component: ReaderMyBooks },
+    { path: "/reader/reservations", component: ReaderReservations },
+    { path: "/reader/profile", component: ReaderProfile },
+    { path: "/reader/fines", component: ReaderFines },
   ],
-  'Thủ thư': [
-    { path: '/librarian', component: LibrarianDashboard, exact: true },
-    { path: '/books', component: BookManagement },
-    { path: '/borrows', component: BorrowManagement },
-    { path: '/librarian/reservations', component: ReservationManagement },
-    { path: '/librarian/reports', component: LibrarianReports },
+  Librarian: [
+    { path: "/librarian", component: LibrarianDashboard, exact: true },
+    { path: "/books", component: BookManagement },
+    { path: "/borrows", component: BorrowManagement },
+    { path: "/librarian/reservations", component: ReservationManagement },
+    { path: "/librarian/reports", component: LibrarianReports },
   ],
-  'Kế toán': [
-    { path: '/accountant', component: AccountantDashboard, exact: true },
-    { path: '/accountant/transactions', component: FinancialTransactions },
-    { path: '/accountant/purchase-proposals', component: PurchaseProposals },
-    { path: '/accountant/purchase-orders', component: PurchaseOrders },
-    { path: '/accountant/suppliers', component: SupplierManagement },
-    { path: '/accountant/reports', component: FinancialReports },
+  Accountant: [
+    { path: "/accountant", component: AccountantDashboard, exact: true },
+    { path: "/accountant/transactions", component: FinancialTransactions },
+    { path: "/accountant/purchase-proposals", component: PurchaseProposals },
+    { path: "/accountant/purchase-orders", component: PurchaseOrders },
+    { path: "/accountant/suppliers", component: SupplierManagement },
+    { path: "/accountant/reports", component: FinancialReports },
   ],
-  'Thủ kho': [
-    { path: '/warehouse', component: WarehouseDashboard, exact: true },
-    { path: '/warehouse/inventory', component: InventoryManagement },
-    { path: '/warehouse/imports', component: BookImports },
-    { path: '/warehouse/checks', component: InventoryChecks },
-    { path: '/warehouse/reports', component: StockReports },
+  "Thủ kho": [
+    { path: "/warehouse", component: WarehouseDashboard, exact: true },
+    { path: "/warehouse/inventory", component: InventoryManagement },
+    { path: "/warehouse/imports", component: BookImports },
+    { path: "/warehouse/checks", component: InventoryChecks },
+    { path: "/warehouse/reports", component: StockReports },
   ],
-  'Quản lý': [
-    { path: '/manager', component: ManagerDashboard, exact: true },
-    { path: '/manager/approvals', component: ManagerApprovals },
+  "Quản lý": [
+    { path: "/manager", component: ManagerDashboard, exact: true },
+    { path: "/manager/approvals", component: ManagerApprovals },
   ],
 };
 
 // Get default route by role
 const getDefaultRoute = (role) => {
   const roleRoutes = {
-    'Admin': '/',
-    'Quản lý': '/manager',
-    'Thủ thư': '/librarian',
-    'Kế toán': '/accountant',
-    'Thủ kho': '/warehouse',
-    'Độc giả': '/reader',
+    Admin: "/",
+    "Quản lý": "/manager",
+    Librarian: "/librarian",
+    Accountant: "/accountant",
+    "Thủ kho": "/warehouse",
+    Reader: "/reader",
   };
-  return roleRoutes[role] || '/';
+  return roleRoutes[role] || "/";
 };
 
 // Protected Route Component
@@ -134,7 +170,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('App Error:', error, errorInfo);
+    console.error("App Error:", error, errorInfo);
   }
 
   render() {
@@ -144,7 +180,7 @@ class ErrorBoundary extends React.Component {
           <div className="error-content">
             <h1>Oops! Có lỗi xảy ra</h1>
             <p>Ứng dụng đã gặp phải một lỗi không mong muốn.</p>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => window.location.reload()}
             >
@@ -171,7 +207,7 @@ const LoadingFallback = () => (
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState("light");
 
   // Initialize app
   useEffect(() => {
@@ -182,15 +218,15 @@ function App() {
     }, 1000);
 
     // Initialize theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
   // Theme management
   useEffect(() => {
-    localStorage.setItem('theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem("theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   if (loading) {
@@ -203,10 +239,7 @@ function App() {
         <div className="login-card">
           <h1>Đăng nhập</h1>
           <p>Vui lòng đăng nhập để tiếp tục</p>
-          <button 
-            className="btn btn-primary"
-            onClick={() => setUser(mockUser)}
-          >
+          <button className="btn btn-primary" onClick={() => setUser(mockUser)}>
             Đăng nhập Demo
           </button>
         </div>
@@ -214,44 +247,47 @@ function App() {
     );
   }
 
-  const userRoutes = routeConfig[user.role] || routeConfig['Độc giả'];
+  const userRoutes = routeConfig[user.role] || routeConfig["Reader"];
 
   return (
     <ErrorBoundary>
       <Router>
         <div className="app">
           <ModernSidebar userRole={user.role} />
-          
+
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               {/* Default redirect */}
-              <Route 
-                path="/" 
-                element={<Navigate to={getDefaultRoute(user.role)} replace />} 
+              <Route
+                path="/"
+                element={<Navigate to={getDefaultRoute(user.role)} replace />}
               />
-              
+
               {/* User-specific routes */}
               {userRoutes.map((route, index) => (
                 <Route
                   key={index}
                   path={route.path}
                   element={
-                    <ProtectedRoute requiredRole={user.role} userRole={user.role}>
+                    <ProtectedRoute
+                      requiredRole={user.role}
+                      userRole={user.role}
+                    >
                       <route.component userRole={user.role} />
                     </ProtectedRoute>
                   }
                 />
               ))}
-              
+
               {/* 404 Route */}
-              <Route 
-                path="*" 
+              <Route
+                path="*"
                 element={
                   <div className="error-page">
                     <div className="error-content">
                       <h1>404</h1>
                       <p>Trang bạn đang tìm kiếm không tồn tại.</p>
-                      <button 
+                      <button
                         className="btn btn-primary"
                         onClick={() => window.history.back()}
                       >
@@ -259,7 +295,7 @@ function App() {
                       </button>
                     </div>
                   </div>
-                } 
+                }
               />
             </Routes>
           </Suspense>

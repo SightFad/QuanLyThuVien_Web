@@ -1,43 +1,60 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { FaSearch, FaEdit, FaEye, FaFilter, FaSync, FaCheck, FaTimes, FaBell } from 'react-icons/fa';
-import { usePagination, useToast } from '../../hooks';
-import reservationService from '../../services/reservationService';
-import { 
-  Button, 
-  Input, 
-  Select, 
-  Table, 
-  Modal, 
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  FaSearch,
+  FaEdit,
+  FaEye,
+  FaFilter,
+  FaSync,
+  FaCheck,
+  FaTimes,
+  FaBell,
+} from "react-icons/fa";
+import { usePagination, useToast } from "../../hooks";
+import reservationService from "../../services/reservationService";
+import {
+  Button,
+  Input,
+  Select,
+  Table,
+  Modal,
   Card,
   Badge,
   Pagination,
-  PageLoading
-} from '../../components/shared';
-import './ReservationManagement.css';
+  PageLoading,
+} from "../../components/shared";
+import "./ReservationManagement.css";
 
 const ReservationManagement = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
-  const [newStatus, setNewStatus] = useState('');
-  
+  const [newStatus, setNewStatus] = useState("");
+
   const { showToast } = useToast();
 
   // Lọc đặt trước theo tìm kiếm và trạng thái
   const filteredReservations = useMemo(() => {
-    return reservations.filter(reservation => {
-      const matchesSearch = reservation.sach?.tenSach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           reservation.sach?.tacGia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           reservation.sach?.maSach?.toString().includes(searchTerm) ||
-                           reservation.docGia?.hoTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           reservation.docGia?.maDG?.toString().includes(searchTerm);
-      
-      const matchesStatus = !statusFilter || reservation.trangThai === statusFilter;
-      
+    return reservations.filter((reservation) => {
+      const matchesSearch =
+        reservation.sach?.tenSach
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        reservation.sach?.tacGia
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        reservation.sach?.maSach?.toString().includes(searchTerm) ||
+        reservation.docGia?.hoTen
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        reservation.docGia?.maDG?.toString().includes(searchTerm);
+
+      const matchesStatus =
+        !statusFilter || reservation.trangThai === statusFilter;
+
       return matchesSearch && matchesStatus;
     });
   }, [reservations, searchTerm, statusFilter]);
@@ -49,10 +66,8 @@ const ReservationManagement = () => {
     totalPages,
     totalItems,
     itemsPerPage,
-    goToPage
+    goToPage,
   } = usePagination(filteredReservations, 10);
-
-
 
   // Load dữ liệu đặt trước
   const loadReservations = async () => {
@@ -61,7 +76,7 @@ const ReservationManagement = () => {
       const data = await reservationService.getAllReservations();
       setReservations(data);
     } catch (error) {
-      showToast(error.message, 'error');
+      showToast(error.message, "error");
     } finally {
       setLoading(false);
     }
@@ -78,17 +93,20 @@ const ReservationManagement = () => {
     try {
       setUpdatingStatus(true);
       await reservationService.updateReservationStatus(reservation.id, status);
-      
+
       const statusMessages = {
-        'Đã thông báo': 'Đã thông báo cho độc giả',
-        'Đã nhận': 'Đã xác nhận độc giả nhận sách',
-        'Đã hủy': 'Đã hủy đặt trước'
+        "Đã thông báo": "Đã thông báo cho Reader",
+        "Đã nhận": "Đã xác nhận Reader nhận sách",
+        "Đã hủy": "Đã hủy đặt trước",
       };
-      
-      showToast(statusMessages[status] || 'Cập nhật trạng thái thành công', 'success');
+
+      showToast(
+        statusMessages[status] || "Cập nhật trạng thái thành công",
+        "success"
+      );
       await loadReservations();
     } catch (error) {
-      showToast(error.message, 'error');
+      showToast(error.message, "error");
     } finally {
       setUpdatingStatus(false);
     }
@@ -98,18 +116,24 @@ const ReservationManagement = () => {
   const handleStatusChange = async (reservationId, newStatus) => {
     try {
       setUpdatingStatus(true);
-      await reservationService.updateReservationStatus(reservationId, newStatus);
-      
+      await reservationService.updateReservationStatus(
+        reservationId,
+        newStatus
+      );
+
       const statusMessages = {
-        'Đang chờ': 'Đã chuyển về trạng thái chờ xử lý',
-        'Đã thông báo': 'Đã thông báo cho độc giả',
-        'Đã hủy': 'Đã hủy đặt trước'
+        "Đang chờ": "Đã chuyển về trạng thái chờ xử lý",
+        "Đã thông báo": "Đã thông báo cho Reader",
+        "Đã hủy": "Đã hủy đặt trước",
       };
-      
-      showToast(statusMessages[newStatus] || 'Cập nhật trạng thái thành công', 'success');
+
+      showToast(
+        statusMessages[newStatus] || "Cập nhật trạng thái thành công",
+        "success"
+      );
       await loadReservations();
     } catch (error) {
-      showToast(error.message, 'error');
+      showToast(error.message, "error");
     } finally {
       setUpdatingStatus(false);
     }
@@ -146,7 +170,7 @@ const ReservationManagement = () => {
         <div className="header-content">
           <h1 className="page-title">PHIẾU ĐẶT TRƯỚC SÁCH</h1>
           <p className="page-subtitle">
-            Quản lý và xử lý các yêu cầu đặt trước sách của độc giả
+            Quản lý và xử lý các yêu cầu đặt trước sách của Reader
           </p>
         </div>
         <Button
@@ -170,7 +194,7 @@ const ReservationManagement = () => {
               className="search-input"
             />
           </div>
-          
+
           <div className="status-filter">
             <Select
               placeholder="Lọc theo trạng thái"
@@ -178,11 +202,11 @@ const ReservationManagement = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="status-select"
               options={[
-                { value: '', label: 'Tất cả trạng thái' },
-                { value: 'Đang chờ', label: 'Chờ xử lý' },
-                { value: 'Đã thông báo', label: 'Đã thông báo' },
-                { value: 'Đã nhận', label: 'Đã nhận' },
-                { value: 'Đã hủy', label: 'Đã hủy' }
+                { value: "", label: "Tất cả trạng thái" },
+                { value: "Đang chờ", label: "Chờ xử lý" },
+                { value: "Đã thông báo", label: "Đã thông báo" },
+                { value: "Đã nhận", label: "Đã nhận" },
+                { value: "Đã hủy", label: "Đã hủy" },
               ]}
             />
           </div>
@@ -197,30 +221,33 @@ const ReservationManagement = () => {
             <p className="stat-value">{reservations.length}</p>
           </div>
         </Card>
-        
+
         <Card className="stat-card">
           <div className="stat-content">
             <h3 className="stat-title">Chờ xử lý</h3>
             <p className="stat-value stat-value-warning">
-              {reservations.filter(r => r.trangThai === 'Đang chờ').length}
+              {reservations.filter((r) => r.trangThai === "Đang chờ").length}
             </p>
           </div>
         </Card>
-        
+
         <Card className="stat-card">
           <div className="stat-content">
             <h3 className="stat-title">Đã thông báo</h3>
             <p className="stat-value stat-value-info">
-              {reservations.filter(r => r.trangThai === 'Đã thông báo').length}
+              {
+                reservations.filter((r) => r.trangThai === "Đã thông báo")
+                  .length
+              }
             </p>
           </div>
         </Card>
-        
+
         <Card className="stat-card">
           <div className="stat-content">
             <h3 className="stat-title">Đã nhận</h3>
             <p className="stat-value stat-value-success">
-              {reservations.filter(r => r.trangThai === 'Đã nhận').length}
+              {reservations.filter((r) => r.trangThai === "Đã nhận").length}
             </p>
           </div>
         </Card>
@@ -244,35 +271,58 @@ const ReservationManagement = () => {
             <tbody>
               {paginatedReservations.length === 0 ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
+                  <td
+                    colSpan="7"
+                    style={{ textAlign: "center", padding: "40px" }}
+                  >
                     Không có đặt trước nào
                   </td>
                 </tr>
               ) : (
                 paginatedReservations.map((reservation) => (
                   <tr key={reservation.id}>
-                    <td>{reservation.docGia?.maDG || '-'}</td>
-                    <td>{reservation.docGia?.hoTen || '-'}</td>
-                    <td>{reservation.sach?.maSach || '-'}</td>
-                    <td>{reservation.sach?.tenSach || '-'}</td>
+                    <td>{reservation.docGia?.maDG || "-"}</td>
+                    <td>{reservation.docGia?.hoTen || "-"}</td>
+                    <td>{reservation.sach?.maSach || "-"}</td>
+                    <td>{reservation.sach?.tenSach || "-"}</td>
                     <td>
-                      {reservation.ngayDat ? new Date(reservation.ngayDat).toLocaleDateString('vi-VN') : '-'}
+                      {reservation.ngayDat
+                        ? new Date(reservation.ngayDat).toLocaleDateString(
+                            "vi-VN"
+                          )
+                        : "-"}
                     </td>
                     <td>
                       <div className="status-checkboxes">
                         {[
-                          { key: 'pending', label: 'Chờ xử lý', value: 'Đang chờ' },
-                          { key: 'notified', label: 'Đã thông báo', value: 'Đã thông báo' },
-                          { key: 'cancelled', label: 'Đã hủy', value: 'Đã hủy' }
+                          {
+                            key: "pending",
+                            label: "Chờ xử lý",
+                            value: "Đang chờ",
+                          },
+                          {
+                            key: "notified",
+                            label: "Đã thông báo",
+                            value: "Đã thông báo",
+                          },
+                          {
+                            key: "cancelled",
+                            label: "Đã hủy",
+                            value: "Đã hủy",
+                          },
                         ].map((option) => (
                           <label key={option.key} className="status-checkbox">
                             <input
                               type="checkbox"
                               checked={reservation.trangThai === option.value}
-                              onChange={() => handleStatusChange(reservation.id, option.value)}
+                              onChange={() =>
+                                handleStatusChange(reservation.id, option.value)
+                              }
                               disabled={updatingStatus}
                             />
-                            <span className="checkbox-label">{option.label}</span>
+                            <span className="checkbox-label">
+                              {option.label}
+                            </span>
                           </label>
                         ))}
                       </div>
@@ -311,29 +361,41 @@ const ReservationManagement = () => {
       <Modal
         isOpen={showStatusModal}
         onClose={handleCloseModal}
-        title={selectedReservation ? `Chi tiết đặt trước: ${selectedReservation.sach?.tenSach}` : 'Chi tiết đặt trước'}
+        title={
+          selectedReservation
+            ? `Chi tiết đặt trước: ${selectedReservation.sach?.tenSach}`
+            : "Chi tiết đặt trước"
+        }
         size="md"
       >
         {selectedReservation && (
           <div className="reservation-details">
             <div className="detail-section">
-              <h4>Thông tin độc giả</h4>
+              <h4>Thông tin Reader</h4>
               <div className="info-grid">
                 <div className="info-item">
                   <span className="info-label">Mã thành viên:</span>
-                  <span className="info-value">{selectedReservation.docGia?.maDG}</span>
+                  <span className="info-value">
+                    {selectedReservation.docGia?.maDG}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Họ tên:</span>
-                  <span className="info-value">{selectedReservation.docGia?.hoTen}</span>
+                  <span className="info-value">
+                    {selectedReservation.docGia?.hoTen}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Email:</span>
-                  <span className="info-value">{selectedReservation.docGia?.email}</span>
+                  <span className="info-value">
+                    {selectedReservation.docGia?.email}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Số điện thoại:</span>
-                  <span className="info-value">{selectedReservation.docGia?.soDienThoai}</span>
+                  <span className="info-value">
+                    {selectedReservation.docGia?.soDienThoai}
+                  </span>
                 </div>
               </div>
             </div>
@@ -343,19 +405,27 @@ const ReservationManagement = () => {
               <div className="info-grid">
                 <div className="info-item">
                   <span className="info-label">Mã sách:</span>
-                  <span className="info-value">{selectedReservation.sach?.maSach}</span>
+                  <span className="info-value">
+                    {selectedReservation.sach?.maSach}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Tên sách:</span>
-                  <span className="info-value">{selectedReservation.sach?.tenSach}</span>
+                  <span className="info-value">
+                    {selectedReservation.sach?.tenSach}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Tác giả:</span>
-                  <span className="info-value">{selectedReservation.sach?.tacGia}</span>
+                  <span className="info-value">
+                    {selectedReservation.sach?.tacGia}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Thể loại:</span>
-                  <span className="info-value">{selectedReservation.sach?.theLoai}</span>
+                  <span className="info-value">
+                    {selectedReservation.sach?.theLoai}
+                  </span>
                 </div>
               </div>
             </div>
@@ -366,17 +436,27 @@ const ReservationManagement = () => {
                 <div className="info-item">
                   <span className="info-label">Ngày đặt:</span>
                   <span className="info-value">
-                    {selectedReservation.ngayDat ? new Date(selectedReservation.ngayDat).toLocaleDateString('vi-VN') : '-'}
+                    {selectedReservation.ngayDat
+                      ? new Date(
+                          selectedReservation.ngayDat
+                        ).toLocaleDateString("vi-VN")
+                      : "-"}
                   </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Trạng thái hiện tại:</span>
                   <span className="info-value">
-                    <Badge variant={
-                      selectedReservation.trangThai === 'Đang chờ' ? 'warning' :
-                      selectedReservation.trangThai === 'Đã thông báo' ? 'info' :
-                      selectedReservation.trangThai === 'Đã nhận' ? 'success' : 'danger'
-                    }>
+                    <Badge
+                      variant={
+                        selectedReservation.trangThai === "Đang chờ"
+                          ? "warning"
+                          : selectedReservation.trangThai === "Đã thông báo"
+                          ? "info"
+                          : selectedReservation.trangThai === "Đã nhận"
+                          ? "success"
+                          : "danger"
+                      }
+                    >
                       {selectedReservation.trangThai}
                     </Badge>
                   </span>
@@ -385,10 +465,7 @@ const ReservationManagement = () => {
             </div>
 
             <div className="modal-actions">
-              <Button
-                variant="secondary"
-                onClick={handleCloseModal}
-              >
+              <Button variant="secondary" onClick={handleCloseModal}>
                 Đóng
               </Button>
             </div>
@@ -399,4 +476,4 @@ const ReservationManagement = () => {
   );
 };
 
-export default ReservationManagement; 
+export default ReservationManagement;

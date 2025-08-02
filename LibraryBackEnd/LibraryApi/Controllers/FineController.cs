@@ -296,7 +296,7 @@ namespace LibraryApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi lấy danh sách phạt tiền của độc giả", error = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi lấy danh sách phạt tiền của Reader", error = ex.Message });
             }
         }
 

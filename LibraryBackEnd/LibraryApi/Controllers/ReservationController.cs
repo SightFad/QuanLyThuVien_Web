@@ -41,7 +41,7 @@ namespace LibraryApi.Controllers
             return Ok(new { message = result.Message, reservation = result.Reservation });
         }
 
-        // GET: api/Reservation - Lấy danh sách đặt trước của độc giả
+        // GET: api/Reservation - Lấy danh sách đặt trước của Reader
         [HttpGet]
         public async Task<IActionResult> GetMyReservations([FromQuery] int docGiaId)
         {

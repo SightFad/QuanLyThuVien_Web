@@ -1,9 +1,9 @@
 /**
  * Route definitions with lazy loading
  */
-import React from 'react';
-import { withLazyLoading } from '../components/LazyRoute';
-import { PageLoading } from '../components/shared';
+import React from "react";
+import { withLazyLoading } from "../components/LazyRoute";
+import { PageLoading } from "../components/shared";
 
 // Loading fallback component
 const RouteLoading = () => (
@@ -14,167 +14,167 @@ const RouteLoading = () => (
 
 // Lazy-loaded components
 const Dashboard = withLazyLoading(
-  () => import('../pages/Dashboard'),
+  () => import("../pages/Dashboard"),
   <RouteLoading />
 );
 
 const BookManagement = withLazyLoading(
-  () => import('../pages/BookManagement'),
+  () => import("../pages/BookManagement"),
   <RouteLoading />
 );
 
 const ReaderManagement = withLazyLoading(
-  () => import('../pages/ReaderManagement'),
+  () => import("../pages/ReaderManagement"),
   <RouteLoading />
 );
 
 const BorrowManagement = withLazyLoading(
-  () => import('../pages/BorrowManagement'),
+  () => import("../pages/BorrowManagement"),
   <RouteLoading />
 );
 
 const UserManagement = withLazyLoading(
-  () => import('../pages/UserManagement'),
+  () => import("../pages/UserManagement"),
   <RouteLoading />
 );
 
 const SystemSettings = withLazyLoading(
-  () => import('../pages/SystemSettings'),
+  () => import("../pages/SystemSettings"),
   <RouteLoading />
 );
 
 const BackupManagement = withLazyLoading(
-  () => import('../pages/BackupManagement'),
+  () => import("../pages/BackupManagement"),
   <RouteLoading />
 );
 
 // Reader pages
 const ReaderHome = withLazyLoading(
-  () => import('../pages/reader/ReaderHome'),
+  () => import("../pages/reader/ReaderHome"),
   <RouteLoading />
 );
 
 const ReaderSearch = withLazyLoading(
-  () => import('../pages/reader/ReaderSearch'),
+  () => import("../pages/reader/ReaderSearch"),
   <RouteLoading />
 );
 
 const ReaderMyBooks = withLazyLoading(
-  () => import('../pages/reader/ReaderMyBooks'),
+  () => import("../pages/reader/ReaderMyBooks"),
   <RouteLoading />
 );
 
 const ReaderProfile = withLazyLoading(
-  () => import('../pages/reader/ReaderProfile'),
+  () => import("../pages/reader/ReaderProfile"),
   <RouteLoading />
 );
 
 const ReaderReservations = withLazyLoading(
-  () => import('../pages/reader/ReaderReservations'),
+  () => import("../pages/reader/ReaderReservations"),
   <RouteLoading />
 );
 
 const ReaderFines = withLazyLoading(
-  () => import('../pages/reader/ReaderFines'),
+  () => import("../pages/reader/ReaderFines"),
   <RouteLoading />
 );
 
 // Librarian pages
 const LibrarianDashboard = withLazyLoading(
-  () => import('../pages/librarian/LibrarianDashboard'),
+  () => import("../pages/librarian/LibrarianDashboard"),
   <RouteLoading />
 );
 
 const LibrarianReports = withLazyLoading(
-  () => import('../pages/librarian/LibrarianReports'),
+  () => import("../pages/librarian/LibrarianReports"),
   <RouteLoading />
 );
 
 const ReservationManagement = withLazyLoading(
-  () => import('../pages/librarian/ReservationManagement'),
+  () => import("../pages/librarian/ReservationManagement"),
   <RouteLoading />
 );
 
 const BookReservationManagement = withLazyLoading(
-  () => import('../pages/librarian/BookReservationManagement'),
+  () => import("../pages/librarian/BookReservationManagement"),
   <RouteLoading />
 );
 
 const ViolationManagement = withLazyLoading(
-  () => import('../pages/librarian/ViolationManagement'),
+  () => import("../pages/librarian/ViolationManagement"),
   <RouteLoading />
 );
 
 const ReportManagement = withLazyLoading(
-  () => import('../pages/librarian/ReportManagement'),
+  () => import("../pages/librarian/ReportManagement"),
   <RouteLoading />
 );
 
 // Accountant pages
 const AccountantDashboard = withLazyLoading(
-  () => import('../pages/accountant/AccountantDashboard'),
+  () => import("../pages/accountant/AccountantDashboard"),
   <RouteLoading />
 );
 
 const FinancialTransactions = withLazyLoading(
-  () => import('../pages/accountant/FinancialTransactions'),
+  () => import("../pages/accountant/FinancialTransactions"),
   <RouteLoading />
 );
 
 const PurchaseProposals = withLazyLoading(
-  () => import('../pages/accountant/PurchaseProposals'),
+  () => import("../pages/accountant/PurchaseProposals"),
   <RouteLoading />
 );
 
 const PurchaseOrders = withLazyLoading(
-  () => import('../pages/accountant/PurchaseOrders'),
+  () => import("../pages/accountant/PurchaseOrders"),
   <RouteLoading />
 );
 
 const SupplierManagement = withLazyLoading(
-  () => import('../pages/accountant/SupplierManagement'),
+  () => import("../pages/accountant/SupplierManagement"),
   <RouteLoading />
 );
 
 const FinancialReports = withLazyLoading(
-  () => import('../pages/accountant/FinancialReports'),
+  () => import("../pages/accountant/FinancialReports"),
   <RouteLoading />
 );
 
 // Manager pages
 const ManagerDashboard = withLazyLoading(
-  () => import('../pages/manager/ManagerDashboard'),
+  () => import("../pages/manager/ManagerDashboard"),
   <RouteLoading />
 );
 
 const ManagerApprovals = withLazyLoading(
-  () => import('../pages/manager/ManagerApprovals'),
+  () => import("../pages/manager/ManagerApprovals"),
   <RouteLoading />
 );
 
 // Warehouse pages
 const WarehouseDashboard = withLazyLoading(
-  () => import('../pages/warehouse/WarehouseDashboard'),
+  () => import("../pages/warehouse/WarehouseDashboard"),
   <RouteLoading />
 );
 
 const InventoryManagement = withLazyLoading(
-  () => import('../pages/warehouse/InventoryManagement'),
+  () => import("../pages/warehouse/InventoryManagement"),
   <RouteLoading />
 );
 
 const StockReports = withLazyLoading(
-  () => import('../pages/warehouse/StockReports'),
+  () => import("../pages/warehouse/StockReports"),
   <RouteLoading />
 );
 
 const BookImports = withLazyLoading(
-  () => import('../pages/warehouse/BookImports'),
+  () => import("../pages/warehouse/BookImports"),
   <RouteLoading />
 );
 
 const InventoryChecks = withLazyLoading(
-  () => import('../pages/warehouse/InventoryChecks'),
+  () => import("../pages/warehouse/InventoryChecks"),
   <RouteLoading />
 );
 
@@ -182,202 +182,202 @@ const InventoryChecks = withLazyLoading(
 export const routes = [
   // Common routes
   {
-    path: '/',
+    path: "/",
     component: Dashboard,
     exact: true,
-    roles: ['Admin', 'Quản lý', 'Thủ thư', 'Kế toán', 'Thủ kho'],
+    roles: ["Admin", "Quản lý", "Librarian", "Accountant", "Thủ kho"],
   },
   {
-    path: '/books',
+    path: "/books",
     component: BookManagement,
-    roles: ['Admin', 'Quản lý', 'Thủ thư'],
+    roles: ["Admin", "Quản lý", "Librarian"],
   },
   {
-    path: '/readers',
+    path: "/readers",
     component: ReaderManagement,
-    roles: ['Admin', 'Quản lý', 'Thủ thư'],
+    roles: ["Admin", "Quản lý", "Librarian"],
   },
   {
-    path: '/borrows',
+    path: "/borrows",
     component: BorrowManagement,
-    roles: ['Admin', 'Quản lý', 'Thủ thư'],
+    roles: ["Admin", "Quản lý", "Librarian"],
   },
   {
-    path: '/users',
+    path: "/users",
     component: UserManagement,
-    roles: ['Admin', 'Quản lý'],
+    roles: ["Admin", "Quản lý"],
   },
   {
-    path: '/settings',
+    path: "/settings",
     component: SystemSettings,
-    roles: ['Admin'],
+    roles: ["Admin"],
   },
   {
-    path: '/backup',
+    path: "/backup",
     component: BackupManagement,
-    roles: ['Admin'],
+    roles: ["Admin"],
   },
 
   // Reader routes
   {
-    path: '/reader',
+    path: "/reader",
     component: ReaderHome,
     exact: true,
-    roles: ['Độc giả'],
+    roles: ["Reader"],
   },
   {
-    path: '/reader/search',
+    path: "/reader/search",
     component: ReaderSearch,
-    roles: ['Độc giả'],
+    roles: ["Reader"],
   },
   {
-    path: '/reader/my-books',
+    path: "/reader/my-books",
     component: ReaderMyBooks,
-    roles: ['Độc giả'],
+    roles: ["Reader"],
   },
   {
-    path: '/reader/profile',
+    path: "/reader/profile",
     component: ReaderProfile,
-    roles: ['Độc giả'],
+    roles: ["Reader"],
   },
   {
-    path: '/reader/reservations',
+    path: "/reader/reservations",
     component: ReaderReservations,
-    roles: ['Độc giả'],
+    roles: ["Reader"],
   },
   {
-    path: '/reader/fines',
+    path: "/reader/fines",
     component: ReaderFines,
-    roles: ['Độc giả'],
+    roles: ["Reader"],
   },
 
   // Librarian routes
   {
-    path: '/librarian',
+    path: "/librarian",
     component: LibrarianDashboard,
     exact: true,
-    roles: ['Thủ thư'],
+    roles: ["Librarian"],
   },
   {
-    path: '/librarian/reports',
+    path: "/librarian/reports",
     component: LibrarianReports,
-    roles: ['Thủ thư'],
+    roles: ["Librarian"],
   },
   {
-    path: '/librarian/reservations',
+    path: "/librarian/reservations",
     component: ReservationManagement,
-    roles: ['Thủ thư'],
+    roles: ["Librarian"],
   },
   {
-    path: '/librarian/book-reservations',
+    path: "/librarian/book-reservations",
     component: BookReservationManagement,
-    roles: ['Thủ thư'],
+    roles: ["Librarian"],
   },
   {
-    path: '/librarian/violations',
+    path: "/librarian/violations",
     component: ViolationManagement,
-    roles: ['Thủ thư'],
+    roles: ["Librarian"],
   },
   {
-    path: '/librarian/reports-management',
+    path: "/librarian/reports-management",
     component: ReportManagement,
-    roles: ['Thủ thư'],
+    roles: ["Librarian"],
   },
 
   // Accountant routes
   {
-    path: '/accountant',
+    path: "/accountant",
     component: AccountantDashboard,
     exact: true,
-    roles: ['Kế toán'],
+    roles: ["Accountant"],
   },
   {
-    path: '/accountant/transactions',
+    path: "/accountant/transactions",
     component: FinancialTransactions,
-    roles: ['Kế toán'],
+    roles: ["Accountant"],
   },
   {
-    path: '/accountant/purchase-proposals',
+    path: "/accountant/purchase-proposals",
     component: PurchaseProposals,
-    roles: ['Kế toán'],
+    roles: ["Accountant"],
   },
   {
-    path: '/accountant/purchase-orders',
+    path: "/accountant/purchase-orders",
     component: PurchaseOrders,
-    roles: ['Kế toán'],
+    roles: ["Accountant"],
   },
   {
-    path: '/accountant/suppliers',
+    path: "/accountant/suppliers",
     component: SupplierManagement,
-    roles: ['Kế toán'],
+    roles: ["Accountant"],
   },
   {
-    path: '/accountant/reports',
+    path: "/accountant/reports",
     component: FinancialReports,
-    roles: ['Kế toán'],
+    roles: ["Accountant"],
   },
 
   // Manager routes
   {
-    path: '/manager',
+    path: "/manager",
     component: ManagerDashboard,
     exact: true,
-    roles: ['Quản lý'],
+    roles: ["Quản lý"],
   },
   {
-    path: '/manager/approvals',
+    path: "/manager/approvals",
     component: ManagerApprovals,
-    roles: ['Quản lý'],
+    roles: ["Quản lý"],
   },
 
   // Warehouse routes
   {
-    path: '/warehouse',
+    path: "/warehouse",
     component: WarehouseDashboard,
     exact: true,
-    roles: ['Thủ kho'],
+    roles: ["Thủ kho"],
   },
   {
-    path: '/warehouse/inventory',
+    path: "/warehouse/inventory",
     component: InventoryManagement,
-    roles: ['Thủ kho'],
+    roles: ["Thủ kho"],
   },
   {
-    path: '/warehouse/reports',
+    path: "/warehouse/reports",
     component: StockReports,
-    roles: ['Thủ kho'],
+    roles: ["Thủ kho"],
   },
   {
-    path: '/warehouse/imports',
+    path: "/warehouse/imports",
     component: BookImports,
-    roles: ['Thủ kho'],
+    roles: ["Thủ kho"],
   },
   {
-    path: '/warehouse/checks',
+    path: "/warehouse/checks",
     component: InventoryChecks,
-    roles: ['Thủ kho'],
+    roles: ["Thủ kho"],
   },
 ];
 
 // Get routes by role
 export const getRoutesByRole = (userRole) => {
-  return routes.filter(route => 
-    !route.roles || route.roles.includes(userRole)
+  return routes.filter(
+    (route) => !route.roles || route.roles.includes(userRole)
   );
 };
 
 // Get default route by role
 export const getDefaultRoute = (userRole) => {
   const roleRoutes = {
-    'Admin': '/',
-    'Quản lý': '/manager',
-    'Thủ thư': '/librarian',
-    'Kế toán': '/accountant',
-    'Thủ kho': '/warehouse',
-    'Độc giả': '/reader',
+    Admin: "/",
+    "Quản lý": "/manager",
+    Librarian: "/librarian",
+    Accountant: "/accountant",
+    "Thủ kho": "/warehouse",
+    Reader: "/reader",
   };
-  
-  return roleRoutes[userRole] || '/';
+
+  return roleRoutes[userRole] || "/";
 };
 
 export {

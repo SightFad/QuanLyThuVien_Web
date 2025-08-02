@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  FaChartBar, 
-  FaUsers, 
-  FaBook, 
-  FaMoneyBillWave, 
+import React, { useState, useEffect } from "react";
+import {
+  FaChartBar,
+  FaUsers,
+  FaBook,
+  FaMoneyBillWave,
   FaExclamationTriangle,
   FaCheckCircle,
   FaClock,
@@ -13,10 +13,10 @@ import {
   FaFileAlt,
   FaCalendarAlt,
   FaBuilding,
-  FaUserTie
-} from 'react-icons/fa';
-import { useToast } from '../../hooks';
-import './DirectorDashboard.css';
+  FaUserTie,
+} from "react-icons/fa";
+import { useToast } from "../../hooks";
+import "./DirectorDashboard.css";
 
 const DirectorDashboard = () => {
   const [statistics, setStatistics] = useState({
@@ -27,12 +27,12 @@ const DirectorDashboard = () => {
     totalRevenue: 0,
     pendingApprovals: 0,
     staffCount: 0,
-    monthlyGrowth: 0
+    monthlyGrowth: 0,
   });
   const [recentActivities, setRecentActivities] = useState([]);
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -51,67 +51,67 @@ const DirectorDashboard = () => {
         totalRevenue: 15000000,
         pendingApprovals: 8,
         staffCount: 15,
-        monthlyGrowth: 12.5
+        monthlyGrowth: 12.5,
       });
 
       setRecentActivities([
         {
           id: 1,
-          type: 'approval',
-          title: 'Phê duyệt mua sách mới',
-          description: 'Đề xuất mua 50 cuốn sách mới cho khoa CNTT',
+          type: "approval",
+          title: "Phê duyệt mua sách mới",
+          description: "Đề xuất mua 50 cuốn sách mới cho khoa CNTT",
           timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          status: 'pending'
+          status: "pending",
         },
         {
           id: 2,
-          type: 'report',
-          title: 'Báo cáo tháng 12/2024',
-          description: 'Báo cáo hoạt động thư viện tháng 12 đã hoàn thành',
+          type: "report",
+          title: "Báo cáo tháng 12/2024",
+          description: "Báo cáo hoạt động thư viện tháng 12 đã hoàn thành",
           timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-          status: 'completed'
+          status: "completed",
         },
         {
           id: 3,
-          type: 'staff',
-          title: 'Tuyển dụng nhân viên mới',
-          description: 'Phê duyệt tuyển dụng 2 thủ thư mới',
+          type: "staff",
+          title: "Tuyển dụng nhân viên mới",
+          description: "Phê duyệt tuyển dụng 2 Librarian mới",
           timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-          status: 'pending'
-        }
+          status: "pending",
+        },
       ]);
 
       setPendingApprovals([
         {
           id: 1,
-          type: 'book_purchase',
-          title: 'Mua sách mới',
-          requester: 'Trưởng thư viện',
+          type: "book_purchase",
+          title: "Mua sách mới",
+          requester: "Trưởng thư viện",
           amount: 5000000,
-          description: 'Mua 100 cuốn sách mới cho khoa Kinh tế',
-          submittedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+          description: "Mua 100 cuốn sách mới cho khoa Kinh tế",
+          submittedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         },
         {
           id: 2,
-          type: 'budget_allocation',
-          title: 'Phân bổ ngân sách',
-          requester: 'Trưởng phòng kế toán',
+          type: "budget_allocation",
+          title: "Phân bổ ngân sách",
+          requester: "Trưởng phòng Accountant",
           amount: 20000000,
-          description: 'Phân bổ ngân sách cho dự án nâng cấp hệ thống',
-          submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+          description: "Phân bổ ngân sách cho dự án nâng cấp hệ thống",
+          submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         },
         {
           id: 3,
-          type: 'staff_hiring',
-          title: 'Tuyển dụng nhân viên',
-          requester: 'HR Manager',
+          type: "staff_hiring",
+          title: "Tuyển dụng nhân viên",
+          requester: "HR Manager",
           amount: 0,
-          description: 'Tuyển dụng 3 thủ thư mới',
-          submittedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
-        }
+          description: "Tuyển dụng 3 Librarian mới",
+          submittedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        },
       ]);
     } catch (error) {
-      showToast('Lỗi khi tải dữ liệu dashboard', 'error');
+      showToast("Lỗi khi tải dữ liệu dashboard", "error");
     } finally {
       setLoading(false);
     }
@@ -120,27 +120,32 @@ const DirectorDashboard = () => {
   const handleApproval = async (approvalId, action) => {
     try {
       // Mock API call
-      showToast(`Đã ${action === 'approve' ? 'phê duyệt' : 'từ chối'} yêu cầu`, 'success');
-      setPendingApprovals(prev => prev.filter(item => item.id !== approvalId));
+      showToast(
+        `Đã ${action === "approve" ? "phê duyệt" : "từ chối"} yêu cầu`,
+        "success"
+      );
+      setPendingApprovals((prev) =>
+        prev.filter((item) => item.id !== approvalId)
+      );
     } catch (error) {
-      showToast('Lỗi khi xử lý phê duyệt', 'error');
+      showToast("Lỗi khi xử lý phê duyệt", "error");
     }
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(amount);
   };
 
   const formatDate = (date) => {
-    return new Intl.DateTimeFormat('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Intl.DateTimeFormat("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(date);
   };
 
@@ -167,7 +172,7 @@ const DirectorDashboard = () => {
           </div>
           <div className="stat-content">
             <h3>{statistics.totalReaders.toLocaleString()}</h3>
-            <p>Tổng độc giả</p>
+            <p>Tổng Reader</p>
             <span className="stat-change positive">
               <FaArrowUp /> +5.2%
             </span>
@@ -233,7 +238,9 @@ const DirectorDashboard = () => {
                       <FaUserTie /> {approval.requester}
                     </span>
                     <span className="amount">
-                      {approval.amount > 0 ? formatCurrency(approval.amount) : 'Không có chi phí'}
+                      {approval.amount > 0
+                        ? formatCurrency(approval.amount)
+                        : "Không có chi phí"}
                     </span>
                     <span className="date">
                       <FaCalendarAlt /> {formatDate(approval.submittedAt)}
@@ -241,15 +248,15 @@ const DirectorDashboard = () => {
                   </div>
                 </div>
                 <div className="approval-actions">
-                  <button 
+                  <button
                     className="btn btn-success"
-                    onClick={() => handleApproval(approval.id, 'approve')}
+                    onClick={() => handleApproval(approval.id, "approve")}
                   >
                     <FaCheckCircle /> Phê duyệt
                   </button>
-                  <button 
+                  <button
                     className="btn btn-danger"
-                    onClick={() => handleApproval(approval.id, 'reject')}
+                    onClick={() => handleApproval(approval.id, "reject")}
                   >
                     <FaExclamationTriangle /> Từ chối
                   </button>
@@ -271,9 +278,9 @@ const DirectorDashboard = () => {
             {recentActivities.map((activity) => (
               <div key={activity.id} className="activity-item">
                 <div className="activity-icon">
-                  {activity.type === 'approval' && <FaCheckCircle />}
-                  {activity.type === 'report' && <FaFileAlt />}
-                  {activity.type === 'staff' && <FaUsers />}
+                  {activity.type === "approval" && <FaCheckCircle />}
+                  {activity.type === "report" && <FaFileAlt />}
+                  {activity.type === "staff" && <FaUsers />}
                 </div>
                 <div className="activity-content">
                   <h4>{activity.title}</h4>
@@ -284,7 +291,7 @@ const DirectorDashboard = () => {
                 </div>
                 <div className="activity-status">
                   <span className={`status-badge ${activity.status}`}>
-                    {activity.status === 'pending' ? 'Chờ xử lý' : 'Hoàn thành'}
+                    {activity.status === "pending" ? "Chờ xử lý" : "Hoàn thành"}
                   </span>
                 </div>
               </div>
@@ -321,4 +328,4 @@ const DirectorDashboard = () => {
   );
 };
 
-export default DirectorDashboard; 
+export default DirectorDashboard;

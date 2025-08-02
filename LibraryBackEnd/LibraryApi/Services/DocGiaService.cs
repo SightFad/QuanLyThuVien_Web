@@ -13,7 +13,7 @@ namespace LibraryApi.Services
             _context = context;
         }
 
-        // Tính phí thành viên theo loại độc giả
+        // Tính phí thành viên theo loại Reader
         public decimal CalculateMembershipFee(string loaiDocGia)
         {
             return loaiDocGia switch
@@ -26,7 +26,7 @@ namespace LibraryApi.Services
             };
         }
 
-        // Xác định cấp bậc theo loại độc giả
+        // Xác định cấp bậc theo loại Reader
         public string DetermineCapBac(string loaiDocGia)
         {
             return loaiDocGia switch
@@ -36,7 +36,7 @@ namespace LibraryApi.Services
             };
         }
 
-        // Xác định giới hạn mượn sách theo loại độc giả
+        // Xác định giới hạn mượn sách theo loại Reader
         public (int soSachToiDa, int soNgayMuonToiDa, int soLanGiaHanToiDa, int soNgayGiaHan) GetBorrowingLimits(string loaiDocGia)
         {
             return loaiDocGia switch
@@ -48,7 +48,7 @@ namespace LibraryApi.Services
             };
         }
 
-        // Kiểm tra điều kiện đăng ký độc giả
+        // Kiểm tra điều kiện đăng ký Reader
         public async Task<(bool Success, string Message)> CheckRegistrationConditions(CreateDocGiaDto dto)
         {
             // Kiểm tra tuổi (phải 16+)
@@ -59,7 +59,7 @@ namespace LibraryApi.Services
                 
                 if (age < 16)
                 {
-                    return (false, "Độc giả phải từ 16 tuổi trở lên mới được đăng ký tài khoản");
+                    return (false, "Reader phải từ 16 tuổi trở lên mới được đăng ký tài khoản");
                 }
             }
 
@@ -68,7 +68,7 @@ namespace LibraryApi.Services
                 .FirstOrDefaultAsync(d => d.Email == dto.Email);
             if (existingEmail != null)
             {
-                return (false, "Email đã được sử dụng bởi độc giả khác");
+                return (false, "Email đã được sử dụng bởi Reader khác");
             }
 
             // Kiểm tra số điện thoại đã tồn tại
@@ -76,13 +76,13 @@ namespace LibraryApi.Services
                 .FirstOrDefaultAsync(d => d.SDT == dto.SDT);
             if (existingPhone != null)
             {
-                return (false, "Số điện thoại đã được sử dụng bởi độc giả khác");
+                return (false, "Số điện thoại đã được sử dụng bởi Reader khác");
             }
 
             return (true, "OK");
         }
 
-        // Tạo độc giả mới
+        // Tạo Reader mới
         public async Task<(bool Success, string Message, DocGia? DocGia)> CreateDocGia(CreateDocGiaDto dto)
         {
             var checkResult = await CheckRegistrationConditions(dto);
@@ -117,7 +117,7 @@ namespace LibraryApi.Services
             _context.DocGias.Add(docGia);
             await _context.SaveChangesAsync();
 
-            return (true, "Tạo độc giả thành công", docGia);
+            return (true, "Tạo Reader thành công", docGia);
         }
 
         // Kiểm tra điều kiện mượn sách
@@ -126,7 +126,7 @@ namespace LibraryApi.Services
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
             {
-                return (false, "Độc giả không tồn tại");
+                return (false, "Reader không tồn tại");
             }
 
             // Kiểm tra trạng thái thành viên
@@ -170,7 +170,7 @@ namespace LibraryApi.Services
 
             if (soSachDangMuon + soSachMuon > docGia.SoSachToiDa)
             {
-                return (false, $"Độc giả chỉ được mượn tối đa {docGia.SoSachToiDa} sách. Hiện tại đang mượn {soSachDangMuon} sách");
+                return (false, $"Reader chỉ được mượn tối đa {docGia.SoSachToiDa} sách. Hiện tại đang mượn {soSachDangMuon} sách");
             }
 
             return (true, "OK");
@@ -182,7 +182,7 @@ namespace LibraryApi.Services
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
             {
-                return (false, "Độc giả không tồn tại");
+                return (false, "Reader không tồn tại");
             }
 
             docGia.MemberStatus = newStatus;
@@ -211,7 +211,7 @@ namespace LibraryApi.Services
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
             {
-                return (false, "Độc giả không tồn tại");
+                return (false, "Reader không tồn tại");
             }
 
             if (soNgayTre <= 0)

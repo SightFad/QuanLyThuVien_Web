@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  FaUsers, 
-  FaUserShield, 
-  FaEye, 
-  FaEdit, 
-  FaTrash, 
+import React, { useState, useEffect } from "react";
+import {
+  FaUsers,
+  FaUserShield,
+  FaEye,
+  FaEdit,
+  FaTrash,
   FaPlus,
   FaCheck,
   FaTimes,
@@ -15,11 +15,16 @@ import {
   FaBookReader,
   FaCalculator,
   FaWarehouse,
-  FaTools
-} from 'react-icons/fa';
-import { USER_ROLES, PERMISSIONS, ROLE_PERMISSIONS, ROLE_HIERARCHY } from '../utils/constants';
-import PermissionService from '../services/permissionService';
-import './RoleManagement.css';
+  FaTools,
+} from "react-icons/fa";
+import {
+  USER_ROLES,
+  PERMISSIONS,
+  ROLE_PERMISSIONS,
+  ROLE_HIERARCHY,
+} from "../utils/constants";
+import PermissionService from "../services/permissionService";
+import "./RoleManagement.css";
 
 const RoleManagement = ({ currentUserRole, onRoleChange }) => {
   const [selectedRole, setSelectedRole] = useState(null);
@@ -33,86 +38,90 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
     [USER_ROLES.ADMIN]: <FaUserShield className="role-icon admin" />,
     [USER_ROLES.LIBRARY_MANAGER]: <FaUserTie className="role-icon manager" />,
     [USER_ROLES.LIBRARIAN]: <FaBookReader className="role-icon librarian" />,
-    [USER_ROLES.ACCOUNTING_MANAGER]: <FaUserTie className="role-icon manager" />,
+    [USER_ROLES.ACCOUNTING_MANAGER]: (
+      <FaUserTie className="role-icon manager" />
+    ),
     [USER_ROLES.ACCOUNTANT]: <FaCalculator className="role-icon accountant" />,
     [USER_ROLES.WAREHOUSE_MANAGER]: <FaUserTie className="role-icon manager" />,
-    [USER_ROLES.WAREHOUSE_STAFF]: <FaWarehouse className="role-icon warehouse" />,
+    [USER_ROLES.WAREHOUSE_STAFF]: (
+      <FaWarehouse className="role-icon warehouse" />
+    ),
     [USER_ROLES.TECHNICIAN]: <FaTools className="role-icon technician" />,
-    [USER_ROLES.READER]: <FaBookReader className="role-icon reader" />
+    [USER_ROLES.READER]: <FaBookReader className="role-icon reader" />,
   };
 
   // Permission categories
   const permissionCategories = {
-    'Quản lý hệ thống': [
+    "Quản lý hệ thống": [
       PERMISSIONS.SYSTEM_MANAGEMENT,
       PERMISSIONS.USER_MANAGEMENT,
       PERMISSIONS.ROLE_MANAGEMENT,
       PERMISSIONS.CONFIGURATION,
-      PERMISSIONS.BACKUP_RESTORE
+      PERMISSIONS.BACKUP_RESTORE,
     ],
-    'Quản lý thư viện': [
+    "Quản lý thư viện": [
       PERMISSIONS.BOOK_MANAGEMENT,
       PERMISSIONS.READER_MANAGEMENT,
       PERMISSIONS.BORROW_RETURN,
       PERMISSIONS.RESERVATION_MANAGEMENT,
       PERMISSIONS.EXTENSION_MANAGEMENT,
-      PERMISSIONS.FINE_MANAGEMENT
+      PERMISSIONS.FINE_MANAGEMENT,
     ],
-    'Quản lý tài chính': [
+    "Quản lý tài chính": [
       PERMISSIONS.FINANCIAL_MANAGEMENT,
       PERMISSIONS.PURCHASE_PROPOSAL,
       PERMISSIONS.PURCHASE_ORDER,
       PERMISSIONS.SUPPLIER_MANAGEMENT,
-      PERMISSIONS.FINANCIAL_REPORTS
+      PERMISSIONS.FINANCIAL_REPORTS,
     ],
-    'Quản lý kho': [
+    "Quản lý kho": [
       PERMISSIONS.INVENTORY_MANAGEMENT,
       PERMISSIONS.STOCK_IN,
       PERMISSIONS.STOCK_CHECK,
-      PERMISSIONS.WAREHOUSE_REPORTS
+      PERMISSIONS.WAREHOUSE_REPORTS,
     ],
-    'Báo cáo và giám sát': [
+    "Báo cáo và giám sát": [
       PERMISSIONS.REPORTS_VIEW,
       PERMISSIONS.REPORTS_EXPORT,
-      PERMISSIONS.ACTIVITY_LOGS
+      PERMISSIONS.ACTIVITY_LOGS,
     ],
-    'Người dùng': [
+    "Người dùng": [
       PERMISSIONS.BOOK_SEARCH,
       PERMISSIONS.BOOK_BORROW,
       PERMISSIONS.BOOK_RESERVE,
-      PERMISSIONS.PROFILE_MANAGEMENT
-    ]
+      PERMISSIONS.PROFILE_MANAGEMENT,
+    ],
   };
 
   // Permission descriptions
   const permissionDescriptions = {
-    [PERMISSIONS.SYSTEM_MANAGEMENT]: 'Quản lý toàn bộ hệ thống',
-    [PERMISSIONS.USER_MANAGEMENT]: 'Quản lý người dùng',
-    [PERMISSIONS.ROLE_MANAGEMENT]: 'Quản lý vai trò và phân quyền',
-    [PERMISSIONS.CONFIGURATION]: 'Cấu hình hệ thống',
-    [PERMISSIONS.BACKUP_RESTORE]: 'Sao lưu và khôi phục dữ liệu',
-    [PERMISSIONS.BOOK_MANAGEMENT]: 'Quản lý sách',
-    [PERMISSIONS.READER_MANAGEMENT]: 'Quản lý độc giả',
-    [PERMISSIONS.BORROW_RETURN]: 'Quản lý mượn/trả sách',
-    [PERMISSIONS.RESERVATION_MANAGEMENT]: 'Quản lý đặt trước sách',
-    [PERMISSIONS.EXTENSION_MANAGEMENT]: 'Quản lý gia hạn sách',
-    [PERMISSIONS.FINE_MANAGEMENT]: 'Quản lý phí phạt',
-    [PERMISSIONS.FINANCIAL_MANAGEMENT]: 'Quản lý tài chính',
-    [PERMISSIONS.PURCHASE_PROPOSAL]: 'Đề xuất mua sách',
-    [PERMISSIONS.PURCHASE_ORDER]: 'Quản lý đơn hàng',
-    [PERMISSIONS.SUPPLIER_MANAGEMENT]: 'Quản lý nhà cung cấp',
-    [PERMISSIONS.FINANCIAL_REPORTS]: 'Báo cáo tài chính',
-    [PERMISSIONS.INVENTORY_MANAGEMENT]: 'Quản lý kho',
-    [PERMISSIONS.STOCK_IN]: 'Nhập kho',
-    [PERMISSIONS.STOCK_CHECK]: 'Kiểm kê',
-    [PERMISSIONS.WAREHOUSE_REPORTS]: 'Báo cáo kho',
-    [PERMISSIONS.REPORTS_VIEW]: 'Xem báo cáo',
-    [PERMISSIONS.REPORTS_EXPORT]: 'Xuất báo cáo',
-    [PERMISSIONS.ACTIVITY_LOGS]: 'Xem log hoạt động',
-    [PERMISSIONS.BOOK_SEARCH]: 'Tìm kiếm sách',
-    [PERMISSIONS.BOOK_BORROW]: 'Mượn sách',
-    [PERMISSIONS.BOOK_RESERVE]: 'Đặt trước sách',
-    [PERMISSIONS.PROFILE_MANAGEMENT]: 'Quản lý thông tin cá nhân'
+    [PERMISSIONS.SYSTEM_MANAGEMENT]: "Quản lý toàn bộ hệ thống",
+    [PERMISSIONS.USER_MANAGEMENT]: "Quản lý người dùng",
+    [PERMISSIONS.ROLE_MANAGEMENT]: "Quản lý vai trò và phân quyền",
+    [PERMISSIONS.CONFIGURATION]: "Cấu hình hệ thống",
+    [PERMISSIONS.BACKUP_RESTORE]: "Sao lưu và khôi phục dữ liệu",
+    [PERMISSIONS.BOOK_MANAGEMENT]: "Quản lý sách",
+    [PERMISSIONS.READER_MANAGEMENT]: "Quản lý Reader",
+    [PERMISSIONS.BORROW_RETURN]: "Quản lý mượn/trả sách",
+    [PERMISSIONS.RESERVATION_MANAGEMENT]: "Quản lý đặt trước sách",
+    [PERMISSIONS.EXTENSION_MANAGEMENT]: "Quản lý gia hạn sách",
+    [PERMISSIONS.FINE_MANAGEMENT]: "Quản lý phí phạt",
+    [PERMISSIONS.FINANCIAL_MANAGEMENT]: "Quản lý tài chính",
+    [PERMISSIONS.PURCHASE_PROPOSAL]: "Đề xuất mua sách",
+    [PERMISSIONS.PURCHASE_ORDER]: "Quản lý đơn hàng",
+    [PERMISSIONS.SUPPLIER_MANAGEMENT]: "Quản lý nhà cung cấp",
+    [PERMISSIONS.FINANCIAL_REPORTS]: "Báo cáo tài chính",
+    [PERMISSIONS.INVENTORY_MANAGEMENT]: "Quản lý kho",
+    [PERMISSIONS.STOCK_IN]: "Nhập kho",
+    [PERMISSIONS.STOCK_CHECK]: "Kiểm kê",
+    [PERMISSIONS.WAREHOUSE_REPORTS]: "Báo cáo kho",
+    [PERMISSIONS.REPORTS_VIEW]: "Xem báo cáo",
+    [PERMISSIONS.REPORTS_EXPORT]: "Xuất báo cáo",
+    [PERMISSIONS.ACTIVITY_LOGS]: "Xem log hoạt động",
+    [PERMISSIONS.BOOK_SEARCH]: "Tìm kiếm sách",
+    [PERMISSIONS.BOOK_BORROW]: "Mượn sách",
+    [PERMISSIONS.BOOK_RESERVE]: "Đặt trước sách",
+    [PERMISSIONS.PROFILE_MANAGEMENT]: "Quản lý thông tin cá nhân",
   };
 
   const handleRoleSelect = (role) => {
@@ -150,11 +159,11 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
   };
 
   const getRoleLevelColor = (level) => {
-    if (level >= 9) return '#dc2626'; // Red for highest
-    if (level >= 8) return '#ea580c'; // Orange for management
-    if (level >= 7) return '#ca8a04'; // Yellow for staff
-    if (level >= 6) return '#16a34a'; // Green for technician
-    return '#6b7280'; // Gray for reader
+    if (level >= 9) return "#dc2626"; // Red for highest
+    if (level >= 8) return "#ea580c"; // Orange for management
+    if (level >= 7) return "#ca8a04"; // Yellow for staff
+    if (level >= 6) return "#16a34a"; // Green for technician
+    return "#6b7280"; // Gray for reader
   };
 
   return (
@@ -188,14 +197,19 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
           <h3>Thứ bậc vai trò</h3>
           <div className="hierarchy-tree">
             {Object.entries(ROLE_HIERARCHY)
-              .sort(([,a], [,b]) => b - a) // Sort by level descending
+              .sort(([, a], [, b]) => b - a) // Sort by level descending
               .map(([role, level]) => (
-                <div 
-                  key={role} 
-                  className={`hierarchy-item ${selectedRole === role ? 'selected' : ''}`}
+                <div
+                  key={role}
+                  className={`hierarchy-item ${
+                    selectedRole === role ? "selected" : ""
+                  }`}
                   onClick={() => handleRoleSelect(role)}
                 >
-                  <div className="hierarchy-level" style={{ backgroundColor: getRoleLevelColor(level) }}>
+                  <div
+                    className="hierarchy-level"
+                    style={{ backgroundColor: getRoleLevelColor(level) }}
+                  >
                     {level}
                   </div>
                   <div className="hierarchy-role">
@@ -204,12 +218,18 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
                   </div>
                   <div className="hierarchy-actions">
                     {canManageRole(role) && (
-                      <button className="action-btn manage" title="Quản lý vai trò">
+                      <button
+                        className="action-btn manage"
+                        title="Quản lý vai trò"
+                      >
                         <FaUserCog />
                       </button>
                     )}
                     {canPerformRole(role) && (
-                      <button className="action-btn perform" title="Thực hiện vai trò">
+                      <button
+                        className="action-btn perform"
+                        title="Thực hiện vai trò"
+                      >
                         <FaEye />
                       </button>
                     )}
@@ -222,20 +242,22 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
         {/* Role Capabilities */}
         <div className="role-capabilities">
           <h3>Khả năng của vai trò hiện tại</h3>
-          
+
           <div className="capabilities-grid">
             <div className="capability-card">
               <h4>Vai trò có thể quản lý</h4>
               <div className="capability-list">
                 {getManageableRoles().length > 0 ? (
-                  getManageableRoles().map(role => (
+                  getManageableRoles().map((role) => (
                     <div key={role} className="capability-item">
                       {roleIcons[role]}
                       <span>{role}</span>
                     </div>
                   ))
                 ) : (
-                  <p className="no-capability">Không có vai trò nào để quản lý</p>
+                  <p className="no-capability">
+                    Không có vai trò nào để quản lý
+                  </p>
                 )}
               </div>
             </div>
@@ -244,14 +266,16 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
               <h4>Vai trò có thể thực hiện</h4>
               <div className="capability-list">
                 {getPerformableRoles().length > 0 ? (
-                  getPerformableRoles().map(role => (
+                  getPerformableRoles().map((role) => (
                     <div key={role} className="capability-item">
                       {roleIcons[role]}
                       <span>{role}</span>
                     </div>
                   ))
                 ) : (
-                  <p className="no-capability">Không có vai trò nào để thực hiện</p>
+                  <p className="no-capability">
+                    Không có vai trò nào để thực hiện
+                  </p>
                 )}
               </div>
             </div>
@@ -263,33 +287,41 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
           <div className="role-permissions">
             <h3>Quyền hạn của vai trò: {selectedRole}</h3>
             <div className="permissions-container">
-              {Object.entries(permissionCategories).map(([category, permissions]) => (
-                <div key={category} className="permission-category">
-                  <h4>{category}</h4>
-                  <div className="permissions-list">
-                    {permissions.map(permission => (
-                      <div 
-                        key={permission} 
-                        className={`permission-item ${isPermissionGranted(selectedRole, permission) ? 'granted' : 'denied'}`}
-                      >
-                        <div className="permission-status">
-                          {isPermissionGranted(selectedRole, permission) ? (
-                            <FaCheck className="status-icon granted" />
-                          ) : (
-                            <FaTimes className="status-icon denied" />
-                          )}
+              {Object.entries(permissionCategories).map(
+                ([category, permissions]) => (
+                  <div key={category} className="permission-category">
+                    <h4>{category}</h4>
+                    <div className="permissions-list">
+                      {permissions.map((permission) => (
+                        <div
+                          key={permission}
+                          className={`permission-item ${
+                            isPermissionGranted(selectedRole, permission)
+                              ? "granted"
+                              : "denied"
+                          }`}
+                        >
+                          <div className="permission-status">
+                            {isPermissionGranted(selectedRole, permission) ? (
+                              <FaCheck className="status-icon granted" />
+                            ) : (
+                              <FaTimes className="status-icon denied" />
+                            )}
+                          </div>
+                          <div className="permission-info">
+                            <span className="permission-name">
+                              {permission}
+                            </span>
+                            <span className="permission-description">
+                              {permissionDescriptions[permission]}
+                            </span>
+                          </div>
                         </div>
-                        <div className="permission-info">
-                          <span className="permission-name">{permission}</span>
-                          <span className="permission-description">
-                            {permissionDescriptions[permission]}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
         )}
@@ -307,7 +339,7 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
                 <p className="stat-value">{Object.keys(USER_ROLES).length}</p>
               </div>
             </div>
-            
+
             <div className="stat-card">
               <div className="stat-icon">
                 <FaUserShield />
@@ -315,11 +347,15 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
               <div className="stat-content">
                 <h4>Vai trò quản lý</h4>
                 <p className="stat-value">
-                  {Object.values(USER_ROLES).filter(role => PermissionService.isManagementRole(role)).length}
+                  {
+                    Object.values(USER_ROLES).filter((role) =>
+                      PermissionService.isManagementRole(role)
+                    ).length
+                  }
                 </p>
               </div>
             </div>
-            
+
             <div className="stat-card">
               <div className="stat-icon">
                 <FaUserCog />
@@ -327,11 +363,15 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
               <div className="stat-content">
                 <h4>Vai trò nhân viên</h4>
                 <p className="stat-value">
-                  {Object.values(USER_ROLES).filter(role => PermissionService.isStaffRole(role)).length}
+                  {
+                    Object.values(USER_ROLES).filter((role) =>
+                      PermissionService.isStaffRole(role)
+                    ).length
+                  }
                 </p>
               </div>
             </div>
-            
+
             <div className="stat-card">
               <div className="stat-icon">
                 <FaBookReader />
@@ -348,4 +388,4 @@ const RoleManagement = ({ currentUserRole, onRoleChange }) => {
   );
 };
 
-export default RoleManagement; 
+export default RoleManagement;

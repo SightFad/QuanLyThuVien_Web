@@ -17,7 +17,7 @@ namespace LibraryApi.Services
         {
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
-                return (false, "Độc giả không tồn tại");
+                return (false, "Reader không tồn tại");
 
             // Kiểm tra sách quá hạn chưa trả
             var overdueBooks = await _context.PhieuMuons
@@ -66,7 +66,7 @@ namespace LibraryApi.Services
         {
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
-                return (false, "Độc giả không tồn tại");
+                return (false, "Reader không tồn tại");
 
             // Kiểm tra sách quá hạn chưa trả
             var overdueBooks = await _context.PhieuMuons

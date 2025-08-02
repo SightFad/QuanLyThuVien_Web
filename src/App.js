@@ -146,16 +146,16 @@ function App() {
               <Routes>
                 {/* System Administrator Routes */}
                 <Route path="/" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Giám đốc', 'Trưởng thư viện', 'Thủ thư', 'Kế toán', 'Trưởng phòng kế toán', 'Nhân viên kế toán', 'Kỹ thuật viên', 'Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Admin', 'Director', 'Trưởng thư viện', 'Librarian', 'Accountant', 'Head Accountant', 'Nhân viên Accountant', 'Kỹ thuật viên', 'Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Reader']}>
                     {user && (
-                      user.role === 'Quản trị viên' ? <ModernDashboard userRole={user.role} /> :
+                      user.role === 'Admin' ? <ModernDashboard userRole={user.role} /> :
                       (() => {
                         const redirectPath = 
-                          user.role === 'Độc giả' ? '/reader/home' :
-                          user.role === 'Giám đốc' ? '/director/dashboard' :
+                          user.role === 'Reader' ? '/reader/home' :
+                          user.role === 'Director' ? '/director/dashboard' :
                           user.role === 'Trưởng thư viện' ? '/manager/dashboard' :
-                          user.role === 'Thủ thư' ? '/librarian/dashboard' :
-                          user.role === 'Kế toán' || user.role === 'Trưởng phòng kế toán' || user.role === 'Nhân viên kế toán' ? '/accountant/dashboard' :
+                          user.role === 'Librarian' ? '/librarian/dashboard' :
+                          user.role === 'Accountant' || user.role === 'Head Accountant' || user.role === 'Nhân viên Accountant' ? '/accountant/dashboard' :
                           user.role === 'Kỹ thuật viên' ? '/technician/dashboard' :
                           user.role === 'Nhân viên kho sách' || user.role === 'Trưởng kho' || user.role === 'warehouse' || user.role === 'Warehouse' ? '/warehouse/dashboard' : '/';
                         
@@ -172,65 +172,65 @@ function App() {
                 <Route path="/auth-test" element={<AuthTest />} />
                 
                 <Route path="/admin" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên']}>
-                    <ModernDashboard userRole="Quản trị viên" />
+                  <ProtectedRoute allowedRoles={['Admin']}>
+                    <ModernDashboard userRole="Admin" />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/system/users" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên']}>
+                  <ProtectedRoute allowedRoles={['Admin']}>
                     <UserManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/system/settings" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên']}>
+                  <ProtectedRoute allowedRoles={['Admin']}>
                     <SystemSettings />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/system/backup" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên']}>
+                  <ProtectedRoute allowedRoles={['Admin']}>
                     <BackupManagement />
                   </ProtectedRoute>
                 } />
                 
                 {/* Shared Routes */}
                 <Route path="/books" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư', 'Trưởng thư viện', 'Nhân viên kho sách', 'Trưởng kho']}>
+                  <ProtectedRoute allowedRoles={['Admin', 'Librarian', 'Trưởng thư viện', 'Nhân viên kho sách', 'Trưởng kho']}>
                     <BookManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/readers" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư', 'Trưởng thư viện']}>
+                  <ProtectedRoute allowedRoles={['Admin', 'Librarian', 'Trưởng thư viện']}>
                     <ReaderManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/borrows" element={
-                  <ProtectedRoute allowedRoles={['Quản trị viên', 'Thủ thư', 'Trưởng thư viện', 'Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Admin', 'Librarian', 'Trưởng thư viện', 'Accountant', 'Nhân viên Accountant']}>
                     <BorrowManagement />
                   </ProtectedRoute>
                 } />
                 
                 {/* Reader Routes */}
                 <Route path="/reader" element={
-                  <ProtectedRoute allowedRoles={['Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Reader']}>
                     <Navigate to="/reader/home" replace />
                   </ProtectedRoute>
                 } />
                 
                 {/* Librarian Routes */}
                 <Route path="/librarian" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <Navigate to="/librarian/dashboard" replace />
                   </ProtectedRoute>
                 } />
                 
                 {/* Accountant Routes */}
                 <Route path="/accountant" element={
-                  <ProtectedRoute allowedRoles={['Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant', 'Nhân viên Accountant']}>
                     <Navigate to="/accountant/dashboard" replace />
                   </ProtectedRoute>
                 } />
@@ -250,123 +250,123 @@ function App() {
                 } />
                 
                 <Route path="/reader/home" element={
-                  <ProtectedRoute allowedRoles={['Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Reader']}>
                     <ReaderHome />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/reader/search" element={
-                  <ProtectedRoute allowedRoles={['Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Reader']}>
                     <ReaderSearch />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/reader/my-books" element={
-                  <ProtectedRoute allowedRoles={['Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Reader']}>
                     <ReaderMyBooks />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/reader/reservations" element={
-                  <ProtectedRoute allowedRoles={['Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Reader']}>
                     <ReaderReservations />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/reader/fines" element={
-                  <ProtectedRoute allowedRoles={['Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Reader']}>
                     <ReaderFines />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/reader/profile" element={
-                  <ProtectedRoute allowedRoles={['Độc giả']}>
+                  <ProtectedRoute allowedRoles={['Reader']}>
                     <ReaderProfile />
                   </ProtectedRoute>
                 } />
                 
                 {/* Librarian Routes */}
                 <Route path="/librarian" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <Navigate to="/librarian/dashboard" replace />
                   </ProtectedRoute>
                 } />
                 
                                 <Route path="/librarian/dashboard" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <LibrarianDashboard />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/librarian/fines" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <FineManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/librarian/reports" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <LibrarianReports />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/librarian/book-status" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <BookStatusManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/librarian/reservations" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <ReservationManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/librarian/violations" element={
-                  <ProtectedRoute allowedRoles={['Thủ thư']}>
+                  <ProtectedRoute allowedRoles={['Librarian']}>
                     <ViolationManagement />
                   </ProtectedRoute>
                 } />
                 
                 {/* Accountant Routes */}
                 <Route path="/accountant" element={
-                  <ProtectedRoute allowedRoles={['Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant', 'Nhân viên Accountant']}>
                     <Navigate to="/accountant/dashboard" replace />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/accountant/dashboard" element={
-                  <ProtectedRoute allowedRoles={['Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant', 'Nhân viên Accountant']}>
                     <AccountantDashboard />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/accountant/transactions" element={
-                  <ProtectedRoute allowedRoles={['Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant', 'Nhân viên Accountant']}>
                     <FinancialTransactions />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/accountant/proposals" element={
-                  <ProtectedRoute allowedRoles={['Kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant']}>
                     <PurchaseProposals />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/accountant/orders" element={
-                  <ProtectedRoute allowedRoles={['Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant', 'Nhân viên Accountant']}>
                     <PurchaseOrders />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/accountant/suppliers" element={
-                  <ProtectedRoute allowedRoles={['Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant', 'Nhân viên Accountant']}>
                     <SupplierManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/accountant/reports" element={
-                  <ProtectedRoute allowedRoles={['Kế toán', 'Nhân viên kế toán']}>
+                  <ProtectedRoute allowedRoles={['Accountant', 'Nhân viên Accountant']}>
                     <FinancialReports />
                   </ProtectedRoute>
                 } />
@@ -437,13 +437,13 @@ function App() {
                 
                 {/* Director Routes */}
                 <Route path="/director" element={
-                  <ProtectedRoute allowedRoles={['Giám đốc']}>
+                  <ProtectedRoute allowedRoles={['Director']}>
                     <Navigate to="/director/dashboard" replace />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/director/dashboard" element={
-                  <ProtectedRoute allowedRoles={['Giám đốc']}>
+                  <ProtectedRoute allowedRoles={['Director']}>
                     <DirectorDashboard />
                   </ProtectedRoute>
                 } />
@@ -463,17 +463,17 @@ function App() {
                 
                 {/* Catch-all route for authenticated users */}
                 <Route path="*" element={
-                  <ProtectedRoute allowedRoles={['Độc giả', 'Giám đốc', 'Trưởng thư viện', 'Thủ thư', 'Kế toán', 'Trưởng phòng kế toán', 'Nhân viên kế toán', 'Kỹ thuật viên', 'Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Quản trị viên']}>
+                  <ProtectedRoute allowedRoles={['Reader', 'Director', 'Trưởng thư viện', 'Librarian', 'Accountant', 'Head Accountant', 'Nhân viên Accountant', 'Kỹ thuật viên', 'Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Admin']}>
                     {user && (
                       <Navigate to={
-                        user.role === 'Độc giả' ? '/reader/home' :
-                        user.role === 'Giám đốc' ? '/director/dashboard' :
+                        user.role === 'Reader' ? '/reader/home' :
+                        user.role === 'Director' ? '/director/dashboard' :
                         user.role === 'Trưởng thư viện' ? '/manager/dashboard' :
-                        user.role === 'Thủ thư' ? '/librarian/dashboard' :
-                        user.role === 'Kế toán' || user.role === 'Trưởng phòng kế toán' || user.role === 'Nhân viên kế toán' ? '/accountant/dashboard' :
+                        user.role === 'Librarian' ? '/librarian/dashboard' :
+                        user.role === 'Accountant' || user.role === 'Head Accountant' || user.role === 'Nhân viên Accountant' ? '/accountant/dashboard' :
                         user.role === 'Kỹ thuật viên' ? '/technician/dashboard' :
                         user.role === 'Nhân viên kho sách' || user.role === 'Trưởng kho' || user.role === 'warehouse' || user.role === 'Warehouse' ? '/warehouse/dashboard' :
-                        user.role === 'Quản trị viên' ? '/admin' : '/'
+                        user.role === 'Admin' ? '/admin' : '/'
                       } replace />
                     )}
                   </ProtectedRoute>

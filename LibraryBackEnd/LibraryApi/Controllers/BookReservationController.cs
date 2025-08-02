@@ -125,7 +125,7 @@ namespace LibraryApi.Controllers
                 var reader = await _context.DocGias.FindAsync(reservation.MaDocGia);
                 if (reader == null)
                 {
-                    return BadRequest(new { message = "Độc giả không tồn tại" });
+                    return BadRequest(new { message = "Reader không tồn tại" });
                 }
 
                 // Check if book exists

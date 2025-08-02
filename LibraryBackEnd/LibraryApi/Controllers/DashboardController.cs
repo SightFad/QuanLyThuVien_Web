@@ -51,13 +51,13 @@ namespace LibraryApi.Controllers
 
                 // Tính sách đang mượn
                 var booksBorrowed = await _context.PhieuMuons
-                    .Where(p => p.TrangThai == "Đang mượn")
+                    .Where(p => p.TrangThai == "borrowed")
                     .CountAsync();
 
                 // Tính sách quá hạn
                 var today = DateTime.Today;
                 var overdueBooks = await _context.PhieuMuons
-                    .Where(p => p.TrangThai == "Đang mượn" && p.HanTra < today)
+                    .Where(p => p.TrangThai == "borrowed" && p.HanTra < today)
                     .CountAsync();
 
                 // Tính phiếu mượn hôm nay
@@ -67,7 +67,7 @@ namespace LibraryApi.Controllers
 
                 // Tính phiếu trả đang chờ
                 var pendingReturns = await _context.PhieuMuons
-                    .Where(p => p.TrangThai == "Đang mượn" && p.HanTra >= today)
+                    .Where(p => p.TrangThai == "borrowed" && p.HanTra >= today)
                     .CountAsync();
 
                 // Tính tăng trưởng tháng này

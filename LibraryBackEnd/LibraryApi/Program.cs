@@ -95,31 +95,31 @@ app.MapControllers();
                         {
                             TenDangNhap = "admin",
                             MatKhau = "admin123",
-                            ChucVu = "Quản trị viên"
+                            ChucVu = "Admin"
                         },
                         new NguoiDung
                         {
                             TenDangNhap = "librarian",
                             MatKhau = "librarian123",
-                            ChucVu = "Thủ thư"
+                            ChucVu = "Librarian"
                         },
                         new NguoiDung
                         {
                             TenDangNhap = "reader",
                             MatKhau = "reader123",
-                            ChucVu = "Độc giả"
+                            ChucVu = "Reader"
                         },
                         new NguoiDung
                         {
                             TenDangNhap = "reader1",
                             MatKhau = "reader123",
-                            ChucVu = "Độc giả"
+                            ChucVu = "Reader"
                         },
                         new NguoiDung
                         {
                             TenDangNhap = "accountant",
                             MatKhau = "accountant123",
-                            ChucVu = "Kế toán"
+                            ChucVu = "Accountant"
                         },
                         new NguoiDung
                         {

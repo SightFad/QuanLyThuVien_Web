@@ -276,7 +276,7 @@ namespace LibraryApi.Controllers
         }
 
         /// <summary>
-        /// Cập nhật trạng thái sách (dành cho thủ thư)
+        /// Cập nhật trạng thái sách (dành cho Librarian)
         /// </summary>
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateBookStatus(int id, [FromBody] UpdateBookStatusDto dto)
