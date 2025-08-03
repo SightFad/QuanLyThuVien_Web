@@ -1,0 +1,353 @@
+/* Reservation Management Styles */
+.reservation-management {
+  /* Remove fixed padding-left to use the new responsive layout */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: #bdc3c7;
+  margin: 0;
+  text-align: center;
+}
+
+/* Filters */
+.filters-card {
+  margin-bottom: 24px;
+  background: #34495e;
+  border: 1px solid #2c3e50;
+}
+
+.filters-content {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-filter {
+  flex: 1;
+  min-width: 250px;
+}
+
+.status-filter {
+  min-width: 200px;
+}
+
+.search-input,
+.status-select {
+  width: 100%;
+  background: #2c3e50;
+  border: 1px solid #34495e;
+  color: white;
+}
+
+.search-input::placeholder {
+  color: #bdc3c7;
+}
+
+/* Statistics */
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  padding: 20px;
+  background: #34495e;
+  border: 1px solid #2c3e50;
+}
+
+.stat-content {
+  text-align: center;
+}
+
+.stat-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #bdc3c7;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.stat-value-success {
+  color: var(--success);
+}
+
+.stat-value-warning {
+  color: var(--warning);
+}
+
+.stat-value-info {
+  color: var(--info);
+}
+
+.stat-value-danger {
+  color: var(--danger);
+}
+
+/* Table */
+.table-card {
+  margin-bottom: 24px;
+  background: #34495e;
+  border: 1px solid #2c3e50;
+}
+
+.table-pagination {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Custom table styles for reservation form */
+.reservation-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #34495e;
+}
+
+.reservation-table th {
+  background: #2c3e50;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #2c3e50;
+  font-weight: 600;
+}
+
+.reservation-table td {
+  padding: 12px;
+  border: 1px solid #2c3e50;
+  color: white;
+  background: #34495e;
+}
+
+.reservation-table tr:hover {
+  background: #3a5a78;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-button-notify {
+  color: var(--info);
+}
+
+.action-button-notify:hover {
+  background-color: var(--info-light);
+  color: var(--info);
+}
+
+.action-button-confirm {
+  color: var(--success);
+}
+
+.action-button-confirm:hover {
+  background-color: var(--success-light);
+  color: var(--success);
+}
+
+.action-button-cancel {
+  color: var(--danger);
+}
+
+.action-button-cancel:hover {
+  background-color: var(--danger-light);
+  color: var(--danger);
+}
+
+/* Status Checkboxes */
+.status-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px;
+}
+
+.status-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.status-checkbox:hover {
+  background-color: #3a5a78;
+}
+
+.status-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #3498db;
+  margin: 0;
+}
+
+.status-checkbox input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox-label {
+  font-weight: 500;
+  user-select: none;
+  color: white;
+  font-size: 12px;
+}
+
+/* Checkbox states */
+.status-checkbox input[type="checkbox"]:checked + .checkbox-label {
+  color: #3498db;
+  font-weight: 600;
+}
+
+/* Modal */
+.reservation-details {
+  padding: 16px 0;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-section h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reservation-management {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-content {
+    flex-direction: column;
+  }
+
+  .search-filter,
+  .status-filter {
+    min-width: auto;
+  }
+
+  .statistics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+} 

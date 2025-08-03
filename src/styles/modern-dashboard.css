@@ -1,0 +1,384 @@
+/* Modern Dashboard Styles */
+
+/* Quick Action Cards */
+.quick-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border: 1px solid transparent;
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  transition: var(--transition-all);
+  cursor: pointer;
+  text-align: center;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.quick-action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-2xl);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: var(--backdrop-blur-sm);
+}
+
+/* Activity List */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: var(--transition-all);
+}
+
+.activity-item:hover {
+  background: var(--color-surface-hover);
+  transform: translateX(4px);
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-base);
+  flex-shrink: 0;
+}
+
+.activity-icon.status-success {
+  background: var(--success-50);
+  color: var(--success-600);
+}
+
+.activity-icon.status-warning {
+  background: var(--warning-50);
+  color: var(--warning-600);
+}
+
+.activity-icon.status-info {
+  background: var(--info-50);
+  color: var(--info-600);
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-main {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+  line-height: var(--leading-snug);
+}
+
+.activity-time {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.activity-status {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+.activity-status.status-success {
+  color: var(--success-600);
+}
+
+.activity-status.status-warning {
+  color: var(--warning-600);
+}
+
+.activity-status.status-info {
+  color: var(--info-600);
+}
+
+/* Popular Books Grid */
+.popular-books-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.popular-book-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: var(--transition-all);
+}
+
+.popular-book-card:hover {
+  background: var(--color-surface-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.book-rank {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  flex-shrink: 0;
+}
+
+.book-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.book-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+  line-height: var(--leading-snug);
+}
+
+.book-author {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.book-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.borrow-count {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-medium);
+}
+
+.trend-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-base);
+  font-size: var(--text-xs);
+}
+
+.trend-indicator.trend-up {
+  background: var(--success-50);
+  color: var(--success-600);
+}
+
+.trend-indicator.trend-down {
+  background: var(--error-50);
+  color: var(--error-600);
+}
+
+.trend-indicator.trend-same {
+  background: var(--gray-50);
+  color: var(--gray-600);
+}
+
+/* Stats Card Enhancements */
+.stats-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-glass);
+  opacity: 0;
+  transition: var(--transition-opacity);
+  pointer-events: none;
+}
+
+.stats-card:hover::before {
+  opacity: 1;
+}
+
+.stats-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Enhanced Color Variants */
+.bg-primary-50 { background-color: var(--primary-50); }
+.bg-primary-100 { background-color: var(--primary-100); }
+.bg-success-50 { background-color: var(--success-50); }
+.bg-success-100 { background-color: rgba(16, 185, 129, 0.1); }
+.bg-warning-50 { background-color: var(--warning-50); }
+.bg-warning-100 { background-color: rgba(245, 158, 11, 0.1); }
+.bg-info-50 { background-color: var(--info-50); }
+.bg-info-100 { background-color: rgba(6, 182, 212, 0.1); }
+
+.hover\:bg-primary-100:hover { background-color: var(--primary-100); }
+.hover\:bg-success-100:hover { background-color: rgba(16, 185, 129, 0.1); }
+.hover\:bg-warning-100:hover { background-color: rgba(245, 158, 11, 0.1); }
+.hover\:bg-info-100:hover { background-color: rgba(6, 182, 212, 0.1); }
+
+.border-primary-200 { border-color: var(--primary-200); }
+.border-success-200 { border-color: rgba(16, 185, 129, 0.3); }
+.border-warning-200 { border-color: rgba(245, 158, 11, 0.3); }
+.border-info-200 { border-color: rgba(6, 182, 212, 0.3); }
+
+.text-primary-600 { color: var(--primary-600); }
+.text-primary-700 { color: var(--primary-700); }
+.text-success-600 { color: var(--success-600); }
+.text-success-700 { color: rgba(4, 120, 87, 1); }
+.text-warning-600 { color: var(--warning-600); }
+.text-warning-700 { color: rgba(180, 83, 9, 1); }
+.text-info-600 { color: var(--info-600); }
+.text-info-700 { color: rgba(14, 116, 144, 1); }
+
+.text-green-600 { color: var(--success-600); }
+.text-red-600 { color: var(--error-600); }
+.text-red-500 { color: var(--error-500); }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .quick-action-card {
+    padding: var(--space-4);
+  }
+
+  .quick-action-icon {
+    width: 40px;
+    height: 40px;
+    font-size: var(--text-xl);
+  }
+
+  .activity-item {
+    padding: var(--space-3);
+  }
+
+  .activity-icon {
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-sm);
+  }
+
+  .popular-book-card {
+    padding: var(--space-4);
+  }
+
+  .book-rank {
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-xs);
+  }
+
+  .book-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .popular-book-card {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .book-stats {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* Loading States */
+.loading-skeleton-dashboard {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.stats-card.loading {
+  background: var(--color-surface);
+}
+
+.stats-card.loading .stats-value,
+.stats-card.loading .stats-label {
+  background: var(--color-border);
+  border-radius: var(--radius-base);
+  color: transparent;
+}
+
+.stats-card.loading .stats-value {
+  height: 2rem;
+  width: 60%;
+  margin-bottom: var(--space-2);
+}
+
+.stats-card.loading .stats-label {
+  height: 1rem;
+  width: 80%;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stats-card,
+.quick-action-card,
+.activity-item,
+.popular-book-card {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.stats-card:nth-child(1) { animation-delay: 0.1s; }
+.stats-card:nth-child(2) { animation-delay: 0.2s; }
+.stats-card:nth-child(3) { animation-delay: 0.3s; }
+.stats-card:nth-child(4) { animation-delay: 0.4s; }

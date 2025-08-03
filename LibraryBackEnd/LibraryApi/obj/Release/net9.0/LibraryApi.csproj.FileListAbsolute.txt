@@ -331,3 +331,14 @@ D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\stati
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\LibraryApi.csproj.Up2Date
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\LibraryApi.genruntimeconfig.cache
 D:\Project_\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\ref\LibraryApi.dll
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\web.config
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\appsettings.Development.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\appsettings.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\LibraryApi.deps.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\LibraryApi.runtimeconfig.json
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\LibraryApi.staticwebassets.endpoints.json
+<<<<<<< HEAD
+=======
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll
+>>>>>>> frontend

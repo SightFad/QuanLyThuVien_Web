@@ -16,7 +16,9 @@ namespace LibraryApi.Services
         {
             var docGia = await _context.DocGias.FindAsync(maDG);
             if (docGia == null)
-                return (false, "Độc giả không tồn tại");
+                return (false, "Reader không tồn tại");
+            if (docGia.MemberStatus != "DaThanhToan")
+                return (false, "Chỉ thành viên đã thanh toán mới được mượn sách. Vui lòng đăng ký và thanh toán gói thành viên tại quầy Librarian.");
             // Có thể bổ sung kiểm tra khác nếu cần
             foreach (var maSach in maSachList)
             {
@@ -35,13 +37,15 @@ namespace LibraryApi.Services
             if (!check.Success)
                 return (false, check.Message, null);
             var now = DateTime.Now;
-            var ngayTraDuKien = now.AddDays(soNgayMuon);
+            var hanTra = now.AddDays(soNgayMuon);
             var phieu = new PhieuMuon
             {
                 MaDG = maDG,
                 NgayMuon = now,
-                NgayTraDuKien = ngayTraDuKien,
+                HanTra = hanTra,
+                TrangThai = "borrowed",
                 NguoiLap = "",
+                GhiChu = ghiChu ?? "",
                 CT_PhieuMuons = new List<CT_PhieuMuon>()
             };
             foreach (var maSach in maSachList)

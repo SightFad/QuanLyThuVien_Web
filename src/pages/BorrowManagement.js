@@ -6,8 +6,12 @@ import {
   FaTrash,
   FaCheck,
   FaTimes,
+  FaClock,
 } from "react-icons/fa";
+import { apiRequest } from "../config/api";
 import BorrowModal from "../components/BorrowModal";
+import ReturnModal from "../components/ReturnModal";
+import RenewalModal from "../components/RenewalModal";
 import "./BorrowManagement.css";
 
 const BorrowManagement = () => {
@@ -15,11 +19,13 @@ const BorrowManagement = () => {
   const [filteredBorrows, setFilteredBorrows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [showRenewalModal, setShowRenewalModal] = useState(false);
   const [editingBorrow, setEditingBorrow] = useState(null);
+  const [selectedBorrowForReturn, setSelectedBorrowForReturn] = useState(null);
+  const [selectedBorrowForRenewal, setSelectedBorrowForRenewal] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const apiUrl =
-    "http://localhost:5280/api/PhieuMuon";
 
   const mapBorrowData = (borrow) => ({
     id: borrow.id,
@@ -34,6 +40,7 @@ const BorrowManagement = () => {
       : null,
     status: borrow.trangThai,
     notes: borrow.ghiChu || "",
+    renewalCount: borrow.renewalCount || 0,
   });
 
   // Tải dữ liệu phiếu mượn từ API
@@ -63,35 +70,95 @@ const BorrowManagement = () => {
   };
 
   // Trả sách
-  const handleReturnBook = (borrowId) => {
+  const handleReturnBook = async (borrowId) => {
     // Tìm borrow hiện tại
     const borrow = borrows.find((b) => b.id === borrowId);
     if (!borrow) return;
 
-    // Gửi yêu cầu cập nhật trạng thái lên API
-    fetch(`${apiUrl}/${borrowId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: borrowId,
-        idDocGia: borrow.readerId,
-        idSach: borrow.bookId,
-        ngayMuon: borrow.borrowDate,
-        hanTra: borrow.returnDate,
-        ngayTra: new Date().toISOString().split("T")[0],
-        trangThai: "returned",
-        ghiChu: borrow.notes || "",
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        refreshBorrows();
-      })
-      .catch((err) => console.error("Lỗi khi trả sách:", err));
+      // Hiển thị modal phiếu trả sách
+  setSelectedBorrowForReturn(borrow);
+  setShowReturnModal(true);
+};
+
+  // Xử lý khi đóng modal trả sách
+  const handleCloseReturnModal = () => {
+    setShowReturnModal(false);
+    setSelectedBorrowForReturn(null);
+  };
+
+  // Xử lý khi xác nhận trả sách từ modal
+  const handleConfirmReturn = (returnData) => {
+    // Cập nhật trạng thái phiếu mượn trong danh sách local
+    const updatedBorrows = borrows.map(b =>
+      b.id === selectedBorrowForReturn.id
+        ? { ...b, status: "returned", actualReturnDate: returnData.actualReturnDate }
+        : b
+    );
+    setBorrows(updatedBorrows);
+    setFilteredBorrows(updatedBorrows);
+    
+    // Đóng modal
+    handleCloseReturnModal();
+  };
+
+  // Gia hạn sách
+  const handleRenewBook = async (borrowId) => {
+    const borrow = borrows.find((b) => b.id === borrowId);
+    if (!borrow) return;
+
+    // Kiểm tra xem sách có thể gia hạn không (chưa trả và chưa quá hạn)
+    if (borrow.status === "returned") {
+      alert("❌ Không thể gia hạn sách đã trả!");
+      return;
+    }
+
+    const today = new Date();
+    const dueDate = new Date(borrow.returnDate);
+    if (today > dueDate) {
+      alert("❌ Không thể gia hạn sách đã quá hạn! Vui lòng trả sách trước.");
+      return;
+    }
+
+    // Kiểm tra số lần gia hạn (tối đa 2 lần)
+    const renewalCount = borrow.renewalCount || 0;
+    if (renewalCount >= 2) {
+      alert("❌ Sách đã được gia hạn tối đa 2 lần! Không thể gia hạn thêm.");
+      return;
+    }
+
+    // Hiển thị modal gia hạn
+    setSelectedBorrowForRenewal(borrow);
+    setShowRenewalModal(true);
+  };
+
+  // Xử lý khi đóng modal gia hạn
+  const handleCloseRenewalModal = () => {
+    setShowRenewalModal(false);
+    setSelectedBorrowForRenewal(null);
+  };
+
+  // Xử lý khi xác nhận gia hạn từ modal
+  const handleConfirmRenewal = (renewalData) => {
+    // Cập nhật ngày hết hạn mới cho phiếu mượn
+    const updatedBorrows = borrows.map(b =>
+      b.id === selectedBorrowForRenewal.id
+        ? { 
+            ...b, 
+            returnDate: renewalData.books[0].newDueDate,
+            status: "renewed",
+            renewalCount: (b.renewalCount || 0) + 1
+          }
+        : b
+    );
+    setBorrows(updatedBorrows);
+    setFilteredBorrows(updatedBorrows);
+    
+    // Đóng modal
+    handleCloseRenewalModal();
   };
 
   // Lưu phiếu mượn
-  const handleSaveBorrow = (borrowData) => {
+  const handleSaveBorrow = async (borrowData) => {
     if (
       !borrowData.readerId ||
       !borrowData.bookId ||
@@ -109,9 +176,9 @@ const BorrowManagement = () => {
 
     const requestData = {
       IdDocGia: borrowData.readerId,
-      TenDocGia: borrowData.readerName, // Thêm dòng này
+      TenDocGia: borrowData.readerName,
       IdSach: borrowData.bookId,
-      TenSach: borrowData.bookTitle, // Thêm dòng này
+      TenSach: borrowData.bookTitle,
       NgayMuon: borrowData.borrowDate,
       HanTra: borrowData.returnDate,
       NgayTra: borrowData.actualReturnDate || null,
@@ -119,70 +186,59 @@ const BorrowManagement = () => {
       GhiChu: borrowData.notes || "",
     };
 
-    if (editingBorrow && editingBorrow.id) {
-      // Cập nhật phiếu mượn hiện tại
-      fetch(`${apiUrl}/${editingBorrow.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...requestData, id: editingBorrow.id }),
-      })
-        .then((res) => res.json())
-        .then(() => {
-          setShowModal(false);
-          setEditingBorrow(null);
-          refreshBorrows();
-        })
-        .catch((err) => console.error("Lỗi khi cập nhật phiếu mượn:", err));
-    } else {
-      // Thêm phiếu mượn mới
-      fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
-      })
-        .then((res) => {
-          if (!res.ok) {
-            res
-              .text()
-              .then((text) => alert("Lỗi khi thêm phiếu mượn: " + text));
-            return;
-          }
-          return res.json();
-        })
-        .then(() => {
-          setShowModal(false);
-          setEditingBorrow(null);
-          refreshBorrows();
-        })
-        .catch((err) => console.error("Lỗi khi thêm phiếu mượn:", err));
+    try {
+      if (editingBorrow && editingBorrow.id) {
+        // Cập nhật phiếu mượn hiện tại
+        await apiRequest(`/api/PhieuMuon/${editingBorrow.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ ...requestData, id: editingBorrow.id }),
+        });
+      } else {
+        // Thêm phiếu mượn mới
+        await apiRequest('/api/PhieuMuon', {
+          method: "POST",
+          body: JSON.stringify(requestData),
+        });
+      }
+      
+      setShowModal(false);
+      setEditingBorrow(null);
+      refreshBorrows();
+    } catch (err) {
+      console.error("Lỗi khi lưu phiếu mượn:", err);
+      alert("Có lỗi xảy ra khi lưu phiếu mượn. Vui lòng thử lại.");
     }
   };
 
-  const refreshBorrows = () => {
+  const refreshBorrows = async () => {
     setLoading(true);
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((data) => {
-        const mappedBorrows = data.map(mapBorrowData);
-        setBorrows(mappedBorrows);
-        setFilteredBorrows(mappedBorrows);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Lỗi khi tải phiếu mượn:", err);
-        setLoading(false);
-      });
+    
+    try {
+      const data = await apiRequest('/api/PhieuMuon');
+      const mappedBorrows = data.map(mapBorrowData);
+      setBorrows(mappedBorrows);
+      setFilteredBorrows(mappedBorrows);
+    } catch (err) {
+      console.error("Lỗi khi tải phiếu mượn:", err);
+      // Fallback data khi API không có sẵn
+      setBorrows([]);
+      setFilteredBorrows([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteBorrow = (borrowId) => {
+  const handleDeleteBorrow = async (borrowId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa phiếu mượn này?")) {
-      fetch(`${apiUrl}/${borrowId}`, {
-        method: "DELETE",
-      })
-        .then(() => {
-          refreshBorrows();
-        })
-        .catch((err) => console.error("Lỗi khi xóa phiếu mượn:", err));
+      try {
+        await apiRequest(`/api/PhieuMuon/${borrowId}`, {
+          method: "DELETE",
+        });
+        refreshBorrows();
+      } catch (err) {
+        console.error("Lỗi khi xóa phiếu mượn:", err);
+        alert("Có lỗi xảy ra khi xóa phiếu mượn. Vui lòng thử lại.");
+      }
     }
   };
 
@@ -192,6 +248,8 @@ const BorrowManagement = () => {
         return <span className="badge badge-info">Đang mượn</span>;
       case "returned":
         return <span className="badge badge-success">Đã trả</span>;
+      case "renewed":
+        return <span className="badge badge-warning">Đã gia hạn</span>;
       case "overdue":
         return <span className="badge badge-danger">Quá hạn</span>;
       default:
@@ -226,7 +284,7 @@ const BorrowManagement = () => {
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên độc giả, tên sách hoặc trạng thái..."
+              placeholder="Tìm kiếm theo tên thành viên, tên sách hoặc trạng thái..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -242,7 +300,7 @@ const BorrowManagement = () => {
             <thead>
               <tr>
                 <th>Mã phiếu</th>
-                <th>Độc giả</th>
+                <th>Thành viên</th>
                 <th>Sách</th>
                 <th>Ngày mượn</th>
                 <th>Hạn trả</th>
@@ -262,7 +320,7 @@ const BorrowManagement = () => {
                       : ""
                   }
                 >
-                  <td>#{borrow.id.toString().padStart(4, "0")}</td>
+                  <td>#{borrow.id?.toString().padStart(4, "0")}</td>
                   <td>
                     <div className="borrow-reader">
                       <strong>{borrow.readerName}</strong>
@@ -295,14 +353,25 @@ const BorrowManagement = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      {borrow.status === "borrowed" && (
-                        <button
-                          className="btn btn-success btn-sm"
-                          onClick={() => handleReturnBook(borrow.id)}
-                          title="Trả sách"
-                        >
-                          <FaCheck />
-                        </button>
+                      {(borrow.status === "borrowed" || borrow.status === "renewed") && (
+                        <>
+                          <button
+                            className="btn btn-success btn-sm"
+                            onClick={() => handleReturnBook(borrow.id)}
+                            title="Xác nhận trả sách"
+                          >
+                            <FaCheck />
+                            <span className="btn-text">Xác nhận trả</span>
+                          </button>
+                          <button
+                            className="btn btn-info btn-sm"
+                            onClick={() => handleRenewBook(borrow.id)}
+                            title="Gia hạn mượn sách"
+                          >
+                            <FaClock />
+                            <span className="btn-text">Gia hạn</span>
+                          </button>
+                        </>
                       )}
                       <button
                         className="btn btn-secondary btn-sm"
@@ -342,6 +411,24 @@ const BorrowManagement = () => {
             setShowModal(false);
             setEditingBorrow(null);
           }}
+        />
+      )}
+
+      {showReturnModal && selectedBorrowForReturn && (
+        <ReturnModal
+          isOpen={showReturnModal}
+          onClose={handleCloseReturnModal}
+          borrowData={selectedBorrowForReturn}
+          onConfirm={handleConfirmReturn}
+        />
+      )}
+
+      {showRenewalModal && selectedBorrowForRenewal && (
+        <RenewalModal
+          isOpen={showRenewalModal}
+          onClose={handleCloseRenewalModal}
+          borrowData={selectedBorrowForRenewal}
+          onConfirm={handleConfirmRenewal}
         />
       )}
     </div>

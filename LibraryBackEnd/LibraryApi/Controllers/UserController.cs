@@ -10,7 +10,6 @@ namespace LibraryApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "RequireAdmin")]
     public class UserController : ControllerBase
     {
         private readonly LibraryContext _context;
@@ -52,7 +51,7 @@ namespace LibraryApi.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = user.MaND }, user);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}")]      
         public async Task<IActionResult> UpdateUser(int id, [FromBody] NguoiDung request)
         {
             var user = await _context.NguoiDungs.FindAsync(id);

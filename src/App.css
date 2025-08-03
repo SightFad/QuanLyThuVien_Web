@@ -1,13 +1,488 @@
+:root {
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: #dbeafe;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --hover-bg: #f8fafc;
+  
+  /* Layout variables */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 80px;
+  --content-gap: 2rem;
+  --content-padding: 2rem;
+}
+
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1002;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+  background: #5a67d8;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+  }
+}
+
 .app {
   display: flex;
   min-height: 100vh;
+  position: relative;
+  background-color: var(--bg-primary);
 }
 
+/* Enhanced responsive behavior for sidebar toggle */
 .main-content {
   flex: 1;
-  padding: 2rem;
-  background-color: #f8fafc;
+  margin-left: var(--sidebar-width);
+  padding: var(--content-padding);
+  background-color: var(--bg-primary);
   overflow-y: auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: calc(100vw - var(--sidebar-width));
+  max-width: calc(100vw - var(--sidebar-width));
+  
+  /* Add gap between sidebar and content */
+  position: relative;
+}
+
+.main-content::before {
+  content: '';
+  position: absolute;
+  left: -var(--content-gap);
+  top: 0;
+  bottom: 0;
+  width: var(--content-gap);
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.02));
+  pointer-events: none;
+}
+
+/* When sidebar is collapsed - main content expands */
+.app .main-content.sidebar-collapsed {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100vw - var(--sidebar-collapsed-width));
+  max-width: calc(100vw - var(--sidebar-collapsed-width));
+  padding-left: calc(var(--content-padding) + var(--content-gap));
+  padding-right: calc(var(--content-padding) + var(--content-gap));
+}
+
+.app .main-content.sidebar-collapsed::before {
+  left: calc(-var(--content-gap) - (var(--sidebar-width) - var(--sidebar-collapsed-width)));
+  width: calc(var(--content-gap) + (var(--sidebar-width) - var(--sidebar-collapsed-width)));
+}
+
+/* Additional spacing for collapsed sidebar state */
+.app .main-content.sidebar-collapsed .page-header {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-bottom: 2rem;
+}
+
+.app .main-content.sidebar-collapsed .content-section {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.app .main-content.sidebar-collapsed .card,
+.app .main-content.sidebar-collapsed .grid,
+.app .main-content.sidebar-collapsed .stats-grid {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Ensure all content inside main-content uses full available width */
+.main-content > * {
+  max-width: none !important; /* Override any max-width constraints */
+  width: 100% !important; /* Use full available width */
+  margin-left: 0 !important; /* Remove auto margins */
+  margin-right: 0 !important;
+}
+
+/* Ensure all page containers use the new responsive layout */
+.main-content .reader-home,
+.main-content .reader-search,
+.main-content .reader-my-books,
+.main-content .reader-reservations,
+.main-content .reader-fines,
+.main-content .reader-history,
+.main-content .reader-profile,
+.main-content .librarian-dashboard,
+.main-content .fine-management,
+.main-content .librarian-reports,
+.main-content .book-status-management,
+.main-content .reservation-management,
+.main-content .violation-management,
+.main-content .book-reservation-management,
+.main-content .accountant-dashboard,
+.main-content .financial-transactions,
+.main-content .purchase-proposals,
+.main-content .purchase-orders,
+.main-content .supplier-management,
+.main-content .financial-reports,
+.main-content .warehouse-dashboard,
+.main-content .inventory-management,
+.main-content .stock-reports,
+.main-content .book-imports,
+.main-content .inventory-checks,
+.main-content .manager-dashboard,
+.main-content .director-dashboard,
+.main-content .technician-dashboard,
+.main-content .modern-dashboard,
+.main-content .book-management,
+.main-content .reader-management,
+.main-content .borrow-management,
+.main-content .user-management,
+.main-content .system-settings,
+.main-content .backup-management {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Override common container constraints */
+.main-content .container,
+.main-content .page-container,
+.main-content .content-wrapper {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure forms and grids use full width */
+.main-content form,
+.main-content .form-container,
+.main-content .grid-container {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Ensure all page headers and content sections use full width */
+.main-content .page-header,
+.main-content .content-section,
+.main-content .page-container,
+.main-content .dashboard-container {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Ensure cards and grids expand properly */
+.main-content .card,
+.main-content .grid,
+.main-content .stats-grid,
+.main-content .books-grid,
+.main-content .violations-table,
+.main-content .inventory-grid,
+.main-content .settings-grid {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Ensure tables and forms expand */
+.main-content table,
+.main-content .table-container,
+.main-content .form-section {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Smooth transition for content expansion */
+.main-content * {
+  transition: all 0.3s ease;
+}
+
+/* Enhanced grid responsiveness */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Optimize grid layouts for better space utilization */
+.main-content .stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 2rem !important;
+}
+
+.main-content .books-grid {
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+  gap: 2rem !important;
+}
+
+.main-content .violations-table {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.main-content .inventory-grid {
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+  gap: 2rem !important;
+}
+
+.main-content .settings-grid {
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+  gap: 2rem !important;
+}
+
+/* Optimize forms for better space utilization */
+.main-content .form-container {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.main-content .form-row {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 2rem !important;
+}
+
+/* Optimize tables for better space utilization */
+.main-content table {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.main-content .table-container {
+  width: 100% !important;
+  max-width: none !important;
+  overflow-x: auto;
+}
+
+/* Optimize cards for better space utilization */
+.main-content .card {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Responsive grid adjustments for larger screens */
+@media (min-width: 1400px) {
+  .main-content .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+  }
+  
+  .main-content .books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+  }
+  
+  .main-content .inventory-grid {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)) !important;
+  }
+  
+  .main-content .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+  }
+  
+  .main-content .form-row {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .main-content .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+  }
+  
+  .main-content .books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)) !important;
+  }
+  
+  .main-content .inventory-grid {
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)) !important;
+  }
+  
+  .main-content .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)) !important;
+  }
+  
+  .main-content .form-row {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+  }
+}
+
+/* Responsive design for tablets */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100vw - var(--sidebar-collapsed-width));
+    max-width: calc(100vw - var(--sidebar-collapsed-width));
+    padding: 1.5rem 2rem;
+  }
+  
+  .app .main-content.sidebar-collapsed {
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100vw - var(--sidebar-collapsed-width));
+    max-width: calc(100vw - var(--sidebar-collapsed-width));
+    padding: 1.5rem 2rem;
+  }
+  
+  /* Optimize grids for tablet */
+  .main-content .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+  
+  .main-content .books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+  
+  .main-content .inventory-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+  
+  .main-content .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+  
+  .main-content .form-row {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: 0;
+  }
+
+  .app .main-content.sidebar-collapsed {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: 0;
+  }
+
+  .main-content::before {
+    display: none;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Optimize grids for mobile */
+  .main-content .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  .main-content .books-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  .main-content .inventory-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  .main-content .settings-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  .main-content .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .welcome-content h1 {
+    font-size: 2rem;
+  }
+
+  .welcome-content p {
+    font-size: 1rem;
+  }
+
+  .login-btn-large {
+    width: 100%;
+  }
+}
+
+/* Better responsive behavior for larger screens */
+@media (min-width: 1200px) {
+  .main-content {
+    padding: 2rem 3rem;
+  }
+  
+  .app .main-content.sidebar-collapsed {
+    padding-left: calc(3rem + var(--content-gap));
+    padding-right: calc(3rem + var(--content-gap));
+  }
+}
+
+@media (min-width: 1400px) {
+  .main-content {
+    padding: 2.5rem 4rem;
+  }
+  
+  .app .main-content.sidebar-collapsed {
+    padding-left: calc(4rem + var(--content-gap));
+    padding-right: calc(4rem + var(--content-gap));
+  }
+}
+
+@media (min-width: 1600px) {
+  .main-content {
+    padding: 3rem 5rem;
+  }
+  
+  .app .main-content.sidebar-collapsed {
+    padding-left: calc(5rem + var(--content-gap));
+    padding-right: calc(5rem + var(--content-gap));
+  }
 }
 
 .page-header {
@@ -24,13 +499,6 @@
 .page-subtitle {
   color: #64748b;
   font-size: 1rem;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .stat-card {
@@ -262,42 +730,4 @@
   border-radius: 8px;
   margin-bottom: 1rem;
   font-size: 0.875rem;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .main-content {
-    padding: 1rem;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .search-bar {
-    flex-direction: column;
-  }
-  
-  .welcome-content h1 {
-    font-size: 2rem;
-  }
-  
-  .welcome-content p {
-    font-size: 1rem;
-  }
-  
-  .login-btn-large {
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-  }
 } 

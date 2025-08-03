@@ -1,0 +1,81 @@
+/* Responsive Layout Helper - Đảm bảo tất cả trang sử dụng layout mới */
+
+/* Reset tất cả padding-left cố định */
+.reader-home,
+.reader-search,
+.reader-my-books,
+.reader-reservations,
+.reader-fines,
+.reader-history,
+.reader-profile,
+.librarian-dashboard,
+.fine-management,
+.librarian-reports,
+.book-status-management,
+.reservation-management,
+.violation-management,
+.book-reservation-management,
+.accountant-dashboard,
+.financial-transactions,
+.purchase-proposals,
+.purchase-orders,
+.supplier-management,
+.financial-reports,
+.warehouse-dashboard,
+.inventory-management,
+.stock-reports,
+.book-imports,
+.inventory-checks,
+.manager-dashboard,
+.director-dashboard,
+.technician-dashboard,
+.modern-dashboard,
+.book-management,
+.reader-management,
+.borrow-management,
+.user-management,
+.system-settings,
+.backup-management {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Đảm bảo tất cả content nằm gọn trong main-content */
+.main-content {
+  overflow-x: hidden !important;
+}
+
+.main-content > * {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem !important;
+  }
+  
+  .main-content > * {
+    padding: 0 !important;
+  }
+}
+
+/* Responsive cho tablet */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Responsive cho desktop */
+@media (min-width: 1025px) {
+  .main-content {
+    padding: 2rem !important;
+  }
+} 

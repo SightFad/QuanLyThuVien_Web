@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj": {}
+    "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj": {}
   },
   "projects": {
-    "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj": {
+    "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
+        "projectUniqueName": "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
         "projectName": "LibraryApi",
-        "projectPath": "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
-        "packagesPath": "C:\\Users\\Khoa\\.nuget\\packages\\",
-        "outputPath": "D:\\Project_\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\obj\\",
+        "projectPath": "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\LibraryApi.csproj",
+        "packagesPath": "C:\\Users\\lepha\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\lepha\\Desktop\\CNPM-Project\\QuanLyThuVien_Web\\LibraryBackEnd\\LibraryApi\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Khoa\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\lepha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -44,9 +50,17 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[9.0.7, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[9.0.7, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
@@ -61,6 +75,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[9.0.3, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.0.1, )"
             }
           },
           "imports": [
@@ -82,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
