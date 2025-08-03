@@ -16,6 +16,7 @@ namespace LibraryApi.Models
         public string ISBN { get; set; }
         public int? SoLuong { get; set; }
         public decimal? GiaSach { get; set; } // Giá sách để tính phạt
+        public decimal? GiaTien { get; set; } // Alias for GiaSach for frontend compatibility
         public string TrangThai { get; set; }
         public string ViTriLuuTru { get; set; }
         public string NhaXuatBan { get; set; } // Thêm trường nhà xuất bản
@@ -26,6 +27,19 @@ namespace LibraryApi.Models
         public string MoTa { get; set; } = string.Empty;
         public int? NamXuatBan { get; set; }
         public DateTime? NgayNhap { get; set; }
+        public DateTime NgayTao { get; set; } = DateTime.Now; // Creation date
+        public DateTime? NgayCapNhat { get; set; } // Last update date
+        
+        // Computed property for available quantity
+        public int? SoLuongConLai 
+        { 
+            get 
+            { 
+                if (SoLuong == null) return null;
+                // Calculate based on borrowed books (this should be computed from borrowed records)
+                return SoLuong; // Simplified for now, should be calculated from CT_PhieuMuon
+            } 
+        }
 
         // Navigation
         public ICollection<CT_PhieuMuon> CT_PhieuMuons { get; set; }

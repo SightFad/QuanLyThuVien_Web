@@ -126,7 +126,7 @@ class PermissionService {
     )
       return true;
 
-    // Trưởng kho có thể thực hiện vai trò nhân viên kho
+    // Trưởng kho có thể thực hiện vai trò Warehouse
     if (
       userRole === USER_ROLES.WAREHOUSE_MANAGER &&
       targetRole === USER_ROLES.WAREHOUSE_STAFF

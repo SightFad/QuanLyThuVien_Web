@@ -41,10 +41,31 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
       let mappedRole = data.role?.trim();
       console.log("Original role from backend:", mappedRole);
 
+      // Tạo userData với đầy đủ thông tin từ backend
       const userData = {
+        // Thông tin cơ bản
+        userId: data.userId,
         username: data.username,
         role: mappedRole,
         email: data.email,
+        token: data.token,
+        expiresAt: data.expiresAt,
+        
+        // Thông tin Reader (nếu có)
+        docGiaId: data.docGiaId,
+        hoTen: data.hoTen,
+        loaiDocGia: data.loaiDocGia,
+        capBac: data.capBac,
+        memberStatus: data.memberStatus,
+        ngayHetHan: data.ngayHetHan,
+        soSachToiDa: data.soSachToiDa || 5,
+        soNgayMuonToiDa: data.soNgayMuonToiDa || 14,
+        
+        // Helper flags
+        isReader: !!data.loaiDocGia,
+        isVipReader: data.capBac === "VIP",
+        isActiveReader: data.memberStatus === "DaThanhToan" && 
+                       new Date(data.ngayHetHan) > new Date(),
       };
 
       // Store token and user data
@@ -54,6 +75,13 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
       console.log("=== Stored Data ===");
       console.log("Token stored:", !!data.token);
       console.log("User data stored:", userData);
+      console.log("User Type:", {
+        isReader: userData.isReader,
+        isVipReader: userData.isVipReader,
+        isActiveReader: userData.isActiveReader,
+        readerType: userData.loaiDocGia,
+        memberLevel: userData.capBac
+      });
 
       onLogin(userData);
       onClose();
@@ -74,7 +102,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
           case "Nhân viên Accountant":
             navigate("/accountant/dashboard");
             break;
-          case "Nhân viên kho sách":
+          case "Warehouse sách":
           case "Trưởng kho":
           case "warehouse":
           case "Warehouse":
@@ -131,7 +159,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
               case "Accountant":
                 navigate("/accountant/dashboard");
                 break;
-              case "Nhân viên kho sách":
+              case "Warehouse sách":
                 navigate("/warehouse/dashboard");
                 break;
               case "Admin":

@@ -178,6 +178,48 @@ const InventoryChecks = withLazyLoading(
   <RouteLoading />
 );
 
+// Demo page for testing authentication
+const UserProfileDemo = withLazyLoading(
+  () => import("../pages/UserProfileDemo"),
+  <RouteLoading />
+);
+
+// Test page for testing reader APIs
+const ReaderTestPage = withLazyLoading(
+  () => import("../pages/ReaderTestPage"),
+  <RouteLoading />
+);
+
+// Test page for testing librarian APIs
+const LibrarianTestPage = withLazyLoading(
+  () => import("../pages/LibrarianTestPage"),
+  <RouteLoading />
+);
+
+// Test page for testing accountant APIs
+const AccountantTestPage = withLazyLoading(
+  () => import("../pages/AccountantTestPage"),
+  <RouteLoading />
+);
+
+// Test page for testing warehouse APIs
+const WarehouseTestPage = withLazyLoading(
+  () => import("../pages/WarehouseTestPage"),
+  <RouteLoading />
+);
+
+// Test page for testing admin APIs
+const AdminTestPage = withLazyLoading(
+  () => import("../pages/AdminTestPage"),
+  <RouteLoading />
+);
+
+// Admin Dashboard
+const AdminDashboard = withLazyLoading(
+  () => import("../pages/AdminDashboard"),
+  <RouteLoading />
+);
+
 // Route configurations
 export const routes = [
   // Common routes
@@ -357,6 +399,55 @@ export const routes = [
     component: InventoryChecks,
     roles: ["Thủ kho"],
   },
+
+  // Demo route - accessible by all authenticated users
+  {
+    path: "/demo/user-profile",
+    component: UserProfileDemo,
+    roles: ["Admin", "Quản lý", "Librarian", "Accountant", "Thủ kho", "Reader"],
+  },
+
+  // Test route for Reader APIs
+  {
+    path: "/demo/reader-test",
+    component: ReaderTestPage,
+    roles: ["Admin", "Quản lý", "Librarian", "Accountant", "Thủ kho", "Reader"],
+  },
+
+  // Test route for Librarian APIs
+  {
+    path: "/demo/librarian-test",
+    component: LibrarianTestPage,
+    roles: ["Admin", "Quản lý", "Librarian"],
+  },
+
+  // Test route for Accountant APIs
+  {
+    path: "/demo/accountant-test",
+    component: AccountantTestPage,
+    roles: ["Admin", "Quản lý", "Accountant"],
+  },
+
+  // Test route for Warehouse APIs
+  {
+    path: "/demo/warehouse-test",
+    component: WarehouseTestPage,
+    roles: ["Admin", "Quản lý", "Warehouse sách"],
+  },
+
+  // Test route for Admin APIs
+  {
+    path: "/demo/admin-test",
+    component: AdminTestPage,
+    roles: ["Admin"],
+  },
+
+  // Admin Dashboard
+  {
+    path: "/admin/dashboard",
+    component: AdminDashboard,
+    roles: ["Admin"],
+  },
 ];
 
 // Get routes by role
@@ -410,4 +501,11 @@ export {
   StockReports,
   BookImports,
   InventoryChecks,
+  UserProfileDemo,
+  ReaderTestPage,
+  LibrarianTestPage,
+  AccountantTestPage,
+  WarehouseTestPage,
+  AdminTestPage,
+  AdminDashboard,
 };

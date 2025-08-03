@@ -5,7 +5,7 @@ const apiUrl = config.api.baseUrl;
 class PhieuNhapKhoService {
   async getAllPhieuNhapKho() {
     try {
-      const response = await fetch(`${apiUrl}/PhieuNhapKho`, {
+      const response = await fetch(`${apiUrl}/api/PhieuNhapKho`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -25,7 +25,7 @@ class PhieuNhapKhoService {
 
   async getPhieuNhapKhoById(id) {
     try {
-      const response = await fetch(`${apiUrl}/PhieuNhapKho/${id}`, {
+      const response = await fetch(`${apiUrl}/api/PhieuNhapKho/${id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -45,7 +45,7 @@ class PhieuNhapKhoService {
 
   async createPhieuNhapKho(phieuNhapKhoData) {
     try {
-      const response = await fetch(`${apiUrl}/PhieuNhapKho`, {
+      const response = await fetch(`${apiUrl}/api/PhieuNhapKho`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -68,7 +68,7 @@ class PhieuNhapKhoService {
 
   async updatePhieuNhapKhoStatus(id, status) {
     try {
-      const response = await fetch(`${apiUrl}/PhieuNhapKho/${id}/status`, {
+      const response = await fetch(`${apiUrl}/api/PhieuNhapKho/${id}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -90,7 +90,7 @@ class PhieuNhapKhoService {
 
   async deletePhieuNhapKho(id) {
     try {
-      const response = await fetch(`${apiUrl}/PhieuNhapKho/${id}`, {
+      const response = await fetch(`${apiUrl}/api/PhieuNhapKho/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

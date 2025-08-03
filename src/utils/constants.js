@@ -21,12 +21,18 @@ export const API_ENDPOINTS = {
   },
 
   // Book Management
-  BOOKS: {
+  BOOKS: "/api/Books",
+  BOOKS_ENDPOINTS: {
     LIST: "/api/Books",
     CREATE: "/api/Books",
     UPDATE: "/api/Books/{id}",
     DELETE: "/api/Books/{id}",
     SEARCH: "/api/Books/search",
+    CATEGORIES: "/api/Books/categories",
+    POPULAR: "/api/Books/popular",
+    RECENT: "/api/Books/recent",
+    IMPORT: "/api/Books/import",
+    EXPORT: "/api/Books/export",
   },
 
   // Reader Management
@@ -100,7 +106,7 @@ export const USER_ROLES = {
 
   // Vai trò kho sách
   WAREHOUSE_MANAGER: "Trưởng kho", // Quản lý kho, duyệt đề xuất bổ sung
-  WAREHOUSE_STAFF: "Nhân viên kho", // Nhập kho, kiểm kê
+  WAREHOUSE_STAFF: "Warehouse", // Nhập kho, kiểm kê
 
   // Vai trò kỹ thuật
   TECHNICIAN: "Kỹ thuật viên", // Bảo trì hệ thống, sao lưu

@@ -13,7 +13,7 @@ import {
   FaClock,
 } from "react-icons/fa";
 import { useToast } from "../../hooks";
-import reservationService from "../../services/reservationService";
+import { bookService, userService } from "../../services";
 import "./ReaderSearch.css";
 
 const ReaderSearch = () => {
@@ -89,119 +89,89 @@ const ReaderSearch = () => {
     { value: "available", label: "Số lượng có sẵn" },
   ];
 
-  // API URLs
-  const apiUrl = "http://localhost:5280/api/Sach";
-  const searchApiUrl = "http://localhost:5280/api/Sach/search";
-  const suggestionsApiUrl = "http://localhost:5280/api/Sach/suggestions";
-
   // Load books from API
   useEffect(() => {
     fetchBooks();
   }, []);
 
-  // Apply filters and sorting when data changes
-  useEffect(() => {
-    applyFiltersAndSort();
-  }, [books, searchForm, sortBy, sortOrder]);
-
   const fetchBooks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-
-      const mappedBooks = data.map((book) => ({
-        id: book.maSach,
-        title: book.tenSach,
-        author: book.tacGia,
-        isbn: book.isbn,
-        category: book.theLoai,
-        publisher: book.nhaXuatBan || "Không có thông tin",
-        publishYear: book.namXB,
-        quantity: book.soLuong,
-        available: book.soLuongConLai,
-        location: book.viTriLuuTru,
-        description: book.moTa || "Không có mô tả",
-        coverImage: book.anhBia || "/images/default-book-cover.jpg",
-      }));
-
-      setBooks(mappedBooks);
+      const booksData = await bookService.getAllBooks();
+      setBooks(booksData);
+      setFilteredBooks(booksData);
     } catch (error) {
-      console.error("Lỗi khi tải sách:", error);
-      // Fallback to mock data if API fails
-      loadMockData();
+      console.error('Error fetching books:', error);
+      showToast('Không thể tải danh sách sách', 'error');
+      
+      // Fallback to empty array
+      setBooks([]);
+      setFilteredBooks([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Apply filters and sorting
   const applyFiltersAndSort = () => {
     let filtered = [...books];
 
-    // Apply main search term to all searchable fields
-    if (searchForm.searchTerm) {
-      const searchLower = searchForm.searchTerm.toLowerCase();
-      filtered = filtered.filter((book) => {
-        return (
-          book.title.toLowerCase().includes(searchLower) ||
-          book.author.toLowerCase().includes(searchLower) ||
-          book.isbn.includes(searchForm.searchTerm) ||
-          book.category.toLowerCase().includes(searchLower) ||
-          book.publisher.toLowerCase().includes(searchLower) ||
-          book.location.toLowerCase().includes(searchLower) ||
-          book.description.toLowerCase().includes(searchLower) ||
-          book.publishYear?.toString().includes(searchForm.searchTerm)
-        );
-      });
+    // Apply search term filter
+    if (searchForm.searchTerm.trim()) {
+      const searchTerm = searchForm.searchTerm.toLowerCase();
+      filtered = filtered.filter(book => 
+        book.tenSach?.toLowerCase().includes(searchTerm) ||
+        book.tacGia?.toLowerCase().includes(searchTerm) ||
+        book.isbn?.toLowerCase().includes(searchTerm) ||
+        book.theLoai?.toLowerCase().includes(searchTerm) ||
+        book.nhaXuatBan?.toLowerCase().includes(searchTerm)
+      );
     }
 
-    // Apply specific field filters (for advanced search)
+    // Apply individual field filters
     if (searchForm.tenSach) {
-      filtered = filtered.filter((book) =>
-        book.title.toLowerCase().includes(searchForm.tenSach.toLowerCase())
+      filtered = filtered.filter(book => 
+        book.tenSach?.toLowerCase().includes(searchForm.tenSach.toLowerCase())
       );
     }
 
     if (searchForm.tacGia) {
-      filtered = filtered.filter((book) =>
-        book.author.toLowerCase().includes(searchForm.tacGia.toLowerCase())
+      filtered = filtered.filter(book => 
+        book.tacGia?.toLowerCase().includes(searchForm.tacGia.toLowerCase())
       );
     }
 
     if (searchForm.isbn) {
-      filtered = filtered.filter((book) => book.isbn.includes(searchForm.isbn));
+      filtered = filtered.filter(book => 
+        book.isbn?.toLowerCase().includes(searchForm.isbn.toLowerCase())
+      );
     }
 
     if (searchForm.theLoai && searchForm.theLoai !== "Tất cả") {
-      filtered = filtered.filter(
-        (book) => book.category === searchForm.theLoai
+      filtered = filtered.filter(book => 
+        book.theLoai === searchForm.theLoai
       );
     }
 
     if (searchForm.namXuatBan && searchForm.namXuatBan !== "Tất cả") {
-      filtered = filtered.filter(
-        (book) => book.publishYear?.toString() === searchForm.namXuatBan
+      filtered = filtered.filter(book => 
+        book.namXuatBan?.toString() === searchForm.namXuatBan
       );
     }
 
     if (searchForm.nhaXuatBan && searchForm.nhaXuatBan !== "Tất cả") {
-      filtered = filtered.filter(
-        (book) => book.publisher === searchForm.nhaXuatBan
+      filtered = filtered.filter(book => 
+        book.nhaXuatBan === searchForm.nhaXuatBan
       );
     }
 
-    // Apply status filter
     if (searchForm.trangThai && searchForm.trangThai !== "Tất cả") {
-      filtered = filtered.filter((book) => {
-        const total = book.total || book.quantity;
-        const available = book.available;
-
+      filtered = filtered.filter(book => {
+        const available = book.soLuongConLai || 0;
         switch (searchForm.trangThai) {
           case "Có sẵn":
-            return available > 0 && available >= total * 0.3;
+            return available > 5;
           case "Còn ít":
-            return available > 0 && available < total * 0.3;
+            return available > 0 && available <= 5;
           case "Hết sách":
             return available === 0;
           default:
@@ -216,24 +186,24 @@ const ReaderSearch = () => {
 
       switch (sortBy) {
         case "title":
-          aValue = a.title.toLowerCase();
-          bValue = b.title.toLowerCase();
+          aValue = a.tenSach || "";
+          bValue = b.tenSach || "";
           break;
         case "author":
-          aValue = a.author.toLowerCase();
-          bValue = b.author.toLowerCase();
+          aValue = a.tacGia || "";
+          bValue = b.tacGia || "";
           break;
         case "year":
-          aValue = a.publishYear;
-          bValue = b.publishYear;
+          aValue = a.namXuatBan || 0;
+          bValue = b.namXuatBan || 0;
           break;
         case "available":
-          aValue = a.available;
-          bValue = b.available;
+          aValue = a.soLuongConLai || 0;
+          bValue = b.soLuongConLai || 0;
           break;
         default:
-          aValue = a.title.toLowerCase();
-          bValue = b.title.toLowerCase();
+          aValue = a.tenSach || "";
+          bValue = b.tenSach || "";
       }
 
       if (sortOrder === "asc") {
@@ -246,119 +216,72 @@ const ReaderSearch = () => {
     setFilteredBooks(filtered);
   };
 
-  // Fetch search suggestions from API
+  // Apply filters whenever search form changes
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [searchForm, sortBy, sortOrder, books]);
+
   const fetchSuggestions = async (searchTerm) => {
-    if (!searchTerm || searchTerm.length < 2) {
+    if (searchTerm.length < 2) {
       setSearchSuggestions([]);
       return;
     }
 
     try {
-      const response = await fetch(
-        `${suggestionsApiUrl}?q=${encodeURIComponent(searchTerm)}`
-      );
-      const data = await response.json();
-      setSearchSuggestions(data);
+      // Use bookService for suggestions
+      const suggestions = await bookService.searchBooks(searchTerm);
+      setSearchSuggestions(suggestions.slice(0, 5)); // Limit to 5 suggestions
     } catch (error) {
-      console.error("Lỗi khi tải gợi ý:", error);
+      console.error('Error fetching suggestions:', error);
       // Fallback to local suggestions
       generateLocalSuggestions(searchTerm);
     }
   };
 
-  // Generate local suggestions as fallback
   const generateLocalSuggestions = (searchTerm) => {
-    if (!searchTerm.trim()) {
-      setSearchSuggestions([]);
-      return;
-    }
-
-    const suggestions = [];
-    const searchLower = searchTerm.toLowerCase();
-
-    // Search in titles
-    books.forEach((book) => {
-      if (
-        book.title.toLowerCase().includes(searchLower) &&
-        !suggestions.some((s) => s.text === book.title)
-      ) {
-        suggestions.push({ text: book.title, type: "Tên sách" });
-      }
-    });
-
-    // Search in authors
-    books.forEach((book) => {
-      if (
-        book.author.toLowerCase().includes(searchLower) &&
-        !suggestions.some((s) => s.text === book.author)
-      ) {
-        suggestions.push({ text: book.author, type: "Tác giả" });
-      }
-    });
-
-    // Search in ISBN
-    books.forEach((book) => {
-      if (
-        book.isbn.includes(searchTerm) &&
-        !suggestions.some((s) => s.text === book.isbn)
-      ) {
-        suggestions.push({ text: book.isbn, type: "ISBN" });
-      }
-    });
-
-    // Search in categories
-    books.forEach((book) => {
-      if (
-        book.category.toLowerCase().includes(searchLower) &&
-        !suggestions.some((s) => s.text === book.category)
-      ) {
-        suggestions.push({ text: book.category, type: "Thể loại" });
-      }
-    });
-
-    // Search in publishers
-    books.forEach((book) => {
-      if (
-        book.publisher.toLowerCase().includes(searchLower) &&
-        !suggestions.some((s) => s.text === book.publisher)
-      ) {
-        suggestions.push({ text: book.publisher, type: "Nhà xuất bản" });
-      }
-    });
-
-    setSearchSuggestions(suggestions.slice(0, 8));
+    const term = searchTerm.toLowerCase();
+    const suggestions = books
+      .filter(book => 
+        book.tenSach?.toLowerCase().includes(term) ||
+        book.tacGia?.toLowerCase().includes(term)
+      )
+      .slice(0, 5)
+      .map(book => ({
+        id: book.maSach,
+        text: book.tenSach,
+        type: 'book',
+        author: book.tacGia
+      }));
+    
+    setSearchSuggestions(suggestions);
   };
 
-  // Handle search input change
   const handleSearchChange = (field, value) => {
-    setSearchForm((prev) => ({
+    setSearchForm(prev => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
 
-    // Generate suggestions for main search field
-    if (field === "searchTerm") {
+    // Update suggestions for main search term
+    if (field === 'searchTerm') {
       fetchSuggestions(value);
-      setShowSuggestions(value.length > 0);
     }
   };
 
-  // Handle suggestion click
   const handleSuggestionClick = (suggestion) => {
-    setSearchForm((prev) => ({
+    setSearchForm(prev => ({
       ...prev,
-      searchTerm: suggestion.text,
+      searchTerm: suggestion.text
     }));
     setShowSuggestions(false);
   };
 
-  // Handle form submission
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setShowSuggestions(false);
+    applyFiltersAndSort();
   };
 
-  // Clear all filters
   const clearFilters = () => {
     setSearchForm({
       searchTerm: "",
@@ -373,20 +296,14 @@ const ReaderSearch = () => {
     setSortBy("title");
     setSortOrder("asc");
     setSearchSuggestions([]);
-    setShowSuggestions(false);
   };
 
-  // Handle keyboard navigation for suggestions
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      setShowSuggestions(false);
-    } else if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       setShowSuggestions(false);
     }
   };
 
-  // Handle sort change
   const handleSortChange = (field) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -398,208 +315,92 @@ const ReaderSearch = () => {
 
   const handleReserveBook = async (bookId) => {
     try {
-      setReserving((prev) => ({ ...prev, [bookId]: true }));
-
-      // Lấy thông tin Reader từ context hoặc localStorage
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const docGiaId = currentUser.maDG || 1; // Fallback cho demo
-
-      // Kiểm tra sách có sẵn không
-      const book = books.find((b) => b.id === bookId);
-      if (!book) {
-        showToast("Không tìm thấy thông tin sách", "error");
-        return;
+      setReserving(prev => ({ ...prev, [bookId]: true }));
+      
+      // Get current user's docGiaId
+      const docGiaId = userService.getCurrentDocGiaId();
+      if (!docGiaId) {
+        throw new Error('Không tìm thấy thông tin độc giả. Vui lòng đăng nhập lại.');
       }
 
-      if (book.available > 0) {
-        // Sách có sẵn - Tạo phiếu đặt mượn
-        const result = await reservationService.createBorrowTicket(
-          docGiaId,
-          bookId
-        );
-        showToast(result.message, "success");
-
-        // Cập nhật trạng thái sách trong danh sách
-        setBooks((prev) =>
-          prev.map((book) =>
-            book.id === bookId
-              ? { ...book, available: book.available - 1, hasReservation: true }
-              : book
-          )
-        );
-      } else {
-        // Sách không có sẵn - Tạo đặt trước
-        const result = await reservationService.createReservation(
-          docGiaId,
-          bookId
-        );
-        showToast(result.message, "success");
-
-        // Cập nhật trạng thái sách trong danh sách
-        setBooks((prev) =>
-          prev.map((book) =>
-            book.id === bookId ? { ...book, hasReservation: true } : book
-          )
-        );
+      // Check borrow conditions first
+      const conditions = await checkBorrowConditions(bookId);
+      if (!conditions.canBorrow) {
+        throw new Error(conditions.message);
       }
+
+      // Create reservation using bookService
+      const result = await bookService.createReservation({
+        maSach: bookId,
+        maDG: docGiaId,
+        ngayDat: new Date().toISOString(),
+        trangThai: 'Đang chờ'
+      });
+
+      showToast('Đặt sách thành công!', 'success');
+      
+      // Refresh books to update availability
+      await fetchBooks();
     } catch (error) {
-      showToast(error.message, "error");
+      console.error('Error reserving book:', error);
+      showToast(error.message || 'Có lỗi xảy ra khi đặt sách', 'error');
     } finally {
-      setReserving((prev) => ({ ...prev, [bookId]: false }));
+      setReserving(prev => ({ ...prev, [bookId]: false }));
     }
   };
 
-  // Kiểm tra điều kiện đặt mượn trước khi hiển thị nút
   const checkBorrowConditions = async (bookId) => {
     try {
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const docGiaId = currentUser.maDG || 1;
+      // Get current user info
+      const docGiaId = userService.getCurrentDocGiaId();
+      if (!docGiaId) {
+        return { canBorrow: false, message: 'Không tìm thấy thông tin độc giả' };
+      }
 
-      const result = await reservationService.checkBorrowConditions(
-        docGiaId,
-        bookId
-      );
-      return result.success;
+      // Check if user has overdue books
+      const userInfo = userService.getCurrentUser();
+      if (userInfo.overdueBooks > 0) {
+        return { canBorrow: false, message: 'Bạn có sách quá hạn, vui lòng trả sách trước khi mượn mới' };
+      }
+
+      // Check if user has reached borrow limit
+      if (userInfo.currentBorrows >= userInfo.soSachToiDa) {
+        return { canBorrow: false, message: 'Bạn đã đạt giới hạn số sách được mượn' };
+      }
+
+      return { canBorrow: true, message: 'Có thể mượn sách' };
     } catch (error) {
-      console.error("Lỗi kiểm tra điều kiện:", error);
-      return false;
+      console.error('Error checking borrow conditions:', error);
+      return { canBorrow: false, message: 'Không thể kiểm tra điều kiện mượn sách' };
     }
   };
 
-  // Lấy thông tin hàng đợi cho sách
   const getQueueInfo = async (bookId) => {
     try {
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const docGiaId = currentUser.maDG || 1;
-
-      const result = await reservationService.getQueueInfo(bookId, docGiaId);
-      return result;
+      // This would typically call an API to get queue information
+      // For now, return mock data
+      return {
+        position: Math.floor(Math.random() * 10) + 1,
+        totalInQueue: Math.floor(Math.random() * 20) + 1
+      };
     } catch (error) {
-      console.error("Lỗi lấy thông tin hàng đợi:", error);
-      return { position: 0, total: 0 };
+      console.error('Error getting queue info:', error);
+      return { position: 0, totalInQueue: 0 };
     }
   };
 
   const getAvailabilityBadge = (available, total) => {
     if (available === 0) {
       return <span className="badge badge-danger">Hết sách</span>;
-    } else if (available < total * 0.3) {
-      return (
-        <span className="badge badge-warning">
-          Còn ít ({available}/{total})
-        </span>
-      );
+    } else if (available <= 5) {
+      return <span className="badge badge-warning">Còn ít</span>;
     } else {
-      return (
-        <span className="badge badge-success">
-          Có sẵn ({available}/{total})
-        </span>
-      );
+      return <span className="badge badge-success">Có sẵn</span>;
     }
   };
 
-  // Handle image error
   const handleImageError = (e) => {
-    e.target.src = "/images/default-book-cover.jpg";
-  };
-
-  const loadMockData = () => {
-    const mockBooks = [
-      {
-        id: 1,
-        title: "Đắc Nhân Tâm - Nghệ Thuật Đắc Nhân Tâm Và Gây Ảnh Hưởng",
-        author: "Dale Carnegie",
-        category: "Kỹ năng sống",
-        publisher: "NXB Tổng hợp TP.HCM",
-        publishYear: 2019,
-        isbn: "978-604-1-00001-1",
-        available: 3,
-        total: 5,
-        location: "Kệ A1 - Tầng 1 - Khu vực Kỹ năng sống",
-        description:
-          "Cuốn sách về nghệ thuật đắc nhân tâm, cách ứng xử và giao tiếp hiệu quả trong cuộc sống và công việc. Sách cung cấp những nguyên tắc và phương pháp thực tế để xây dựng mối quan hệ tốt đẹp với mọi người.",
-        coverImage: "/images/book-covers/dac-nhan-tam.jpg",
-      },
-      {
-        id: 2,
-        title: "Nhà Giả Kim - Hành Trình Tìm Kiếm Kho Báu Và Ý Nghĩa Cuộc Sống",
-        author: "Paulo Coelho",
-        category: "Tiểu thuyết",
-        publisher: "NXB Văn học",
-        publishYear: 2020,
-        isbn: "978-604-1-00002-2",
-        available: 1,
-        total: 3,
-        location: "Kệ B2 - Tầng 1 - Khu vực Văn học nước ngoài",
-        description:
-          "Câu chuyện về hành trình tìm kiếm kho báu và khám phá ý nghĩa thực sự của cuộc sống. Thông qua chuyến phiêu lưu của Santiago, tác giả gửi gắm những bài học sâu sắc về ước mơ, lòng dũng cảm và sự kiên trì.",
-        coverImage: "/images/book-covers/nha-gia-kim.jpg",
-      },
-      {
-        id: 3,
-        title:
-          "Tuổi Trẻ Đáng Giá Bao Nhiêu - Những Trải Nghiệm Và Bài Học Quý Giá",
-        author: "Rosie Nguyễn",
-        category: "Kỹ năng sống",
-        publisher: "NXB Hội nhà văn",
-        publishYear: 2018,
-        isbn: "978-604-1-00003-3",
-        available: 2,
-        total: 4,
-        location: "Kệ A3 - Tầng 1 - Khu vực Kỹ năng sống",
-        description:
-          "Những trải nghiệm và bài học quý giá cho tuổi trẻ về việc sống có ý nghĩa, theo đuổi đam mê và tạo dựng giá trị cho bản thân. Sách chia sẻ góc nhìn chân thực về cuộc sống và cách vượt qua những thách thức.",
-        coverImage: "/images/book-covers/tuoi-tre-dang-gia-bao-nhieu.jpg",
-      },
-      {
-        id: 4,
-        title:
-          "Cách Nghĩ Để Thành Công - Những Nguyên Tắc Và Phương Pháp Để Đạt Được Thành Công",
-        author: "Napoleon Hill",
-        category: "Kinh doanh",
-        publisher: "NXB Lao động",
-        publishYear: 2021,
-        isbn: "978-604-1-00004-4",
-        available: 4,
-        total: 6,
-        location: "Kệ C1 - Tầng 2 - Khu vực Kinh doanh và Quản lý",
-        description:
-          "Những nguyên tắc và phương pháp để đạt được thành công trong cuộc sống và sự nghiệp. Sách phân tích tư duy của những người thành công và đưa ra các bước thực hành cụ thể.",
-        coverImage: "/images/book-covers/cach-nghi-de-thanh-cong.jpg",
-      },
-      {
-        id: 5,
-        title:
-          "Đọc Vị Bất Kỳ Ai - Nghệ Thuật Đọc Hiểu Tâm Lý Và Suy Nghĩ Của Người Khác",
-        author: "David J. Lieberman",
-        category: "Tâm lý học",
-        publisher: "NXB Thế giới",
-        publishYear: 2020,
-        isbn: "978-604-1-00005-5",
-        available: 0,
-        total: 2,
-        location: "Kệ B3 - Tầng 2 - Khu vực Tâm lý học",
-        description:
-          "Nghệ thuật đọc hiểu tâm lý và suy nghĩ của người khác thông qua ngôn ngữ cơ thể, biểu hiện và hành vi. Sách cung cấp các kỹ năng thực tế để hiểu và giao tiếp hiệu quả với mọi người.",
-        coverImage: "/images/book-covers/doc-vi-bat-ky-ai.jpg",
-      },
-      {
-        id: 6,
-        title: "Sapiens: Lược Sử Loài Người - Từ Thời Cổ Đại Đến Kỷ Nguyên Số",
-        author: "Yuval Noah Harari",
-        category: "Lịch sử",
-        publisher: "NXB Thế giới",
-        publishYear: 2021,
-        isbn: "978-604-1-00006-6",
-        available: 2,
-        total: 3,
-        location: "Kệ D1 - Tầng 2 - Khu vực Lịch sử và Văn hóa",
-        description:
-          "Lịch sử phát triển của loài người từ thời cổ đại đến kỷ nguyên số. Sách đưa ra góc nhìn mới mẻ về sự tiến hóa của con người và những thay đổi lớn lao trong lịch sử nhân loại.",
-        coverImage: "/images/book-covers/sapiens.jpg",
-      },
-    ];
-    setBooks(mockBooks);
+    e.target.src = '/images/default-book-cover.jpg';
   };
 
   if (loading) {
@@ -901,12 +702,12 @@ const ReaderSearch = () => {
               <div key={book.id} className="book-card">
                 <div className="book-cover">
                   <img
-                    src={book.coverImage}
-                    alt={`Bìa sách ${book.title}`}
+                    src={book.anhBia || "/images/default-book-cover.jpg"}
+                    alt={`Bìa sách ${book.tenSach}`}
                     onError={handleImageError}
                     className="book-cover-image"
                   />
-                  {!book.coverImage && (
+                  {!book.anhBia && (
                     <div className="book-cover-placeholder">
                       <FaImage />
                     </div>
@@ -915,10 +716,10 @@ const ReaderSearch = () => {
 
                 <div className="book-content">
                   <div className="book-header">
-                    <h4 className="book-title">{book.title}</h4>
+                    <h4 className="book-title">{book.tenSach}</h4>
                     {getAvailabilityBadge(
-                      book.available,
-                      book.total || book.quantity
+                      book.soLuongConLai || 0,
+                      book.soLuong || 0
                     )}
                   </div>
 
@@ -927,7 +728,7 @@ const ReaderSearch = () => {
                       <FaUser className="book-info-icon" />
                       <div className="book-info-content">
                         <span className="book-info-label">Tác giả</span>
-                        <span className="book-info-value">{book.author}</span>
+                        <span className="book-info-value">{book.tacGia}</span>
                       </div>
                     </div>
 
@@ -935,7 +736,7 @@ const ReaderSearch = () => {
                       <FaBook className="book-info-icon" />
                       <div className="book-info-content">
                         <span className="book-info-label">Thể loại</span>
-                        <span className="book-info-value">{book.category}</span>
+                        <span className="book-info-value">{book.theLoai}</span>
                       </div>
                     </div>
 
@@ -946,7 +747,7 @@ const ReaderSearch = () => {
                           Thông tin xuất bản
                         </span>
                         <span className="book-info-value">
-                          {book.publisher} - {book.publishYear}
+                          {book.nhaXuatBan} - {book.namXuatBan}
                         </span>
                       </div>
                     </div>
@@ -956,7 +757,7 @@ const ReaderSearch = () => {
                       <div className="book-info-content">
                         <span className="book-info-label">Vị trí lưu trữ</span>
                         <span className="book-info-value highlight">
-                          {book.location}
+                          {book.viTriLuuTru}
                         </span>
                       </div>
                     </div>
@@ -973,18 +774,18 @@ const ReaderSearch = () => {
                   </div>
 
                   <div className="book-description">
-                    <p>{book.description}</p>
+                    <p>{book.moTa || "Không có mô tả"}</p>
                   </div>
 
                   <div className="book-actions">
-                    {book.available > 0 ? (
+                    {book.soLuongConLai > 0 ? (
                       <button
                         className="btn btn-primary"
-                        onClick={() => handleReserveBook(book.id)}
-                        disabled={reserving[book.id]}
+                        onClick={() => handleReserveBook(book.maSach)}
+                        disabled={reserving[book.maSach]}
                       >
                         <FaClock />
-                        {reserving[book.id]
+                        {reserving[book.maSach]
                           ? "Đang đặt trước..."
                           : "Yêu cầu mượn"}
                       </button>
@@ -997,11 +798,11 @@ const ReaderSearch = () => {
                         ) : (
                           <button
                             className="btn btn-warning"
-                            onClick={() => handleReserveBook(book.id)}
-                            disabled={reserving[book.id]}
+                            onClick={() => handleReserveBook(book.maSach)}
+                            disabled={reserving[book.maSach]}
                           >
                             <FaClock />
-                            {reserving[book.id]
+                            {reserving[book.maSach]
                               ? "Đang đặt trước..."
                               : "Đặt trước"}
                           </button>

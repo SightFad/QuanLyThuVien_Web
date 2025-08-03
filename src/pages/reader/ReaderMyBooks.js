@@ -9,6 +9,7 @@ import {
   FaUser,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { readerService } from "../../services";
 import "./ReaderMyBooks.css";
 
 const ReaderMyBooks = () => {
@@ -18,107 +19,26 @@ const ReaderMyBooks = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading data
-    setTimeout(() => {
-      const mockMyBooks = [
-        {
-          id: 1,
-          bookTitle: "Đắc Nhân Tâm",
-          author: "Dale Carnegie",
-          category: "Kỹ năng sống",
-          borrowDate: "2024-01-15",
-          returnDate: "2024-02-15",
-          daysLeft: 5,
-          status: "borrowed",
-          isbn: "978-604-1-00001-1",
-          location: "Kệ A1",
-        },
-        {
-          id: 2,
-          bookTitle: "Nhà Giả Kim",
-          author: "Paulo Coelho",
-          category: "Tiểu thuyết",
-          borrowDate: "2024-01-20",
-          returnDate: "2024-02-20",
-          daysLeft: -5,
-          status: "overdue",
-          isbn: "978-604-1-00002-2",
-          location: "Kệ A2",
-        },
-        {
-          id: 3,
-          bookTitle: "Tuổi Trẻ Đáng Giá Bao Nhiêu",
-          author: "Rosie Nguyễn",
-          category: "Kỹ năng sống",
-          borrowDate: "2024-01-10",
-          returnDate: "2024-02-10",
-          daysLeft: -2,
-          status: "overdue",
-          isbn: "978-604-1-00003-3",
-          location: "Kệ A3",
-        },
-      ];
-
-      const mockBorrowHistory = [
-        {
-          id: 101,
-          bookTitle: "Cách Nghĩ Để Thành Công",
-          author: "Napoleon Hill",
-          category: "Kinh doanh",
-          borrowDate: "2023-12-01",
-          returnDate: "2023-12-15",
-          actualReturnDate: "2023-12-14",
-          status: "returned",
-          isbn: "978-604-1-00004-4",
-          location: "Kệ C1",
-          fine: 0,
-        },
-        {
-          id: 102,
-          bookTitle: "Đọc Vị Bất Kỳ Ai",
-          author: "David J. Lieberman",
-          category: "Tâm lý học",
-          borrowDate: "2023-11-15",
-          returnDate: "2023-11-30",
-          actualReturnDate: "2023-12-05",
-          status: "returned_late",
-          isbn: "978-604-1-00005-5",
-          location: "Kệ B3",
-          fine: 75000,
-        },
-        {
-          id: 103,
-          bookTitle: "Sapiens: Lược Sử Loài Người",
-          author: "Yuval Noah Harari",
-          category: "Lịch sử",
-          borrowDate: "2023-10-20",
-          returnDate: "2023-11-05",
-          actualReturnDate: "2023-11-03",
-          status: "returned",
-          isbn: "978-604-1-00006-6",
-          location: "Kệ D1",
-          fine: 0,
-        },
-        {
-          id: 104,
-          bookTitle: "Nghĩ Giàu Làm Giàu",
-          author: "Napoleon Hill",
-          category: "Kinh doanh",
-          borrowDate: "2023-09-10",
-          returnDate: "2023-09-25",
-          actualReturnDate: "2023-09-28",
-          status: "returned_late",
-          isbn: "978-604-1-00007-7",
-          location: "Kệ C2",
-          fine: 45000,
-        },
-      ];
-
-      setMyBooks(mockMyBooks);
-      setBorrowHistory(mockBorrowHistory);
-      setLoading(false);
-    }, 1000);
+    loadMyBooksData();
   }, []);
+
+  const loadMyBooksData = async () => {
+    try {
+      setLoading(true);
+      const myBooksData = await readerService.getMyBooks();
+      
+      setMyBooks(myBooksData.currentBooks);
+      setBorrowHistory(myBooksData.borrowHistory);
+    } catch (error) {
+      console.error('Error loading my books data:', error);
+      
+      // Fallback to empty arrays if API fails
+      setMyBooks([]);
+      setBorrowHistory([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status, daysLeft) => {
     if (status === "overdue" || daysLeft < 0) {

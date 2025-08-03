@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaHistory, FaBook, FaCalendar, FaCheck, FaTimes, FaSearch } from 'react-icons/fa';
+import { readerService } from '../../services';
 import './ReaderHistory.css';
 
 const ReaderHistory = () => {
@@ -17,133 +18,122 @@ const ReaderHistory = () => {
   ];
 
   useEffect(() => {
-    // Simulate loading data
-    setTimeout(() => {
-      const mockHistory = [
-        {
-          id: 1,
-          bookTitle: 'Đắc Nhân Tâm',
-          author: 'Dale Carnegie',
-          category: 'Kỹ năng sống',
-          borrowDate: '2024-01-15',
-          returnDate: '2024-02-15',
-          actualReturnDate: '2024-02-10',
-          status: 'returned',
-          daysLate: 0,
-          isbn: '978-604-1-00001-1'
-        },
-        {
-          id: 2,
-          bookTitle: 'Nhà Giả Kim',
-          author: 'Paulo Coelho',
-          category: 'Tiểu thuyết',
-          borrowDate: '2024-01-20',
-          returnDate: '2024-02-20',
-          actualReturnDate: null,
-          status: 'borrowed',
-          daysLate: 0,
-          isbn: '978-604-1-00002-2'
-        },
-        {
-          id: 3,
-          bookTitle: 'Tuổi Trẻ Đáng Giá Bao Nhiêu',
-          author: 'Rosie Nguyễn',
-          category: 'Kỹ năng sống',
-          borrowDate: '2024-01-10',
-          returnDate: '2024-02-10',
-          actualReturnDate: '2024-02-15',
-          status: 'returned',
-          daysLate: 5,
-          isbn: '978-604-1-00003-3'
-        },
-        {
-          id: 4,
-          bookTitle: 'Cách Nghĩ Để Thành Công',
-          author: 'Napoleon Hill',
-          category: 'Kinh doanh',
-          borrowDate: '2023-12-01',
-          returnDate: '2024-01-01',
-          actualReturnDate: '2024-01-05',
-          status: 'returned',
-          daysLate: 4,
-          isbn: '978-604-1-00004-4'
-        },
-        {
-          id: 5,
-          bookTitle: 'Đọc Vị Bất Kỳ Ai',
-          author: 'David J. Lieberman',
-          category: 'Tâm lý học',
-          borrowDate: '2023-11-15',
-          returnDate: '2023-12-15',
-          actualReturnDate: '2023-12-20',
-          status: 'returned',
-          daysLate: 5,
-          isbn: '978-604-1-00005-5'
-        },
-        {
-          id: 6,
-          bookTitle: 'Sapiens: Lược Sử Loài Người',
-          author: 'Yuval Noah Harari',
-          category: 'Lịch sử',
-          borrowDate: '2023-10-01',
-          returnDate: '2023-11-01',
-          actualReturnDate: '2023-11-10',
-          status: 'returned',
-          daysLate: 9,
-          isbn: '978-604-1-00006-6'
-        }
-      ];
-      setHistory(mockHistory);
-      setFilteredHistory(mockHistory);
-      setLoading(false);
-    }, 1000);
+    loadHistoryData();
   }, []);
 
-  useEffect(() => {
-    let filtered = history;
+  const loadHistoryData = async () => {
+    try {
+      setLoading(true);
+      
+      // Load borrow history using readerService
+      const myBooksData = await readerService.getMyBooks();
+      const historyData = myBooksData.borrowHistory || [];
+      
+      setHistory(historyData);
+      setFilteredHistory(historyData);
+    } catch (error) {
+      console.error('Error loading history data:', error);
+      
+      // Fallback to empty array if API fails
+      setHistory([]);
+      setFilteredHistory([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(item =>
-        item.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.isbn.includes(searchTerm)
+  // Apply filters when search term or status changes
+  useEffect(() => {
+    let filtered = [...history];
+
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(item => 
+        item.bookTitle?.toLowerCase().includes(term) ||
+        item.author?.toLowerCase().includes(term) ||
+        item.category?.toLowerCase().includes(term) ||
+        item.isbn?.toLowerCase().includes(term)
       );
     }
 
-    // Filter by status
+    // Apply status filter
     if (selectedStatus) {
-      filtered = filtered.filter(item => item.status === selectedStatus);
+      filtered = filtered.filter(item => {
+        switch (selectedStatus) {
+          case 'returned':
+            return item.status === 'returned' || item.status === 'Đã trả';
+          case 'overdue':
+            return item.status === 'overdue' || item.status === 'Quá hạn';
+          case 'borrowed':
+            return item.status === 'borrowed' || item.status === 'Đang mượn';
+          default:
+            return true;
+        }
+      });
     }
 
     setFilteredHistory(filtered);
-  }, [searchTerm, selectedStatus, history]);
+  }, [history, searchTerm, selectedStatus]);
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'returned':
+      case 'Đã trả':
         return <span className="badge badge-success">Đã trả</span>;
-      case 'borrowed':
-        return <span className="badge badge-info">Đang mượn</span>;
       case 'overdue':
+      case 'Quá hạn':
         return <span className="badge badge-danger">Quá hạn</span>;
+      case 'borrowed':
+      case 'Đang mượn':
+        return <span className="badge badge-warning">Đang mượn</span>;
+      case 'returned_late':
+      case 'Trả trễ':
+        return <span className="badge badge-warning">Trả trễ</span>;
       default:
-        return <span className="badge badge-secondary">Không xác định</span>;
+        return <span className="badge badge-secondary">{status}</span>;
     }
   };
 
   const getDaysLateText = (daysLate) => {
-    if (daysLate === 0) {
-      return <span className="days-on-time">Trả đúng hạn</span>;
+    if (!daysLate || daysLate === 0) {
+      return 'Trả đúng hạn';
+    } else if (daysLate > 0) {
+      return `Trả trễ ${daysLate} ngày`;
     } else {
-      return <span className="days-late">Trả muộn {daysLate} ngày</span>;
+      return 'Trả sớm';
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleStatusChange = (e) => {
+    setSelectedStatus(e.target.value);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedStatus('');
   };
 
   if (loading) {
     return (
-      <div className="loading">
-        <div className="spinner"></div>
+      <div className="reader-history">
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>Đang tải lịch sử mượn sách...</p>
+        </div>
       </div>
     );
   }
@@ -151,131 +141,131 @@ const ReaderHistory = () => {
   return (
     <div className="reader-history">
       <div className="page-header">
-        <h1 className="page-title">Lịch sử mượn sách</h1>
-        <p className="page-subtitle">Xem lại lịch sử mượn trả sách của bạn</p>
+        <h1><FaHistory /> Lịch sử mượn sách</h1>
+        <p>Xem lại tất cả các sách bạn đã mượn và trả</p>
       </div>
 
-      <div className="content-section">
-        <div className="section-header">
-          <div className="search-filters">
-            <div className="search-bar">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Tìm kiếm theo tên sách, tác giả..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-            </div>
-            <div className="filter-group">
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="filter-select"
-              >
-                {statusOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+      {/* Search and Filter Controls */}
+      <div className="controls-section">
+        <div className="search-filter-container">
+          <div className="search-box">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên sách, tác giả, thể loại..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="search-input"
+            />
+          </div>
+
+          <div className="filter-controls">
+            <select
+              value={selectedStatus}
+              onChange={handleStatusChange}
+              className="status-filter"
+            >
+              {statusOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            <button onClick={clearFilters} className="clear-filters-btn">
+              <FaTimes /> Xóa bộ lọc
+            </button>
           </div>
         </div>
 
-        <div className="history-stats">
-          <div className="stat-item">
-            <div className="stat-number">{history.length}</div>
-            <div className="stat-label">Tổng lượt mượn</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">
-              {history.filter(item => item.status === 'returned').length}
-            </div>
-            <div className="stat-label">Đã trả</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">
-              {history.filter(item => item.daysLate > 0).length}
-            </div>
-            <div className="stat-label">Trả muộn</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">
-              {history.filter(item => item.status === 'borrowed').length}
-            </div>
-            <div className="stat-label">Đang mượn</div>
-          </div>
+        <div className="results-info">
+          <span>Hiển thị {filteredHistory.length} trong tổng số {history.length} bản ghi</span>
         </div>
+      </div>
 
-        {filteredHistory.length > 0 ? (
-          <div className="history-list">
-            {filteredHistory.map((item) => (
-              <div key={item.id} className="history-item">
-                <div className="history-info">
-                  <div className="book-header">
-                    <h3 className="book-title">{item.bookTitle}</h3>
-                    {getStatusBadge(item.status)}
+      {/* History List */}
+      <div className="history-content">
+        {filteredHistory.length === 0 ? (
+          <div className="empty-state">
+            <FaHistory />
+            <h3>Không có lịch sử mượn sách</h3>
+            <p>
+              {searchTerm || selectedStatus 
+                ? 'Không tìm thấy kết quả phù hợp với bộ lọc hiện tại'
+                : 'Bạn chưa có lịch sử mượn sách nào'
+              }
+            </p>
+            {(searchTerm || selectedStatus) && (
+              <button onClick={clearFilters} className="btn btn-primary">
+                Xóa bộ lọc
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="history-grid">
+            {filteredHistory.map(item => (
+              <div key={item.id || item.phieuMuonId} className="history-card">
+                <div className="history-header">
+                  <div className="book-info">
+                    <h3>{item.bookTitle}</h3>
+                    <p className="author">{item.author}</p>
                   </div>
-                  
-                  <div className="book-details">
-                    <p className="book-author">
-                      <strong>Tác giả:</strong> {item.author}
-                    </p>
-                    <p className="book-category">
-                      <strong>Thể loại:</strong> {item.category}
-                    </p>
-                    <p className="book-isbn">
-                      <strong>ISBN:</strong> {item.isbn}
-                    </p>
-                  </div>
+                  {getStatusBadge(item.status)}
+                </div>
 
-                  <div className="history-dates">
-                    <div className="date-row">
-                      <FaCalendar />
-                      <span><strong>Ngày mượn:</strong> {item.borrowDate}</span>
-                    </div>
-                    <div className="date-row">
-                      <FaBook />
-                      <span><strong>Hạn trả:</strong> {item.returnDate}</span>
-                    </div>
-                    {item.actualReturnDate && (
-                      <div className="date-row">
-                        <FaCheck />
-                        <span><strong>Ngày trả:</strong> {item.actualReturnDate}</span>
-                      </div>
-                    )}
-                    {item.daysLate > 0 && (
-                      <div className="date-row late">
-                        <FaTimes />
-                        <span>{getDaysLateText(item.daysLate)}</span>
-                      </div>
-                    )}
-                    {item.daysLate === 0 && item.status === 'returned' && (
-                      <div className="date-row on-time">
-                        <FaCheck />
-                        <span>Trả đúng hạn</span>
-                      </div>
-                    )}
+                <div className="history-details">
+                  <div className="detail-row">
+                    <span className="label">Thể loại:</span>
+                    <span className="value">{item.category}</span>
                   </div>
+                  <div className="detail-row">
+                    <span className="label">ISBN:</span>
+                    <span className="value">{item.isbn}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Ngày mượn:</span>
+                    <span className="value">{formatDate(item.borrowDate)}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Hạn trả:</span>
+                    <span className="value">{formatDate(item.returnDate)}</span>
+                  </div>
+                  {item.actualReturnDate && (
+                    <div className="detail-row">
+                      <span className="label">Ngày trả thực tế:</span>
+                      <span className="value">{formatDate(item.actualReturnDate)}</span>
+                    </div>
+                  )}
+                  {item.fine && item.fine > 0 && (
+                    <div className="detail-row">
+                      <span className="label">Tiền phạt:</span>
+                      <span className="value text-danger">
+                        {item.fine.toLocaleString('vi-VN')} VNĐ
+                      </span>
+                    </div>
+                  )}
+                  {item.daysLate !== undefined && (
+                    <div className="detail-row">
+                      <span className="label">Tình trạng trả:</span>
+                      <span className={`value ${item.daysLate > 0 ? 'text-warning' : 'text-success'}`}>
+                        {getDaysLateText(item.daysLate)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="history-actions">
+                  <button className="btn btn-secondary">
+                    <FaBook /> Xem chi tiết
+                  </button>
+                  {item.fine && item.fine > 0 && (
+                    <button className="btn btn-primary">
+                      <FaCheck /> Thanh toán phạt
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <h3>Không tìm thấy lịch sử</h3>
-            <p>Không có lịch sử mượn sách nào phù hợp với tiêu chí tìm kiếm.</p>
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedStatus('');
-              }}
-            >
-              Xóa bộ lọc
-            </button>
           </div>
         )}
       </div>

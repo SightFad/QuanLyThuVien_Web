@@ -146,7 +146,7 @@ function App() {
               <Routes>
                 {/* System Administrator Routes */}
                 <Route path="/" element={
-                  <ProtectedRoute allowedRoles={['Admin', 'Director', 'Trưởng thư viện', 'Librarian', 'Accountant', 'Head Accountant', 'Nhân viên Accountant', 'Kỹ thuật viên', 'Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Reader']}>
+                  <ProtectedRoute allowedRoles={['Admin', 'Director', 'Trưởng thư viện', 'Librarian', 'Accountant', 'Head Accountant', 'Nhân viên Accountant', 'Kỹ thuật viên', 'Warehouse sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Reader']}>
                     {user && (
                       user.role === 'Admin' ? <ModernDashboard userRole={user.role} /> :
                       (() => {
@@ -157,7 +157,7 @@ function App() {
                           user.role === 'Librarian' ? '/librarian/dashboard' :
                           user.role === 'Accountant' || user.role === 'Head Accountant' || user.role === 'Nhân viên Accountant' ? '/accountant/dashboard' :
                           user.role === 'Kỹ thuật viên' ? '/technician/dashboard' :
-                          user.role === 'Nhân viên kho sách' || user.role === 'Trưởng kho' || user.role === 'warehouse' || user.role === 'Warehouse' ? '/warehouse/dashboard' : '/';
+                          user.role === 'Warehouse sách' || user.role === 'Trưởng kho' || user.role === 'warehouse' || user.role === 'Warehouse' ? '/warehouse/dashboard' : '/';
                         
                         console.log('=== Redirect Logic ===');
                         console.log('User role:', user.role);
@@ -197,7 +197,7 @@ function App() {
                 
                 {/* Shared Routes */}
                 <Route path="/books" element={
-                  <ProtectedRoute allowedRoles={['Admin', 'Librarian', 'Trưởng thư viện', 'Nhân viên kho sách', 'Trưởng kho']}>
+                  <ProtectedRoute allowedRoles={['Admin', 'Librarian', 'Trưởng thư viện', 'Warehouse sách', 'Trưởng kho']}>
                     <BookManagement />
                   </ProtectedRoute>
                 } />
@@ -237,7 +237,7 @@ function App() {
                 
                 {/* Warehouse Routes */}
                 <Route path="/warehouse" element={
-                  <ProtectedRoute allowedRoles={['Nhân viên kho sách', 'Trưởng kho', 'warehouse']}>
+                  <ProtectedRoute allowedRoles={['Warehouse sách', 'Trưởng kho', 'warehouse']}>
                     <Navigate to="/warehouse/dashboard" replace />
                   </ProtectedRoute>
                 } />
@@ -373,13 +373,13 @@ function App() {
                 
                 {/* Warehouse Routes */}
                 <Route path="/warehouse" element={
-                  <ProtectedRoute allowedRoles={['Nhân viên kho sách', 'Trưởng kho', 'warehouse']}>
+                  <ProtectedRoute allowedRoles={['Warehouse sách', 'Trưởng kho', 'warehouse']}>
                     <Navigate to="/warehouse/dashboard" replace />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/warehouse/dashboard" element={
-                  <ProtectedRoute allowedRoles={['Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
+                  <ProtectedRoute allowedRoles={['Warehouse sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
                     <WarehouseDashboard />
                   </ProtectedRoute>
                 } />
@@ -387,25 +387,25 @@ function App() {
 
                 
                 <Route path="/warehouse/inventory" element={
-                  <ProtectedRoute allowedRoles={['Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
+                  <ProtectedRoute allowedRoles={['Warehouse sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
                     <InventoryManagement />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/warehouse/reports" element={
-                  <ProtectedRoute allowedRoles={['Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
+                  <ProtectedRoute allowedRoles={['Warehouse sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
                     <StockReports />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/warehouse/imports" element={
-                  <ProtectedRoute allowedRoles={['Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
+                  <ProtectedRoute allowedRoles={['Warehouse sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
                     <BookImports />
                   </ProtectedRoute>
                 } />
                 
                 <Route path="/warehouse/checks" element={
-                  <ProtectedRoute allowedRoles={['Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
+                  <ProtectedRoute allowedRoles={['Warehouse sách', 'Trưởng kho', 'warehouse', 'Warehouse']}>
                     <InventoryChecks />
                   </ProtectedRoute>
                 } />
@@ -463,7 +463,7 @@ function App() {
                 
                 {/* Catch-all route for authenticated users */}
                 <Route path="*" element={
-                  <ProtectedRoute allowedRoles={['Reader', 'Director', 'Trưởng thư viện', 'Librarian', 'Accountant', 'Head Accountant', 'Nhân viên Accountant', 'Kỹ thuật viên', 'Nhân viên kho sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Admin']}>
+                  <ProtectedRoute allowedRoles={['Reader', 'Director', 'Trưởng thư viện', 'Librarian', 'Accountant', 'Head Accountant', 'Nhân viên Accountant', 'Kỹ thuật viên', 'Warehouse sách', 'Trưởng kho', 'warehouse', 'Warehouse', 'Admin']}>
                     {user && (
                       <Navigate to={
                         user.role === 'Reader' ? '/reader/home' :
@@ -472,7 +472,7 @@ function App() {
                         user.role === 'Librarian' ? '/librarian/dashboard' :
                         user.role === 'Accountant' || user.role === 'Head Accountant' || user.role === 'Nhân viên Accountant' ? '/accountant/dashboard' :
                         user.role === 'Kỹ thuật viên' ? '/technician/dashboard' :
-                        user.role === 'Nhân viên kho sách' || user.role === 'Trưởng kho' || user.role === 'warehouse' || user.role === 'Warehouse' ? '/warehouse/dashboard' :
+                        user.role === 'Warehouse sách' || user.role === 'Trưởng kho' || user.role === 'warehouse' || user.role === 'Warehouse' ? '/warehouse/dashboard' :
                         user.role === 'Admin' ? '/admin' : '/'
                       } replace />
                     )}

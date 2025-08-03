@@ -11,8 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<LibraryContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Configure database based on environment
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<LibraryContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
+else
+{
+    builder.Services.AddDbContext<LibraryContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 // Add JWT Service
 builder.Services.AddScoped<JwtService>();
@@ -115,7 +124,7 @@ app.MapControllers();
                         {
                             TenDangNhap = "warehouse",
                             MatKhau = "warehouse123",
-                            ChucVu = "Nhân viên kho sách"
+                            ChucVu = "Warehouse sách"
                         }
                     );
                     

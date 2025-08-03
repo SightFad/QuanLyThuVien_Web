@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaBoxes, FaTruck, FaClipboardList, FaExclamationTriangle, FaCheckCircle, FaWarehouse } from 'react-icons/fa';
+import { warehouseService } from '../../services';
 import './WarehouseDashboard.css';
 
 const WarehouseDashboard = () => {
@@ -14,7 +15,18 @@ const WarehouseDashboard = () => {
     todayDeliveries: 0,
     damagedBooks: 0
   });
+  const [overview, setOverview] = useState({
+    stockRatio: 0,
+    lowStockCount: 0,
+    qualityRatio: 100
+  });
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [alerts, setAlerts] = useState({
+    lowStockBooks: [],
+    outOfStockBooks: []
+  });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
@@ -23,18 +35,27 @@ const WarehouseDashboard = () => {
   const fetchDashboardData = async () => {
     console.log('WarehouseDashboard fetchDashboardData running...');
     try {
-      // Mock data for warehouse dashboard
-      setStats({
-        totalBooks: 1250,
-        booksInStock: 980,
-        booksOutOfStock: 45,
-        pendingOrders: 12,
-        todayDeliveries: 8,
-        damagedBooks: 23
-      });
-      console.log('WarehouseDashboard stats set successfully');
+      setLoading(true);
+      setError('');
+      
+      const dashboardData = await warehouseService.getDashboardSummary();
+      
+      setStats(dashboardData.stats);
+      setOverview(dashboardData.overview);
+      setRecentActivities(dashboardData.recentActivities);
+      setAlerts(dashboardData.alerts);
+      
+      console.log('WarehouseDashboard data loaded successfully:', dashboardData);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setError('Không thể tải dữ liệu dashboard. Đang hiển thị dữ liệu fallback.');
+      
+      // Fallback to default data
+      const fallbackData = warehouseService.createFallbackDashboardData();
+      setStats(fallbackData.stats);
+      setOverview(fallbackData.overview);
+      setRecentActivities(fallbackData.recentActivities);
+      setAlerts(fallbackData.alerts);
     } finally {
       setLoading(false);
       console.log('WarehouseDashboard loading set to false');
@@ -69,8 +90,14 @@ const WarehouseDashboard = () => {
 
   return (
     <div className="warehouse-dashboard">
+      {error && (
+        <div className="error-banner">
+          <p>⚠️ {error}</p>
+        </div>
+      )}
+      
       <div className="dashboard-header">
-        <h1>Dashboard - Nhân viên kho sách</h1>
+        <h1>Dashboard - Warehouse sách</h1>
         <p>Quản lý kho sách và nhập xuất hàng</p>
       </div>
 
@@ -131,7 +158,7 @@ const WarehouseDashboard = () => {
             <div className="overview-card stock">
               <h3>Tỷ lệ tồn kho</h3>
               <div className="overview-percentage">
-                {Math.round((stats.booksInStock / stats.totalBooks) * 100)}%
+                {overview.stockRatio}%
               </div>
               <p>Đang có sẵn</p>
             </div>
@@ -139,7 +166,7 @@ const WarehouseDashboard = () => {
             <div className="overview-card low-stock">
               <h3>Sách sắp hết</h3>
               <div className="overview-count">
-                {stats.booksOutOfStock}
+                {overview.lowStockCount}
               </div>
               <p>Loại sách</p>
             </div>
@@ -147,7 +174,7 @@ const WarehouseDashboard = () => {
             <div className="overview-card quality">
               <h3>Tỷ lệ chất lượng</h3>
               <div className="overview-percentage">
-                {Math.round(((stats.totalBooks - stats.damagedBooks) / stats.totalBooks) * 100)}%
+                {overview.qualityRatio}%
               </div>
               <p>Sách tốt</p>
             </div>
@@ -180,80 +207,67 @@ const WarehouseDashboard = () => {
       <div className="recent-activities">
         <h2>Hoạt động gần đây</h2>
         <div className="activity-list">
-          <div className="activity-item">
-            <div className="activity-icon delivery">
-              <FaTruck />
+          {recentActivities.length > 0 ? (
+            recentActivities.map((activity, index) => (
+              <div key={activity.id || index} className="activity-item">
+                <div className={`activity-icon ${activity.type}`}>
+                  {activity.type === 'import' ? <FaTruck /> : <FaClipboardList />}
+                </div>
+                <div className="activity-content">
+                  <p className="activity-text">{activity.description}</p>
+                  <p className="activity-time">{activity.time}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+              <p>Chưa có hoạt động gần đây</p>
             </div>
-            <div className="activity-content">
-              <p className="activity-text">Nhập 50 cuốn "Lập trình Python" từ NXB Giáo dục</p>
-              <p className="activity-time">30 phút trước</p>
-            </div>
-          </div>
-          
-          <div className="activity-item">
-            <div className="activity-icon check">
-              <FaClipboardList />
-            </div>
-            <div className="activity-content">
-              <p className="activity-text">Kiểm kê kho sách - Phát hiện 3 cuốn hư hỏng</p>
-              <p className="activity-time">2 giờ trước</p>
-            </div>
-          </div>
-          
-          <div className="activity-item">
-            <div className="activity-icon order">
-              <FaClipboardList />
-            </div>
-            <div className="activity-content">
-              <p className="activity-text">Đặt hàng 100 cuốn "Machine Learning cơ bản"</p>
-              <p className="activity-time">1 ngày trước</p>
-            </div>
-          </div>
-          
-          <div className="activity-item">
-            <div className="activity-icon damage">
-              <FaExclamationTriangle />
-            </div>
-            <div className="activity-content">
-              <p className="activity-text">Báo cáo 2 cuốn "Cơ sở dữ liệu" bị rách trang</p>
-              <p className="activity-time">1 ngày trước</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
       <div className="stock-alerts">
         <h2>Cảnh báo tồn kho</h2>
         <div className="alert-list">
-          <div className="alert-item critical">
-            <div className="alert-icon">
-              <FaExclamationTriangle />
+          {/* Out of stock alerts */}
+          {alerts.outOfStockBooks?.map((book, index) => (
+            <div key={`out-${book.id || index}`} className="alert-item critical">
+              <div className="alert-icon">
+                <FaExclamationTriangle />
+              </div>
+              <div className="alert-content">
+                <h4>Hết sách "{book.title}"</h4>
+                <p>Tác giả: {book.author} - Cần nhập thêm ngay</p>
+              </div>
             </div>
-            <div className="alert-content">
-              <h4>Hết sách "Lập trình Web"</h4>
-              <p>Cần nhập thêm 20 cuốn</p>
-            </div>
-          </div>
+          ))}
           
-          <div className="alert-item warning">
-            <div className="alert-icon">
-              <FaExclamationTriangle />
+          {/* Low stock alerts */}
+          {alerts.lowStockBooks?.slice(0, 3).map((book, index) => (
+            <div key={`low-${book.id || index}`} className="alert-item warning">
+              <div className="alert-icon">
+                <FaExclamationTriangle />
+              </div>
+              <div className="alert-content">
+                <h4>Sắp hết "{book.title}"</h4>
+                <p>Chỉ còn {book.currentStock} cuốn</p>
+              </div>
             </div>
-            <div className="alert-content">
-              <h4>Sắp hết "Cơ sở dữ liệu"</h4>
-              <p>Chỉ còn 3 cuốn</p>
-            </div>
-          </div>
+          ))}
           
-          <div className="alert-item info">
-            <div className="alert-icon">
-              <FaCheckCircle />
+          {/* Show placeholder if no alerts */}
+          {(!alerts.outOfStockBooks?.length && !alerts.lowStockBooks?.length) && (
+            <div className="alert-item info">
+              <div className="alert-icon">
+                <FaCheckCircle />
+              </div>
+              <div className="alert-content">
+                <h4>Tình trạng kho ổn định</h4>
+                <p>Không có cảnh báo tồn kho</p>
+              </div>
             </div>
-            <div className="alert-content">
-              <h4>Đơn hàng đã xác nhận</h4>
-              <p>"Machine Learning" sẽ giao vào tuần tới</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

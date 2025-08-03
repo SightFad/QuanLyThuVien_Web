@@ -5,7 +5,7 @@ const reservationService = {
   async getMyReservations(docGiaId) {
     try {
       const response = await api.get(`/api/Reservation?docGiaId=${docGiaId}`);
-      return response.data;
+      return this.mapReservationsFromApi(response.data);
     } catch (error) {
       throw new Error("Lỗi khi tải danh sách đặt trước");
     }
@@ -117,6 +117,53 @@ const reservationService = {
     } catch (error) {
       throw new Error("Lỗi khi tự động hủy đặt trước quá hạn");
     }
+  },
+
+  // Map reservation data from API format to frontend format
+  mapReservationFromApi(apiReservation) {
+    return {
+      id: apiReservation.id,
+      reservationCode: apiReservation.maDatTruoc,
+      readerId: apiReservation.maDocGia,
+      readerName: apiReservation.tenDocGia,
+      bookId: apiReservation.maSach,
+      bookTitle: apiReservation.tenSach,
+      author: apiReservation.tacGia,
+      reservationDate: apiReservation.ngayDatTruoc,
+      pickupDeadline: apiReservation.hanLaySach,
+      status: apiReservation.trangThai,
+      processedDate: apiReservation.ngayXuLy,
+      processedBy: apiReservation.nguoiXuLy,
+      notes: apiReservation.ghiChu,
+      borrowTicketId: apiReservation.maPhieuMuon,
+      createdAt: apiReservation.createdAt,
+      updatedAt: apiReservation.updatedAt,
+    };
+  },
+
+  // Map multiple reservations from API
+  mapReservationsFromApi(apiReservations) {
+    if (!Array.isArray(apiReservations)) {
+      return [];
+    }
+    return apiReservations.map(reservation => this.mapReservationFromApi(reservation));
+  },
+
+  // Map reservation data from frontend format to API format
+  mapReservationToApi(frontendReservation) {
+    return {
+      id: frontendReservation.id,
+      maDatTruoc: frontendReservation.reservationCode,
+      maDocGia: frontendReservation.readerId,
+      maSach: frontendReservation.bookId,
+      ngayDatTruoc: frontendReservation.reservationDate,
+      hanLaySach: frontendReservation.pickupDeadline,
+      trangThai: frontendReservation.status,
+      ngayXuLy: frontendReservation.processedDate,
+      nguoiXuLy: frontendReservation.processedBy,
+      ghiChu: frontendReservation.notes,
+      maPhieuMuon: frontendReservation.borrowTicketId,
+    };
   },
 };
 
