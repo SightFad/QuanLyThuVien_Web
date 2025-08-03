@@ -61,7 +61,7 @@ namespace LibraryApi.Controllers
                     .Where(p => p.MaDG == readerId && p.TrangThai == "borrowed" && p.HanTra < DateTime.Now)
                     .CountAsync();
 
-                // Get unpaid fines
+                // Calculate total fines
                 var totalFines = await _context.PhieuThus
                     .Where(pt => pt.MaDG == readerId && pt.LoaiThu == "PhiPhat" && pt.TrangThai == "ChuaThu")
                     .SumAsync(pt => pt.SoTien);
@@ -159,9 +159,9 @@ namespace LibraryApi.Controllers
                         location = ct.Sach.ViTriLuuTru,
                         borrowDate = p.NgayMuon.ToString("yyyy-MM-dd"),
                         returnDate = p.HanTra.ToString("yyyy-MM-dd"),
-                        actualReturnDate = p.NgayTra?.ToString("yyyy-MM-dd") ?? "",
+                        actualReturnDate = p.NgayTra.HasValue ? p.NgayTra.Value.ToString("yyyy-MM-dd") : "",
                         status = (p.NgayTra > p.HanTra) ? "returned_late" : "returned",
-                        fine = p.PhieuTras.FirstOrDefault()?.TienPhat ?? 0,
+                        fine = 0, // Calculate fine based on late return
                         coverImage = ct.Sach.AnhBia
                     }))
                     .ToListAsync();

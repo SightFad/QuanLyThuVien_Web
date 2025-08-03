@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
+/*
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryApi.Data;
-using LibraryApi.Models;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace LibraryApi.Controllers
 {
@@ -27,30 +24,15 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                var today = DateTime.Now.Date;
-
-                // Basic book statistics
+                // Basic statistics
                 var totalBooks = await _context.Saches.SumAsync(s => s.SoLuong ?? 0);
                 var totalUniqueBooks = await _context.Saches.CountAsync();
-                
-                var booksInStock = await _context.Saches
-                    .Where(s => s.SoLuongConLai > 0)
-                    .SumAsync(s => s.SoLuongConLai);
-
-                var booksOutOfStock = await _context.Saches
-                    .CountAsync(s => s.SoLuongConLai == 0);
-
-                // Pending orders (from PhieuNhapKho)
-                var pendingOrders = await _context.PhieuNhapKhos
-                    .CountAsync(p => p.TrangThai == "ChuaDuyet" || p.TrangThai == "DangXuLy");
-
-                // Today deliveries (completed imports today)
+                var booksInStock = await _context.Saches.SumAsync(s => s.SoLuongConLai ?? 0);
+                var booksOutOfStock = await _context.Saches.CountAsync(s => s.SoLuongConLai == 0);
+                var pendingOrders = await _context.PhieuDeXuatMuaSachs.CountAsync(p => p.TrangThai == "Chờ duyệt");
                 var todayDeliveries = await _context.PhieuNhapKhos
-                    .CountAsync(p => p.NgayNhap.Date == today && p.TrangThai == "DaHoanThanh");
-
-                // Damaged books (estimate based on status or create a proper tracking system)
-                var damagedBooks = await _context.Saches
-                    .CountAsync(s => s.TrangThai == "HuHong" || s.TrangThai == "CanKiemTra");
+                    .CountAsync(p => p.NgayTao.Date == DateTime.Today);
+                var damagedBooks = await _context.Saches.CountAsync(s => s.TrangThai == "Hư hỏng");
 
                 // Recent activities
                 var recentActivities = await _context.PhieuNhapKhos
@@ -155,7 +137,7 @@ namespace LibraryApi.Controllers
 
                 // Inventory by location
                 var inventoryByLocation = await _context.Saches
-                    .GroupBy(s => s.KeSach ?? "Chưa phân kệ")
+                    .GroupBy(s => s.ViTriLuuTru ?? "Không xác định")
                     .Select(g => new
                     {
                         location = g.Key,
@@ -166,24 +148,25 @@ namespace LibraryApi.Controllers
                     .OrderByDescending(x => x.totalBooks)
                     .ToListAsync();
 
-                // Monthly import trends
-                var importTrends = await _context.PhieuNhapKhos
-                    .Where(p => p.NgayNhap >= DateTime.Now.AddMonths(-6))
-                    .GroupBy(p => new { p.NgayNhap.Year, p.NgayNhap.Month })
+                // Stock movement (last 30 days)
+                var thirtyDaysAgo = DateTime.Now.AddDays(-30);
+                var stockMovement = await _context.PhieuNhapKhos
+                    .Where(p => p.NgayTao >= thirtyDaysAgo)
+                    .GroupBy(p => p.NgayTao.Date)
                     .Select(g => new
                     {
-                        month = $"{g.Key.Year}-{g.Key.Month:D2}",
-                        importCount = g.Count(),
-                        totalQuantity = g.Sum(p => p.ChiTietPhieuNhapKho.Sum(ct => ct.SoLuong))
+                        date = g.Key.ToString("yyyy-MM-dd"),
+                        imports = g.Sum(p => p.ChiTietPhieuNhapKho.Sum(ct => ct.SoLuong)),
+                        count = g.Count()
                     })
-                    .OrderBy(x => x.month)
+                    .OrderBy(x => x.date)
                     .ToListAsync();
 
                 var status = new
                 {
-                    inventoryByCategory = inventoryByCategory,
-                    inventoryByLocation = inventoryByLocation,
-                    importTrends = importTrends,
+                    byCategory = inventoryByCategory,
+                    byLocation = inventoryByLocation,
+                    stockMovement = stockMovement,
                     generatedAt = DateTime.Now
                 };
 
@@ -191,23 +174,54 @@ namespace LibraryApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi lấy tình trạng kho", error = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi lấy thông tin inventory status", error = ex.Message });
             }
         }
 
-        // Helper method to get time ago string
+        // GET: api/WarehouseDashboard/supplier-performance
+        [HttpGet("supplier-performance")]
+        public async Task<ActionResult<object>> GetSupplierPerformance()
+        {
+            try
+            {
+                var supplierPerformance = await _context.PhieuNhapKhos
+                    .GroupBy(p => p.NhaCungCap)
+                    .Select(g => new
+                    {
+                        supplier = g.Key,
+                        totalOrders = g.Count(),
+                        totalBooks = g.Sum(p => p.ChiTietPhieuNhapKho.Sum(ct => ct.SoLuong)),
+                        averageDeliveryTime = g.Average(p => (p.NgayTao - p.NgayDat).Days),
+                        lastOrder = g.Max(p => p.NgayTao),
+                        totalValue = g.Sum(p => p.ChiTietPhieuNhapKho.Sum(ct => ct.DonGia * ct.SoLuong))
+                    })
+                    .OrderByDescending(x => x.totalOrders)
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    suppliers = supplierPerformance,
+                    generatedAt = DateTime.Now
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy thông tin supplier performance", error = ex.Message });
+            }
+        }
+
         private string GetTimeAgo(DateTime dateTime)
         {
-            var timespan = DateTime.Now - dateTime;
-            
-            if (timespan.TotalMinutes < 1)
-                return "Vừa xong";
-            else if (timespan.TotalMinutes < 60)
-                return $"{(int)timespan.TotalMinutes} phút trước";
-            else if (timespan.TotalHours < 24)
-                return $"{(int)timespan.TotalHours} giờ trước";
+            var timeSpan = DateTime.Now - dateTime;
+            if (timeSpan.TotalDays >= 1)
+                return $"{(int)timeSpan.TotalDays} ngày trước";
+            else if (timeSpan.TotalHours >= 1)
+                return $"{(int)timeSpan.TotalHours} giờ trước";
+            else if (timeSpan.TotalMinutes >= 1)
+                return $"{(int)timeSpan.TotalMinutes} phút trước";
             else
-                return $"{(int)timespan.TotalDays} ngày trước";
+                return "Vừa xong";
         }
     }
 }
+*/

@@ -10,6 +10,7 @@ using System.IO;
 
 namespace LibraryApi.Controllers
 {
+    /*
     [ApiController]
     [Route("api/[controller]")]
     [Authorize] // Restrict to admin only
@@ -376,4 +377,6 @@ namespace LibraryApi.Controllers
         public string? Description { get; set; }
         public string? Error { get; set; }
     }
+}
+*/
 }
