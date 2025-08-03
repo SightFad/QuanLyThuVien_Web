@@ -8,7 +8,7 @@ namespace LibraryApi.Models
     {
         [Key]
         public int MaSach { get; set; } // PRIMARY KEY
-        [Reuqired]
+        [Required]
         public string TenSach { get; set; }
         public string TacGia { get; set; }
         public string TheLoai { get; set; }
