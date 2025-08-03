@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaBook, FaFilter } from 'react-icons/fa';
 import { authenticatedRequest } from '../config/api';
-import BookCard from '../components/BookCard';
+import BookManagementCard from '../components/BookManagementCard';
+import BookModal from '../components/BookModal';
 import './BookManagement.css';
 
 const BookManagement = () => {
@@ -15,13 +16,8 @@ const BookManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-<<<<<<< HEAD
-  const apiUrl =
-    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Sach";
-=======
   const categories = ['Tất cả', 'Kỹ năng sống', 'Tiểu thuyết', 'Công nghệ', 'Khoa học', 'Văn học'];
   const statuses = ['Tất cả', 'Có sẵn', 'Đã mượn', 'Đã đặt', 'Hư hỏng'];
->>>>>>> frontend
 
   useEffect(() => {
     fetchBooks();
@@ -56,20 +52,20 @@ const BookManagement = () => {
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(book =>
-        book.tenSach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.tacGia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.theLoai?.toLowerCase().includes(searchTerm.toLowerCase())
+        book.TenSach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.TacGia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.TheLoai?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by category
     if (selectedCategory && selectedCategory !== 'Tất cả') {
-      filtered = filtered.filter(book => book.theLoai === selectedCategory);
+      filtered = filtered.filter(book => book.TheLoai === selectedCategory);
     }
 
     // Filter by status
     if (selectedStatus && selectedStatus !== 'Tất cả') {
-      filtered = filtered.filter(book => book.trangThai === selectedStatus);
+      filtered = filtered.filter(book => book.TrangThai === selectedStatus);
     }
 
     setFilteredBooks(filtered);
@@ -81,8 +77,78 @@ const BookManagement = () => {
   };
 
   const handleEditBook = (book) => {
-    setEditingBook(book);
+    setEditingBook({
+      MaSach: book.id,
+      TenSach: book.title,
+      TacGia: book.author,
+      ISBN: book.isbn,
+      TheLoai: book.category,
+      NhaXuatBan: book.publisher,
+      NamXuatBan: book.publishedYear,
+      SoLuong: book.quantity,
+      SoLuongConLai: book.available,
+      ViTriLuuTru: book.location,
+      AnhBia: book.coverImage,
+      MoTa: book.description,
+      KeSach: book.shelf
+    });
     setShowModal(true);
+  };
+
+  const handleSaveBook = async (bookData) => {
+    try {
+      if (editingBook) {
+        // Update existing book
+        await authenticatedRequest(`/api/Book/${editingBook.maSach}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            TenSach: bookData.title,
+            TacGia: bookData.author,
+            ISBN: bookData.isbn,
+            TheLoai: bookData.category,
+            NhaXuatBan: bookData.publisher,
+            NamXuatBan: bookData.publishYear,
+            SoLuong: bookData.quantity,
+            ViTriLuuTru: bookData.location,
+            AnhBia: bookData.coverImage,
+            MoTa: bookData.description || '',
+            KeSach: bookData.location || '', // Use location as shelf
+            TrangThai: 'Có sẵn' // Default status
+          })
+        });
+      } else {
+        // Create new book
+        await authenticatedRequest('/api/Book', {
+          method: 'POST',
+          body: JSON.stringify({
+            TenSach: bookData.title,
+            TacGia: bookData.author,
+            ISBN: bookData.isbn,
+            TheLoai: bookData.category,
+            NhaXuatBan: bookData.publisher,
+            NamXuatBan: bookData.publishYear,
+            SoLuong: bookData.quantity,
+            ViTriLuuTru: bookData.location,
+            AnhBia: bookData.coverImage,
+            MoTa: bookData.description || '',
+            KeSach: bookData.location || '', // Use location as shelf
+            TrangThai: 'Có sẵn' // Default status
+          })
+        });
+      }
+      
+      setShowModal(false);
+      setEditingBook(null);
+      fetchBooks(); // Refresh the list
+    } catch (err) {
+      console.error('Error saving book:', err);
+      alert('Không thể lưu sách. Vui lòng thử lại.');
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingBook(null);
   };
 
   const handleDeleteBook = async (bookId) => {
@@ -94,43 +160,14 @@ const BookManagement = () => {
       await authenticatedRequest(`/api/Book/${bookId}`, { method: 'DELETE' });
       fetchBooks();
     } catch (err) {
-      alert('Không thể xóa sách');
-    }
-  };
-
-  const handleBorrowBook = async (book) => {
-    try {
-      await authenticatedRequest(`/api/Book/${book.maSach}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          ...book,
-          trangThai: 'Đã mượn'
-        })
-      });
-      fetchBooks();
-    } catch (err) {
-      alert('Không thể mượn sách');
-    }
-  };
-
-  const handleReserveBook = async (book) => {
-    try {
-      await authenticatedRequest(`/api/Book/${book.maSach}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          ...book,
-          trangThai: 'Đã đặt'
-        })
-      });
-      fetchBooks();
-    } catch (err) {
-      alert('Không thể đặt trước sách');
+      console.error('Error deleting book:', err);
+      alert('Không thể xóa sách. Vui lòng thử lại.');
     }
   };
 
   const handleViewDetails = (book) => {
-    // Implement book details modal
     console.log('View details:', book);
+    // TODO: Implement book details modal
   };
 
   if (loading) {
@@ -145,7 +182,7 @@ const BookManagement = () => {
     <div className="book-management">
       <div className="page-header">
         <h1 className="page-title">Quản lý sách</h1>
-        <p className="page-subtitle">Quản lý kho sách và thông tin sách</p>
+        <p className="page-subtitle">Thêm, sửa, xóa thông tin sách trong thư viện</p>
       </div>
 
       {error && (
@@ -196,22 +233,24 @@ const BookManagement = () => {
 
       <div className="books-grid">
         {filteredBooks.map((book) => (
-          <BookCard
-            key={book.maSach}
+          <BookManagementCard
+            key={book.MaSach}
             book={{
-              id: book.maSach,
-              title: book.tenSach,
-              author: book.tacGia,
-              category: book.theLoai,
-              shelf: book.keSach,
-              status: book.trangThai,
-              coverImage: book.anhBia,
-              description: book.moTa,
-              publishedYear: book.namXuatBan,
-              isbn: book.isbn
+              id: book.MaSach,
+              title: book.TenSach,
+              author: book.TacGia,
+              category: book.TheLoai,
+              shelf: book.KeSach || book.ViTriLuuTru,
+              status: book.TrangThai,
+              coverImage: book.AnhBia,
+              description: book.MoTa,
+              publishedYear: book.NamXuatBan || book.NamXB,
+              isbn: book.ISBN,
+              quantity: book.SoLuong,
+              available: book.SoLuongConLai || book.SoLuong
             }}
-            onBorrow={handleBorrowBook}
-            onReserve={handleReserveBook}
+            onEdit={handleEditBook}
+            onDelete={handleDeleteBook}
             onViewDetails={handleViewDetails}
           />
         ))}
@@ -223,6 +262,27 @@ const BookManagement = () => {
           <h3>Không có sách nào</h3>
           <p>Bắt đầu bằng cách thêm sách mới</p>
         </div>
+      )}
+
+      {/* Book Modal */}
+      {showModal && (
+        <BookModal
+          book={editingBook ? {
+            title: editingBook.TenSach,
+            author: editingBook.TacGia,
+            isbn: editingBook.ISBN,
+            category: editingBook.TheLoai,
+            publisher: editingBook.NhaXuatBan,
+            publishYear: editingBook.NamXuatBan || editingBook.NamXB,
+            quantity: editingBook.SoLuong,
+            available: editingBook.SoLuongConLai || editingBook.SoLuong,
+            location: editingBook.ViTriLuuTru || editingBook.KeSach,
+            coverImage: editingBook.AnhBia,
+            description: editingBook.MoTa
+          } : null}
+          onSave={handleSaveBook}
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );

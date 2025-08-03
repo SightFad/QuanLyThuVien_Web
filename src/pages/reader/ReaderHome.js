@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaBook, FaClock, FaCheck, FaExclamationTriangle, FaSearch, FaUser, FaCalendar, FaMapMarkerAlt, FaInbox } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { readerService } from '../../services';
 import './ReaderHome.css';
 
 const ReaderHome = () => {
@@ -10,77 +11,37 @@ const ReaderHome = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading data
-    setTimeout(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const dashboardData = await readerService.getDashboard();
+      
+      setReaderInfo(dashboardData.readerInfo);
+      setCurrentBorrows(dashboardData.currentBorrows);
+      setRecentBooks(dashboardData.recentBooks);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      
+      // Fallback to mock data if API fails
       setReaderInfo({
         id: 1,
-        name: 'Nguyễn Văn A',
-        email: 'nguyenvana@email.com',
+        name: 'Độc giả (Offline)',
+        email: 'N/A',
         memberSince: '2023-01-15',
-        totalBorrows: 15,
-        currentBorrows: 2,
+        totalBorrows: 0,
+        currentBorrows: 0,
         overdueBooks: 0,
         fines: 0
       });
-
-      setCurrentBorrows([
-        {
-          id: 1,
-          bookTitle: 'Đắc Nhân Tâm',
-          author: 'Dale Carnegie',
-          borrowDate: '2024-01-15',
-          returnDate: '2024-02-15',
-          daysLeft: 5,
-          status: 'borrowed',
-          category: 'Kỹ năng sống',
-          location: 'Kệ A1'
-        },
-        {
-          id: 2,
-          bookTitle: 'Nhà Giả Kim',
-          author: 'Paulo Coelho',
-          borrowDate: '2024-01-20',
-          returnDate: '2024-02-20',
-          daysLeft: 10,
-          status: 'borrowed',
-          category: 'Tiểu thuyết',
-          location: 'Kệ B2'
-        }
-      ]);
-
-      setRecentBooks([
-        {
-          id: 1,
-          title: 'Tuổi Trẻ Đáng Giá Bao Nhiêu',
-          author: 'Rosie Nguyễn',
-          category: 'Kỹ năng sống',
-          available: 3,
-          total: 5,
-          location: 'Kệ A3'
-        },
-        {
-          id: 2,
-          title: 'Cách Nghĩ Để Thành Công',
-          author: 'Napoleon Hill',
-          category: 'Kinh doanh',
-          available: 4,
-          total: 6,
-          location: 'Kệ C1'
-        },
-        {
-          id: 3,
-          title: 'Đọc Vị Bất Kỳ Ai',
-          author: 'David J. Lieberman',
-          category: 'Tâm lý học',
-          available: 2,
-          total: 3,
-          location: 'Kệ B3'
-        }
-      ]);
-
+      setCurrentBorrows([]);
+      setRecentBooks([]);
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+    }
+  };
 
   const getStatusBadge = (status, daysLeft) => {
     if (daysLeft < 0) {

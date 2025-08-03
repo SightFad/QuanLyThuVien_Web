@@ -1,60 +1,149 @@
-import React, { useState } from 'react';
-import { FaDatabase, FaDownload, FaUpload, FaHistory, FaClock, FaCheck } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaDatabase, FaDownload, FaUpload, FaHistory, FaClock, FaCheck, FaCog, FaExclamationTriangle } from 'react-icons/fa';
+import { adminService } from '../services';
 import './BackupManagement.css';
 
 const BackupManagement = () => {
-  const [backupHistory, setBackupHistory] = useState([
-    {
-      id: 1,
-      date: '2024-01-15 23:00:00',
-      type: 'automatic',
-      status: 'completed',
-      size: '2.5 GB',
-      duration: '15 phút'
-    },
-    {
-      id: 2,
-      date: '2024-01-14 23:00:00',
-      type: 'automatic',
-      status: 'completed',
-      size: '2.4 GB',
-      duration: '14 phút'
-    },
-    {
-      id: 3,
-      date: '2024-01-13 15:30:00',
-      type: 'manual',
-      status: 'completed',
-      size: '2.3 GB',
-      duration: '12 phút'
-    }
-  ]);
+  const [backupHistoryData, setBackupHistoryData] = useState({
+    backups: [],
+    pagination: { page: 1, pageSize: 10, totalCount: 0, totalPages: 0 },
+    databaseInfo: { tableCount: 0, recordCount: 0, sizeInMB: 0 },
+    statistics: { totalBackups: 0, successfulBackups: 0, failedBackups: 0 }
+  });
+  const [backupStatus, setBackupStatus] = useState(null);
+  const [backupSettings, setBackupSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [isCreatingBackup, setIsCreatingBackup] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [selectedBackup, setSelectedBackup] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const handleCreateBackup = () => {
-    setIsCreatingBackup(true);
-    setTimeout(() => {
-      const newBackup = {
-        id: backupHistory.length + 1,
-        date: new Date().toLocaleString('vi-VN'),
+  useEffect(() => {
+    loadBackupData();
+  }, [currentPage]);
+
+  const loadBackupData = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Load backup history, status, and settings in parallel
+      const [historyData, statusData, settingsData] = await Promise.all([
+        adminService.getBackupHistory({ page: currentPage, pageSize: 10 }),
+        adminService.getBackupStatus(),
+        adminService.getBackupSettings()
+      ]);
+      
+      setBackupHistoryData(historyData);
+      setBackupStatus(statusData);
+      setBackupSettings(settingsData);
+    } catch (error) {
+      console.error('Error loading backup data:', error);
+      setError('Không thể tải dữ liệu backup. Đang hiển thị dữ liệu fallback.');
+      
+      // Fallback to default data
+      const fallbackHistory = adminService.createFallbackBackupHistory();
+      setBackupHistoryData(fallbackHistory);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateBackup = async (options = {}) => {
+    try {
+      setIsCreatingBackup(true);
+      setError('');
+      
+      const backupData = {
         type: 'manual',
-        status: 'completed',
-        size: '2.6 GB',
-        duration: '16 phút'
+        description: options.description || 'Manual backup created from admin panel',
+        includeUserData: options.includeUserData !== false,
+        includeSystemData: options.includeSystemData !== false,
+        enableCompression: options.enableCompression !== false
       };
-      setBackupHistory([newBackup, ...backupHistory]);
+      
+      const result = await adminService.createBackup(backupData);
+      
+      // Reload backup history after creation
+      await loadBackupData();
+      
+      alert(`Backup được tạo thành công! Dự kiến hoàn thành lúc ${new Date(result.estimatedCompletion).toLocaleString('vi-VN')}`);
+    } catch (error) {
+      console.error('Error creating backup:', error);
+      setError(`Lỗi khi tạo backup: ${error.message}`);
+    } finally {
       setIsCreatingBackup(false);
-    }, 3000);
+    }
   };
 
-  const handleRestore = (backupId) => {
-    setIsRestoring(true);
-    setTimeout(() => {
+  const handleRestore = async (backup) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn khôi phục backup từ ngày ${backup.date}?\n\nCảnh báo: Thao tác này sẽ ghi đè dữ liệu hiện tại!`)) {
+      return;
+    }
+    
+    try {
+      setIsRestoring(true);
+      setSelectedBackup(backup);
+      setError('');
+      
+      const restoreOptions = {
+        overwriteExisting: true,
+        restoreUserData: true,
+        restoreSystemData: true,
+        createBackupBeforeRestore: true
+      };
+      
+      const result = await adminService.restoreBackup(backup.id, restoreOptions);
+      
+      alert(`Quá trình khôi phục đã được khởi tạo. Dự kiến hoàn thành lúc ${new Date(result.estimatedCompletion).toLocaleString('vi-VN')}`);
+      
+      // Reload data after restore
+      await loadBackupData();
+    } catch (error) {
+      console.error('Error restoring backup:', error);
+      setError(`Lỗi khi khôi phục backup: ${error.message}`);
+    } finally {
       setIsRestoring(false);
-    }, 5000);
+      setSelectedBackup(null);
+    }
   };
+
+  const handleDeleteBackup = async (backup) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa backup từ ngày ${backup.date}?`)) {
+      return;
+    }
+    
+    try {
+      await adminService.deleteBackup(backup.id);
+      await loadBackupData();
+      alert('Xóa backup thành công!');
+    } catch (error) {
+      console.error('Error deleting backup:', error);
+      setError(`Lỗi khi xóa backup: ${error.message}`);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleUpdateSettings = async (newSettings) => {
+    try {
+      await adminService.updateBackupSettings(newSettings);
+      setBackupSettings(newSettings);
+      setShowSettings(false);
+      alert('Cập nhật cài đặt backup thành công!');
+    } catch (error) {
+      console.error('Error updating backup settings:', error);
+      setError(`Lỗi khi cập nhật cài đặt: ${error.message}`);
+    }
+  };
+
+  // Extract data for easier access
+  const { backups, pagination, databaseInfo, statistics } = backupHistoryData;
 
   return (
     <div className="backup-management">
@@ -127,7 +216,7 @@ const BackupManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {backupHistory.map(backup => (
+              {backupHistoryData.map(backup => (
                 <tr key={backup.id}>
                   <td>{backup.date}</td>
                   <td>

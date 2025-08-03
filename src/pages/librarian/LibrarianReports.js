@@ -1,85 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { FaChartBar, FaChartLine, FaChartPie, FaDownload, FaPrint, FaCalendarAlt, FaBook, FaUsers, FaExchangeAlt } from 'react-icons/fa';
+import { librarianReportsService } from '../../services';
 import './LibrarianReports.css';
 
 const LibrarianReports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [selectedReport, setSelectedReport] = useState('overview');
   const [reportData, setReportData] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Mock data
+  // Load report data từ API
   useEffect(() => {
-    const mockData = {
-      overview: {
-        totalBooks: 1250,
-        totalReaders: 450,
-        totalBorrows: 320,
-        totalReturns: 298,
-        overdueBooks: 22,
-        totalFines: 1500000,
-        popularBooks: [
-          { title: 'Lập trình Python', borrows: 45 },
-          { title: 'Cơ sở dữ liệu', borrows: 38 },
-          { title: 'Mạng máy tính', borrows: 32 },
-          { title: 'Thuật toán nâng cao', borrows: 28 },
-          { title: 'Lập trình Web', borrows: 25 }
-        ],
-        categoryStats: [
-          { category: 'Công nghệ', count: 45 },
-          { category: 'Kinh tế', count: 32 },
-          { category: 'Văn học', count: 28 },
-          { category: 'Khoa học', count: 25 },
-          { category: 'Lịch sử', count: 20 }
-        ]
-      },
-      borrowing: {
-        dailyStats: [
-          { date: '2024-02-01', borrows: 12, returns: 10 },
-          { date: '2024-02-02', borrows: 15, returns: 12 },
-          { date: '2024-02-03', borrows: 8, returns: 14 },
-          { date: '2024-02-04', borrows: 20, returns: 16 },
-          { date: '2024-02-05', borrows: 18, returns: 19 },
-          { date: '2024-02-06', borrows: 22, returns: 21 },
-          { date: '2024-02-07', borrows: 25, returns: 23 }
-        ],
-        readerStats: [
-          { reader: 'Nguyễn Văn A', borrows: 8, returns: 7 },
-          { reader: 'Trần Thị B', borrows: 6, returns: 5 },
-          { reader: 'Lê Văn C', borrows: 5, returns: 4 },
-          { reader: 'Phạm Thị D', borrows: 4, returns: 4 },
-          { reader: 'Hoàng Văn E', borrows: 3, returns: 3 }
-        ]
-      },
-      overdue: {
-        overdueBooks: [
-          {
-            reader: 'Nguyễn Văn A',
-            book: 'Lập trình Python',
-            dueDate: '2024-02-01',
-            daysOverdue: 6,
-            fine: 30000
-          },
-          {
-            reader: 'Trần Thị B',
-            book: 'Cơ sở dữ liệu',
-            dueDate: '2024-02-03',
-            daysOverdue: 4,
-            fine: 20000
-          },
-          {
-            reader: 'Lê Văn C',
-            book: 'Mạng máy tính',
-            dueDate: '2024-02-05',
-            daysOverdue: 2,
-            fine: 10000
-          }
-        ],
-        totalOverdue: 22,
-        totalFines: 1500000
+    loadReportData();
+  }, [selectedPeriod, selectedReport]);
+
+  const loadReportData = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      let data;
+      switch (selectedReport) {
+        case 'overview':
+          data = await librarianReportsService.getOverviewReport(selectedPeriod);
+          setReportData({ overview: data });
+          break;
+        case 'borrowing':
+          data = await librarianReportsService.getBorrowingReport(selectedPeriod);
+          setReportData({ borrowing: data });
+          break;
+        case 'overdue':
+          data = await librarianReportsService.getOverdueReport();
+          setReportData({ overdue: data });
+          break;
+        default:
+          // Load all reports for overview
+          const [overviewData, borrowingData, overdueData] = await Promise.all([
+            librarianReportsService.getOverviewReport(selectedPeriod),
+            librarianReportsService.getBorrowingReport(selectedPeriod),
+            librarianReportsService.getOverdueReport()
+          ]);
+          setReportData({
+            overview: overviewData,
+            borrowing: borrowingData,
+            overdue: overdueData
+          });
       }
-    };
-    setReportData(mockData);
-  }, []);
+    } catch (error) {
+      console.error('Error loading report data:', error);
+      setError('Không thể tải dữ liệu báo cáo. Đang hiển thị dữ liệu fallback.');
+      
+      // Fallback to empty/default data
+      const fallbackData = {
+        overview: librarianReportsService.createFallbackOverviewData(),
+        borrowing: librarianReportsService.createFallbackBorrowingData(),
+        overdue: librarianReportsService.createFallbackOverdueData()
+      };
+      setReportData(fallbackData);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getPeriodLabel = () => {
     const labels = {
@@ -100,9 +82,17 @@ const LibrarianReports = () => {
     return labels[selectedReport] || 'Báo cáo tổng quan';
   };
 
-  const exportReport = () => {
-    // Simulate export functionality
-    alert('Báo cáo đã được xuất thành công!');
+  const exportReport = async () => {
+    try {
+      setLoading(true);
+      await librarianReportsService.exportReport(selectedReport, selectedPeriod, 'pdf');
+      alert('Báo cáo đã được xuất thành công!');
+    } catch (error) {
+      console.error('Error exporting report:', error);
+      alert('Lỗi khi xuất báo cáo: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const printReport = () => {
@@ -341,8 +331,25 @@ const LibrarianReports = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="librarian-reports">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Đang tải báo cáo...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="librarian-reports">
+      {error && (
+        <div className="error-banner">
+          <p>⚠️ {error}</p>
+        </div>
+      )}
+      
       <div className="reports-header">
         <h1>Báo Cáo Thư Viện</h1>
         <div className="reports-controls">

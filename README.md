@@ -35,7 +35,7 @@
 - Xử lý thanh toán phạt
 - Báo cáo tài chính
 
-### 5. **Nhân viên kho sách** (warehouse/warehouse123)
+### 5. **Warehouse sách** (warehouse/warehouse123)
 
 - Quản lý kho sách
 - Nhập xuất sách

@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999; /* Increased z-index */
   padding: 20px;
 }
 
@@ -23,6 +23,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative; /* Added position relative */
 }
 
 .modal-header {

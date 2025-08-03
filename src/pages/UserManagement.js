@@ -17,13 +17,7 @@ const UserManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
-  const [error, setError] = useState('');
-
-  const apiUrl = "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Users";
-=======
   const [error, setError] = useState("");
->>>>>>> frontend
 
   useEffect(() => {
     fetchUsers();

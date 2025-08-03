@@ -187,7 +187,7 @@ namespace LibraryApi.Data
                     {
                         TenDangNhap = "warehouse",
                         MatKhau = "warehouse123",
-                        ChucVu = "Nhân viên kho sách"
+                        ChucVu = "Warehouse sách"
                     },
                     new NguoiDung
                     {

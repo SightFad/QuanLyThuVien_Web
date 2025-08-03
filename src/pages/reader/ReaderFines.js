@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaCreditCard, FaMoneyBillWave, FaExclamationTriangle, FaCheck, FaClock, FaHistory } from 'react-icons/fa';
+import { readerService } from '../../services';
 import './ReaderFines.css';
 
 const ReaderFines = () => {
@@ -8,46 +9,26 @@ const ReaderFines = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setFines([
-        {
-          id: 1,
-          bookTitle: 'Đắc Nhân Tâm',
-          dueDate: '2024-01-10',
-          returnDate: '2024-01-15',
-          daysLate: 5,
-          amount: 25000,
-          reason: 'Trả sách trễ',
-          status: 'pending',
-          fineType: 'late_return'
-        },
-        {
-          id: 2,
-          bookTitle: 'Nhà Giả Kim',
-          dueDate: '2024-01-05',
-          returnDate: '2024-01-08',
-          daysLate: 3,
-          amount: 15000,
-          reason: 'Trả sách trễ',
-          status: 'paid',
-          fineType: 'late_return',
-          paidDate: '2024-01-08'
-        },
-        {
-          id: 3,
-          bookTitle: 'Tuổi Trẻ Đáng Giá Bao Nhiêu',
-          dueDate: '2024-01-12',
-          returnDate: '2024-01-14',
-          daysLate: 2,
-          amount: 50000,
-          reason: 'Sách bị hư hỏng',
-          status: 'pending',
-          fineType: 'damage'
-        }
-      ]);
+    loadFinesData();
+  }, []);
+
+  const loadFinesData = async () => {
+    try {
+      setLoading(true);
+      const finesData = await readerService.getFines();
+      setFines(finesData);
+    } catch (error) {
+      console.error('Error loading fines data:', error);
+      
+      // Fallback to empty array if API fails
+      setFines([]);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    loadFinesData();
   }, []);
 
   const handlePayFine = (fineId) => {

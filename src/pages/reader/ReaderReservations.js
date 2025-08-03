@@ -11,7 +11,7 @@ import {
   FaEye
 } from 'react-icons/fa';
 import { useToast } from '../../hooks';
-import reservationService from '../../services/reservationService';
+import { readerService, userService } from '../../services';
 import './ReaderReservations.css';
 
 const ReaderReservations = () => {
@@ -30,19 +30,28 @@ const ReaderReservations = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const docGiaId = currentUser.maDG || 1;
-
-      // Load đặt trước
-      const reservationsData = await reservationService.getMyReservations(docGiaId);
+      
+      // Load reservations using readerService
+      const reservationsData = await readerService.getReservations();
       setReservations(reservationsData);
 
-      // Load phiếu mượn (cần tạo API riêng)
-      // const borrowData = await borrowService.getMyBorrows(docGiaId);
-      // setBorrowTickets(borrowData);
+      // Load borrow tickets (if available in readerService)
+      // For now, we'll use the current borrows from dashboard
+      try {
+        const dashboardData = await readerService.getDashboard();
+        setBorrowTickets(dashboardData.currentBorrows || []);
+      } catch (error) {
+        console.error('Error loading borrow tickets:', error);
+        setBorrowTickets([]);
+      }
 
     } catch (error) {
+      console.error('Error loading data:', error);
       showToast('Lỗi khi tải dữ liệu', 'error');
+      
+      // Fallback to empty arrays
+      setReservations([]);
+      setBorrowTickets([]);
     } finally {
       setLoading(false);
     }
@@ -52,16 +61,15 @@ const ReaderReservations = () => {
     try {
       setCancelling(prev => ({ ...prev, [reservationId]: true }));
       
-      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const docGiaId = currentUser.maDG || 1;
-
-      const result = await reservationService.cancelReservation(reservationId, docGiaId);
-      showToast(result.message, 'success');
+      // Cancel reservation using readerService
+      await readerService.cancelReservation(reservationId);
+      showToast('Hủy đặt trước thành công!', 'success');
       
-      // Cập nhật danh sách
-      setReservations(prev => prev.filter(r => r.maPhieuDat !== reservationId));
+      // Refresh data
+      await loadData();
     } catch (error) {
-      showToast(error.message, 'error');
+      console.error('Error cancelling reservation:', error);
+      showToast(error.message || 'Có lỗi xảy ra khi hủy đặt trước', 'error');
     } finally {
       setCancelling(prev => ({ ...prev, [reservationId]: false }));
     }
@@ -70,13 +78,29 @@ const ReaderReservations = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Đang chờ':
+      case 'pending':
         return <span className="badge badge-warning">Đang chờ</span>;
       case 'Đã xử lý':
+      case 'approved':
         return <span className="badge badge-success">Đã xử lý</span>;
       case 'Quá hạn':
+      case 'expired':
         return <span className="badge badge-danger">Quá hạn</span>;
+      case 'Đã hủy':
+      case 'cancelled':
+        return <span className="badge badge-secondary">Đã hủy</span>;
       default:
         return <span className="badge badge-secondary">{status}</span>;
+    }
+  };
+
+  const getBorrowStatusBadge = (status, daysLeft) => {
+    if (daysLeft < 0) {
+      return <span className="badge badge-danger">Quá hạn</span>;
+    } else if (daysLeft <= 3) {
+      return <span className="badge badge-warning">Sắp hạn</span>;
+    } else {
+      return <span className="badge badge-success">Bình thường</span>;
     }
   };
 
@@ -89,6 +113,15 @@ const ReaderReservations = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const getDaysLeft = (returnDate) => {
+    if (!returnDate) return 0;
+    const today = new Date();
+    const returnDateObj = new Date(returnDate);
+    const diffTime = returnDateObj - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   if (loading) {
@@ -105,94 +138,87 @@ const ReaderReservations = () => {
   return (
     <div className="reader-reservations">
       <div className="page-header">
-        <h1 className="page-title">Quản lý đặt mượn sách</h1>
-        <p className="page-subtitle">Theo dõi trạng thái đặt trước và phiếu mượn của bạn</p>
+        <h1><FaClock /> Quản lý đặt trước và mượn sách</h1>
+        <p>Theo dõi trạng thái đặt trước và sách đang mượn</p>
       </div>
 
-      <div className="tabs">
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
         <button 
-          className={`tab ${activeTab === 'reservations' ? 'active' : ''}`}
+          className={`tab-button ${activeTab === 'reservations' ? 'active' : ''}`}
           onClick={() => setActiveTab('reservations')}
         >
-          <FaClock />
-          Đặt trước ({reservations.length})
+          <FaClock /> Đặt trước ({reservations.length})
         </button>
         <button 
-          className={`tab ${activeTab === 'borrows' ? 'active' : ''}`}
+          className={`tab-button ${activeTab === 'borrows' ? 'active' : ''}`}
           onClick={() => setActiveTab('borrows')}
         >
-          <FaBook />
-          Phiếu mượn ({borrowTickets.length})
+          <FaBook /> Đang mượn ({borrowTickets.length})
         </button>
       </div>
 
+      {/* Reservations Tab */}
       {activeTab === 'reservations' && (
-        <div className="reservations-section">
-          <h2>Danh sách đặt trước</h2>
-          
+        <div className="tab-content">
+          <div className="section-header">
+            <h2>Danh sách đặt trước</h2>
+            <p>Quản lý các yêu cầu đặt trước sách của bạn</p>
+          </div>
+
           {reservations.length === 0 ? (
             <div className="empty-state">
+              <FaClock />
               <h3>Chưa có đặt trước nào</h3>
-              <p>Bạn chưa đặt trước sách nào. Hãy tìm kiếm và đặt trước sách bạn muốn mượn.</p>
+              <p>Bạn chưa có yêu cầu đặt trước sách nào</p>
             </div>
           ) : (
             <div className="reservations-grid">
-              {reservations.map((reservation) => (
-                <div key={reservation.maPhieuDat} className="reservation-card">
+              {reservations.map(reservation => (
+                <div key={reservation.id || reservation.maPhieuDat} className="reservation-card">
                   <div className="reservation-header">
-                    <div className="reservation-status">
-                      {getStatusBadge(reservation.trangThai)}
+                    <div className="reservation-info">
+                      <h3>{reservation.bookTitle || reservation.tenSach}</h3>
+                      <p className="author">{reservation.author || reservation.tacGia}</p>
                     </div>
-                    <div className="reservation-actions">
-                      {reservation.trangThai === 'Đang chờ' && (
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleCancelReservation(reservation.maPhieuDat)}
-                          disabled={cancelling[reservation.maPhieuDat]}
-                        >
-                          <FaTrash />
-                          {cancelling[reservation.maPhieuDat] ? 'Đang hủy...' : 'Hủy'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="book-info">
-                    <h4 className="book-title">{reservation.sach?.tenSach || 'Không có thông tin'}</h4>
-                    <div className="book-details">
-                      <div className="detail-item">
-                        <FaUser className="detail-icon" />
-                        <span>{reservation.sach?.tacGia || 'N/A'}</span>
-                      </div>
-                      <div className="detail-item">
-                        <FaBook className="detail-icon" />
-                        <span>{reservation.sach?.theLoai || 'N/A'}</span>
-                      </div>
-                      <div className="detail-item">
-                        <FaMapMarkerAlt className="detail-icon" />
-                        <span>{reservation.sach?.viTriLuuTru || 'N/A'}</span>
-                      </div>
-                    </div>
+                    {getStatusBadge(reservation.status || reservation.trangThai)}
                   </div>
 
                   <div className="reservation-details">
-                    <div className="detail-item">
-                      <FaCalendar className="detail-icon" />
-                      <div className="detail-content">
-                        <span className="detail-label">Ngày đặt:</span>
-                        <span className="detail-value">{formatDate(reservation.ngayDat)}</span>
-                      </div>
+                    <div className="detail-row">
+                      <span className="label">Ngày đặt:</span>
+                      <span className="value">{formatDate(reservation.reservationDate || reservation.ngayDat)}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="label">Mã đặt trước:</span>
+                      <span className="value">{reservation.id || reservation.maPhieuDat}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="label">Thể loại:</span>
+                      <span className="value">{reservation.category || reservation.theLoai}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="label">Vị trí:</span>
+                      <span className="value">{reservation.location || reservation.viTriLuuTru}</span>
                     </div>
                   </div>
 
-                  {reservation.trangThai === 'Đang chờ' && (
-                    <div className="queue-info">
-                      <p className="queue-message">
-                        <FaClock />
-                        Sách hiện không có sẵn. Bạn sẽ được thông báo khi sách có sẵn.
-                      </p>
-                    </div>
-                  )}
+                  <div className="reservation-actions">
+                    {(reservation.status === 'Đang chờ' || reservation.status === 'pending') && (
+                      <button 
+                        className="btn btn-danger"
+                        onClick={() => handleCancelReservation(reservation.id || reservation.maPhieuDat)}
+                        disabled={cancelling[reservation.id || reservation.maPhieuDat]}
+                      >
+                        <FaTrash />
+                        {cancelling[reservation.id || reservation.maPhieuDat] ? 'Đang hủy...' : 'Hủy đặt trước'}
+                      </button>
+                    )}
+                    
+                    <button className="btn btn-secondary">
+                      <FaEye /> Xem chi tiết
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -200,62 +226,68 @@ const ReaderReservations = () => {
         </div>
       )}
 
+      {/* Borrows Tab */}
       {activeTab === 'borrows' && (
-        <div className="borrows-section">
-          <h2>Phiếu mượn sách</h2>
-          
+        <div className="tab-content">
+          <div className="section-header">
+            <h2>Sách đang mượn</h2>
+            <p>Danh sách sách bạn đang mượn và thời hạn trả</p>
+          </div>
+
           {borrowTickets.length === 0 ? (
             <div className="empty-state">
-              <h3>Chưa có phiếu mượn nào</h3>
-              <p>Bạn chưa có phiếu mượn sách nào. Hãy tìm kiếm và mượn sách bạn cần.</p>
+              <FaBook />
+              <h3>Chưa có sách đang mượn</h3>
+              <p>Bạn chưa mượn sách nào</p>
             </div>
           ) : (
             <div className="borrows-grid">
-              {borrowTickets.map((borrow) => (
-                <div key={borrow.maPhieuMuon} className="borrow-card">
-                  <div className="borrow-header">
-                    <div className="borrow-status">
-                      {getStatusBadge(borrow.trangThai)}
+              {borrowTickets.map(borrow => {
+                const daysLeft = getDaysLeft(borrow.returnDate);
+                return (
+                  <div key={borrow.id || borrow.phieuMuonId} className="borrow-card">
+                    <div className="borrow-header">
+                      <div className="borrow-info">
+                        <h3>{borrow.bookTitle}</h3>
+                        <p className="author">{borrow.author}</p>
+                      </div>
+                      {getBorrowStatusBadge(borrow.status, daysLeft)}
                     </div>
-                  </div>
 
-                  <div className="book-info">
-                    <h4 className="book-title">{borrow.sach?.tenSach || 'Không có thông tin'}</h4>
-                    <div className="book-details">
-                      <div className="detail-item">
-                        <FaUser className="detail-icon" />
-                        <span>{borrow.sach?.tacGia || 'N/A'}</span>
+                    <div className="borrow-details">
+                      <div className="detail-row">
+                        <span className="label">Ngày mượn:</span>
+                        <span className="value">{formatDate(borrow.borrowDate)}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Hạn trả:</span>
+                        <span className="value">{formatDate(borrow.returnDate)}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Thời gian còn lại:</span>
+                        <span className={`value ${daysLeft < 0 ? 'text-danger' : daysLeft <= 3 ? 'text-warning' : 'text-success'}`}>
+                          {daysLeft < 0 ? `Quá hạn ${Math.abs(daysLeft)} ngày` : 
+                           daysLeft === 0 ? 'Hạn trả hôm nay' : 
+                           `Còn ${daysLeft} ngày`}
+                        </span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Vị trí:</span>
+                        <span className="value">{borrow.location}</span>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="borrow-details">
-                    <div className="detail-item">
-                      <FaCalendar className="detail-icon" />
-                      <div className="detail-content">
-                        <span className="detail-label">Ngày mượn:</span>
-                        <span className="detail-value">{formatDate(borrow.ngayMuon)}</span>
-                      </div>
-                    </div>
-                    <div className="detail-item">
-                      <FaCalendar className="detail-icon" />
-                      <div className="detail-content">
-                        <span className="detail-label">Hạn trả:</span>
-                        <span className="detail-value">{formatDate(borrow.hanTra)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {borrow.trangThai === 'borrowed' && (
                     <div className="borrow-actions">
-                      <button className="btn btn-primary btn-sm">
-                        <FaEye />
-                        Xem chi tiết
+                      <button className="btn btn-primary">
+                        <FaCalendar /> Gia hạn
+                      </button>
+                      <button className="btn btn-secondary">
+                        <FaEye /> Xem chi tiết
                       </button>
                     </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

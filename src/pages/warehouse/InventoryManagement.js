@@ -1,51 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaWarehouse, FaSearch, FaPlus, FaEdit, FaEye, FaBoxes } from 'react-icons/fa';
+import { warehouseService } from '../../services';
 import './InventoryManagement.css';
 
 const InventoryManagement = () => {
-  const [inventory, setInventory] = useState([
-    {
-      id: 1,
-      bookTitle: 'Đắc Nhân Tâm',
-      author: 'Dale Carnegie',
-      isbn: '978-604-1-00001-1',
-      totalQuantity: 50,
-      availableQuantity: 45,
-      location: 'Kệ A1',
-      status: 'available'
-    },
-    {
-      id: 2,
-      bookTitle: 'Nhà Giả Kim',
-      author: 'Paulo Coelho',
-      isbn: '978-604-1-00002-2',
-      totalQuantity: 30,
-      availableQuantity: 28,
-      location: 'Kệ A2',
-      status: 'available'
-    },
-    {
-      id: 3,
-      bookTitle: 'Tuổi Trẻ Đáng Giá Bao Nhiêu',
-      author: 'Rosie Nguyễn',
-      isbn: '978-604-1-00003-3',
-      totalQuantity: 25,
-      availableQuantity: 0,
-      location: 'Kệ B1',
-      status: 'out_of_stock'
-    }
-  ]);
+  const [inventoryData, setInventoryData] = useState({
+    inventory: [],
+    pagination: { page: 1, pageSize: 10, totalCount: 0, totalPages: 0 },
+    summary: { totalBooks: 0, availableBooks: 0, borrowedBooks: 0, outOfStockCount: 0, lowStockCount: 0, uniqueTitles: 0 },
+    locations: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterLocation, setFilterLocation] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredInventory = inventory.filter(item => {
-    const matchesSearch = item.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.isbn.includes(searchTerm);
-    const matchesStatus = filterStatus === 'all' || item.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  useEffect(() => {
+    loadInventory();
+  }, [searchTerm, filterStatus, filterLocation, currentPage]);
+
+  const loadInventory = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const params = {
+        search: searchTerm,
+        status: filterStatus,
+        location: filterLocation,
+        page: currentPage,
+        pageSize: 10
+      };
+      
+      const data = await warehouseService.getInventory(params);
+      setInventoryData(data);
+    } catch (error) {
+      console.error('Error loading inventory:', error);
+      setError('Không thể tải dữ liệu tồn kho. Đang hiển thị dữ liệu fallback.');
+      
+      // Fallback to empty data
+      const fallbackData = warehouseService.createFallbackInventoryData();
+      setInventoryData(fallbackData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Extract data for easier access
+  const { inventory, pagination, summary, locations } = inventoryData;
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleStatusChange = (e) => {
+    setFilterStatus(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleLocationChange = (e) => {
+    setFilterLocation(e.target.value);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="inventory-management">

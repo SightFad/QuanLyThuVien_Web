@@ -320,7 +320,7 @@ const ModernSidebar = ({
           },
         ];
 
-      case "Nhân viên kho sách":
+      case "Warehouse sách":
       case "Trưởng kho":
       case "warehouse":
       case "Warehouse":
@@ -330,7 +330,7 @@ const ModernSidebar = ({
             icon: <FaChartBar />,
             label: "Dashboard",
             roles: [
-              "Nhân viên kho sách",
+              "Warehouse sách",
               "Trưởng kho",
               "warehouse",
               "Warehouse",
@@ -341,7 +341,7 @@ const ModernSidebar = ({
             icon: <FaBoxes />,
             label: "Quản lý kho",
             roles: [
-              "Nhân viên kho sách",
+              "Warehouse sách",
               "Trưởng kho",
               "warehouse",
               "Warehouse",
@@ -352,7 +352,7 @@ const ModernSidebar = ({
             icon: <FaUpload />,
             label: "Nhập sách",
             roles: [
-              "Nhân viên kho sách",
+              "Warehouse sách",
               "Trưởng kho",
               "warehouse",
               "Warehouse",
@@ -363,7 +363,7 @@ const ModernSidebar = ({
             icon: <FaCheckCircle />,
             label: "Kiểm kê",
             roles: [
-              "Nhân viên kho sách",
+              "Warehouse sách",
               "Trưởng kho",
               "warehouse",
               "Warehouse",
@@ -374,7 +374,7 @@ const ModernSidebar = ({
             icon: <FaChartPie />,
             label: "Báo cáo kho",
             roles: [
-              "Nhân viên kho sách",
+              "Warehouse sách",
               "Trưởng kho",
               "warehouse",
               "Warehouse",

@@ -31,12 +31,35 @@ namespace LibraryApi.Controllers
             
             var token = _jwtService.GenerateToken(user);
             
-            // Return the role as is since seed data already uses Vietnamese names
-            return Ok(new { 
-                token, 
-                username = user.TenDangNhap, 
-                role = user.ChucVu
-            });
+            // Tạo response cơ bản
+            var response = new LoginResponse
+            {
+                Token = token,
+                UserId = user.MaND,
+                Username = user.TenDangNhap,
+                Role = user.ChucVu,
+                ExpiresAt = DateTime.UtcNow.AddDays(7) // Mặc định 7 ngày
+            };
+            
+            // Nếu user là Reader, lấy thông tin DocGia chi tiết
+            if (user.DocGiaId.HasValue)
+            {
+                var docGia = await _context.DocGias.FirstOrDefaultAsync(d => d.MaDG == user.DocGiaId.Value);
+                if (docGia != null)
+                {
+                    response.DocGiaId = docGia.MaDG;
+                    response.HoTen = docGia.HoTen;
+                    response.Email = docGia.Email;
+                    response.LoaiDocGia = docGia.LoaiDocGia ?? "Thuong";
+                    response.CapBac = docGia.CapBac ?? "Thuong";
+                    response.MemberStatus = docGia.MemberStatus ?? "ChuaThanhToan";
+                    response.NgayHetHan = docGia.NgayHetHan;
+                    response.SoSachToiDa = docGia.SoSachToiDa;
+                    response.SoNgayMuonToiDa = docGia.SoNgayMuonToiDa;
+                }
+            }
+            
+            return Ok(response);
         }
 
         [HttpPost("register")]

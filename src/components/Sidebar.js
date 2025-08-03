@@ -174,7 +174,7 @@ const Sidebar = ({ user, onLogout }) => {
           },
           { path: "/borrows", icon: <FaExchangeAlt />, label: "Xem mượn trả" },
         ];
-      case "Nhân viên kho sách":
+      case "Warehouse sách":
       case "warehouse":
         return [
           {
@@ -385,7 +385,7 @@ const Sidebar = ({ user, onLogout }) => {
       "Trưởng phòng Accountant": "Accounting Manager",
       "Kỹ thuật viên": "Technician",
       "Nhân viên Accountant": "Accounting Staff",
-      "Nhân viên kho sách": "Warehouse Staff",
+      "Warehouse sách": "Warehouse Staff",
       "Trưởng kho": "Warehouse Manager",
       warehouse: "Warehouse Staff",
       Reader: "Reader",

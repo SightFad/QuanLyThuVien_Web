@@ -41,12 +41,16 @@ namespace LibraryApi.Controllers
                 TenSach = request.TenSach,
                 TacGia = request.TacGia,
                 TheLoai = request.TheLoai,
+                NhaXuatBan = request.NhaXuatBan,
+                NamXuatBan = request.NamXuatBan,
+                ISBN = request.ISBN,
+                SoLuong = request.SoLuong ?? 1,
+                ViTriLuuTru = request.ViTriLuuTru,
                 KeSach = request.KeSach,
                 TrangThai = request.TrangThai ?? "Có sẵn",
                 MoTa = request.MoTa,
-                NamXuatBan = request.NamXuatBan,
-                ISBN = request.ISBN,
-                AnhBia = request.AnhBia
+                AnhBia = request.AnhBia,
+                NgayTao = DateTime.Now
             };
 
             _context.Saches.Add(book);
@@ -63,12 +67,16 @@ namespace LibraryApi.Controllers
             book.TenSach = request.TenSach;
             book.TacGia = request.TacGia;
             book.TheLoai = request.TheLoai;
-            book.KeSach = request.KeSach;
-            book.TrangThai = request.TrangThai;
-            book.MoTa = request.MoTa;
+            book.NhaXuatBan = request.NhaXuatBan;
             book.NamXuatBan = request.NamXuatBan;
             book.ISBN = request.ISBN;
+            book.SoLuong = request.SoLuong ?? book.SoLuong;
+            book.ViTriLuuTru = request.ViTriLuuTru;
+            book.KeSach = request.KeSach;
+            book.TrangThai = request.TrangThai ?? book.TrangThai;
+            book.MoTa = request.MoTa;
             book.AnhBia = request.AnhBia;
+            book.NgayCapNhat = DateTime.Now;
 
             await _context.SaveChangesAsync();
             return NoContent();

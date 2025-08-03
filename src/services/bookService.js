@@ -8,7 +8,7 @@ class BookService {
   // Get all books
   async getBooks(params = {}) {
     try {
-      const data = await apiService.get(API_ENDPOINTS.BOOKS, params);
+      const data = await apiService.get(API_ENDPOINTS.BOOKS_ENDPOINTS.LIST, params);
       return this.mapBooksFromApi(data);
     } catch (error) {
       console.error('Error fetching books:', error);
@@ -16,10 +16,26 @@ class BookService {
     }
   }
 
+  // Get all books (alias for getBooks)
+  async getAllBooks(params = {}) {
+    return this.getBooks(params);
+  }
+
+  // Create reservation
+  async createReservation(reservationData) {
+    try {
+      const data = await apiService.post('/api/Reservation', reservationData);
+      return data;
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+      throw error;
+    }
+  }
+
   // Get book by ID
   async getBookById(id) {
     try {
-      const data = await apiService.get(`${API_ENDPOINTS.BOOKS}/${id}`);
+      const data = await apiService.get(`${API_ENDPOINTS.BOOKS_ENDPOINTS.LIST}/${id}`);
       return this.mapBookFromApi(data);
     } catch (error) {
       console.error('Error fetching book:', error);
@@ -31,7 +47,7 @@ class BookService {
   async createBook(bookData) {
     try {
       const mappedData = this.mapBookToApi(bookData);
-      const data = await apiService.post(API_ENDPOINTS.BOOKS, mappedData);
+      const data = await apiService.post(API_ENDPOINTS.BOOKS_ENDPOINTS.CREATE, mappedData);
       return this.mapBookFromApi(data);
     } catch (error) {
       console.error('Error creating book:', error);
@@ -43,7 +59,7 @@ class BookService {
   async updateBook(id, bookData) {
     try {
       const mappedData = this.mapBookToApi(bookData);
-      const data = await apiService.put(`${API_ENDPOINTS.BOOKS}/${id}`, mappedData);
+      const data = await apiService.put(`${API_ENDPOINTS.BOOKS_ENDPOINTS.LIST}/${id}`, mappedData);
       return this.mapBookFromApi(data);
     } catch (error) {
       console.error('Error updating book:', error);
@@ -54,7 +70,7 @@ class BookService {
   // Delete book
   async deleteBook(id) {
     try {
-      await apiService.delete(`${API_ENDPOINTS.BOOKS}/${id}`);
+      await apiService.delete(`${API_ENDPOINTS.BOOKS_ENDPOINTS.LIST}/${id}`);
       return true;
     } catch (error) {
       console.error('Error deleting book:', error);
@@ -69,7 +85,7 @@ class BookService {
         q: query,
         ...filters,
       };
-      const data = await apiService.get(`${API_ENDPOINTS.BOOKS}/search`, params);
+      const data = await apiService.get(API_ENDPOINTS.BOOKS_ENDPOINTS.SEARCH, params);
       return this.mapBooksFromApi(data);
     } catch (error) {
       console.error('Error searching books:', error);
@@ -80,7 +96,7 @@ class BookService {
   // Get book categories
   async getCategories() {
     try {
-      const data = await apiService.get(`${API_ENDPOINTS.BOOKS}/categories`);
+      const data = await apiService.get(API_ENDPOINTS.BOOKS_ENDPOINTS.CATEGORIES);
       return data;
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -91,7 +107,7 @@ class BookService {
   // Get books by category
   async getBooksByCategory(category, params = {}) {
     try {
-      const data = await apiService.get(`${API_ENDPOINTS.BOOKS}/category/${category}`, params);
+      const data = await apiService.get(`${API_ENDPOINTS.BOOKS_ENDPOINTS.LIST}/category/${category}`, params);
       return this.mapBooksFromApi(data);
     } catch (error) {
       console.error('Error fetching books by category:', error);
@@ -102,7 +118,7 @@ class BookService {
   // Get popular books
   async getPopularBooks(limit = 10) {
     try {
-      const data = await apiService.get(`${API_ENDPOINTS.BOOKS}/popular`, { limit });
+      const data = await apiService.get(API_ENDPOINTS.BOOKS_ENDPOINTS.POPULAR, { limit });
       return this.mapBooksFromApi(data);
     } catch (error) {
       console.error('Error fetching popular books:', error);
@@ -113,7 +129,7 @@ class BookService {
   // Get recently added books
   async getRecentBooks(limit = 10) {
     try {
-      const data = await apiService.get(`${API_ENDPOINTS.BOOKS}/recent`, { limit });
+      const data = await apiService.get(API_ENDPOINTS.BOOKS_ENDPOINTS.RECENT, { limit });
       return this.mapBooksFromApi(data);
     } catch (error) {
       console.error('Error fetching recent books:', error);
@@ -124,7 +140,7 @@ class BookService {
   // Upload book cover
   async uploadCover(bookId, file) {
     try {
-      const data = await apiService.upload(`${API_ENDPOINTS.BOOKS}/${bookId}/cover`, file);
+      const data = await apiService.upload(`${API_ENDPOINTS.BOOKS_ENDPOINTS.LIST}/${bookId}/cover`, file);
       return data;
     } catch (error) {
       console.error('Error uploading book cover:', error);
@@ -135,7 +151,7 @@ class BookService {
   // Import books from CSV/Excel
   async importBooks(file) {
     try {
-      const data = await apiService.upload(`${API_ENDPOINTS.BOOKS}/import`, file);
+      const data = await apiService.upload(API_ENDPOINTS.BOOKS_ENDPOINTS.IMPORT, file);
       return data;
     } catch (error) {
       console.error('Error importing books:', error);
@@ -150,7 +166,7 @@ class BookService {
         format,
         ...filters,
       };
-      await apiService.download(`${API_ENDPOINTS.BOOKS}/export`, `books.${format}`, params);
+      await apiService.download(API_ENDPOINTS.BOOKS_ENDPOINTS.EXPORT, `books.${format}`, params);
     } catch (error) {
       console.error('Error exporting books:', error);
       throw error;
@@ -170,10 +186,12 @@ class BookService {
       quantity: apiBook.soLuong,
       available: apiBook.soLuongConLai,
       location: apiBook.viTriLuuTru,
-      price: apiBook.giaTien,
+      shelf: apiBook.keSach,
+      price: apiBook.giaTien || apiBook.giaSach, // Support both field names
       description: apiBook.moTa,
       coverImage: apiBook.anhBia,
       status: apiBook.trangThai,
+      entryDate: apiBook.ngayNhap,
       createdAt: apiBook.ngayTao,
       updatedAt: apiBook.ngayCapNhat,
     };
@@ -198,12 +216,15 @@ class BookService {
       nhaXuatBan: frontendBook.publisher,
       namXB: frontendBook.publishYear,
       soLuong: frontendBook.quantity,
-      soLuongConLai: frontendBook.available,
       viTriLuuTru: frontendBook.location,
-      giaTien: frontendBook.price,
+      keSach: frontendBook.shelf,
+      giaSach: frontendBook.price,
+      giaTien: frontendBook.price, // Send both for backend compatibility
       moTa: frontendBook.description,
       anhBia: frontendBook.coverImage,
       trangThai: frontendBook.status,
+      ngayNhap: frontendBook.entryDate,
+      ngayCapNhat: frontendBook.updatedAt ? new Date(frontendBook.updatedAt) : new Date(),
     };
   }
 }

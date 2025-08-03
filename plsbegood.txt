@@ -1,6 +1,6 @@
 Phòng Accountant:Trưởng phòng Accountant + Nhân viên Accountant
 Phòng dịch vụ Reader: Trưởng thư viện + Librarian
-Kho sách: Trưởng kho + Nhân viên kho
+Kho sách: Trưởng kho + Warehouse
 Phòng công nghệ thông tin: Admin + Kỹ thuật viên
 mọi chức năng đều lưu lại log để xuất báo cáo
 
@@ -84,7 +84,7 @@ Role: Kỹ thuật viên
 + Cấu hình hệ thống(Thời gian mượn, phí phạt, giới hạn số lượng sách mượn, giới hạn số lượng sách đặt trước, phí thành viên hàng năm)
 + Sao lưu dữ liệu
 + Có toàn bộ chức năng của các role khác, trừ giám đốc và Admin
-+ Xem được hoạt động thay đổi của Librarian, nhân viên Accountant, nhân viên kho
++ Xem được hoạt động thay đổi của Librarian, nhân viên Accountant, Warehouse
 + Xem và xuất các báo cáo liên quan
 
 Role: Trưởng phòng Accountant
@@ -107,13 +107,13 @@ Role: Nhân viên Accountant
 Role: Trưởng kho
 -Tài khoản được cấp bởi Giám đốc
 -Chức năng của trưởng kho:
-+ Có toàn bộ chức năng của nhân viên kho
++ Có toàn bộ chức năng của Warehouse
 + Duyệt đề xuất bổ sung sách và gửi tới phòng Accountant (Nếu từ chối, phải ghi rõ lý do)(thời gian duyệt là 3 ngày, quá 3 ngày thì tự động hủy, lý do quá hạn duyệt)
-+ Xem được hoạt động thay đổi của nhân viên kho
++ Xem được hoạt động thay đổi của Warehouse
 
-Role: Nhân viên kho
+Role: Warehouse
 -Tài khoản được cấp bởi Admin
--Chức năng của nhân viên kho:
+-Chức năng của Warehouse:
 + Xét duyệt phiếu đề xuất bổ sung sách và gửi tới Trưởng kho (Nếu từ chối, phải ghi rõ lý do)(thời gian duyệt là 3 ngày, quá 3 ngày thì tự động hủy, lý do quá hạn duyệt)
 + Quản lý kho với PHIẾU NHẬP KHO SÁCH và PHIẾU KIỂM KÊ SÁCH
 + Xem và xuất các báo cáo liên quan

@@ -22,13 +22,7 @@ const ReaderManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingReader, setEditingReader] = useState(null);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
-
-const apiUrl =
-    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/DocGia";
-=======
   const [error, setError] = useState(null);
->>>>>>> frontend
 
   useEffect(() => {
     loadReaders();

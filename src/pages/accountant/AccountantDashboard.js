@@ -13,6 +13,7 @@ import {
   FaPlus,
   FaEye,
 } from "react-icons/fa";
+import { accountantService } from '../../services';
 import "./AccountantDashboard.css";
 
 const AccountantDashboard = () => {
@@ -34,6 +35,8 @@ const AccountantDashboard = () => {
     profit: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [recentTransactions, setRecentTransactions] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -41,30 +44,23 @@ const AccountantDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // Mock data for accountant dashboard
-      const mockStats = {
-        totalRevenue: 12500000, // 12.5M VND
-        monthlyRevenue: 2500000, // 2.5M VND
-        pendingFines: 850000, // 850K VND
-        overdueFines: 1200000, // 1.2M VND
-        todayTransactions: 45,
-        monthlyTransactions: 320,
-        totalMembers: 1250,
-        activeMembers: 980,
-        totalBooks: 8500,
-        availableBooks: 7200,
-      };
-
-      const mockFinancialData = {
-        income: 2500000,
-        expenses: 1800000,
-        profit: 700000,
-      };
-
-      setStats(mockStats);
-      setFinancialData(mockFinancialData);
+      setLoading(true);
+      setError('');
+      
+      const dashboardData = await accountantService.getDashboardSummary();
+      
+      setStats(dashboardData.stats);
+      setFinancialData(dashboardData.financialData);
+      setRecentTransactions(dashboardData.recentTransactions);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      setError('Không thể tải dữ liệu dashboard. Đang hiển thị dữ liệu fallback.');
+      
+      // Fallback to default data
+      const fallbackData = accountantService.createFallbackDashboardData();
+      setStats(fallbackData.stats);
+      setFinancialData(fallbackData.financialData);
+      setRecentTransactions(fallbackData.recentTransactions);
     } finally {
       setLoading(false);
     }
@@ -159,6 +155,12 @@ const AccountantDashboard = () => {
 
   return (
     <div className="accountant-dashboard">
+      {error && (
+        <div className="error-banner">
+          <p>⚠️ {error}</p>
+        </div>
+      )}
+      
       <div className="dashboard-header">
         <div className="header-content">
           <h1>Dashboard - Accountant</h1>
@@ -345,45 +347,22 @@ const AccountantDashboard = () => {
               </button>
             </div>
             <div className="transaction-list">
-              <TransactionItem
-                type="income"
-                title="Nguyễn Văn A - Phí mượn sách"
-                amount={50000}
-                time="2 phút trước"
-                icon={<FaMoneyBillWave />}
-              />
-
-              <TransactionItem
-                type="income"
-                title="Trần Thị B - Tiền phạt quá hạn"
-                amount={25000}
-                time="15 phút trước"
-                icon={<FaExclamationTriangle />}
-              />
-
-              <TransactionItem
-                type="income"
-                title="Lê Văn C - Phí thành viên"
-                amount={200000}
-                time="1 giờ trước"
-                icon={<FaMoneyBillWave />}
-              />
-
-              <TransactionItem
-                type="expenses"
-                title="Mua sách mới - Machine Learning"
-                amount={150000}
-                time="2 giờ trước"
-                icon={<FaBook />}
-              />
-
-              <TransactionItem
-                type="income"
-                title="Phạm Thị D - Gia hạn thẻ"
-                amount={100000}
-                time="3 giờ trước"
-                icon={<FaCreditCard />}
-              />
+              {recentTransactions.length > 0 ? (
+                recentTransactions.map((transaction, index) => (
+                  <TransactionItem
+                    key={transaction.id || index}
+                    type={transaction.type}
+                    title={transaction.title}
+                    amount={transaction.amount}
+                    time={transaction.time}
+                    icon={transaction.type === 'fine' ? <FaExclamationTriangle /> : <FaMoneyBillWave />}
+                  />
+                ))
+              ) : (
+                <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                  <p>Chưa có giao dịch gần đây</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
