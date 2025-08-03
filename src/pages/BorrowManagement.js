@@ -28,19 +28,16 @@ const BorrowManagement = () => {
 
 
   const mapBorrowData = (borrow) => ({
-    id: borrow.id,
-    readerId: borrow.idDocGia,
-    readerName: borrow.docGia?.tenDocGia || borrow.tenDocGia || "",
-    bookId: borrow.idSach,
-    bookTitle: borrow.sach?.tenSach || borrow.tenSach || "",
-    borrowDate: new Date(borrow.ngayMuon).toISOString().split("T")[0],
-    returnDate: new Date(borrow.hanTra).toISOString().split("T")[0],
-    actualReturnDate: borrow.ngayTra
-      ? new Date(borrow.ngayTra).toISOString().split("T")[0]
+    readerId: borrow.readerId,
+    readerName: borrow.docGia?.readerName || borrow.readerName || "",
+    books: borrow.books || [],
+    bookTitle: borrow.bookTitle?.tenSach || borrow.tenSach || "",
+    borrowDate: new Date(borrow.borrowDate).toISOString().split("T")[0],
+    returnDate: new Date(borrow.returnDate).toISOString().split("T")[0],
+    actualReturnDate: borrow.returnDate
+      ? new Date(borrow.expectedReturnDate).toISOString().split("T")[0]
       : null,
-    status: borrow.trangThai,
-    notes: borrow.ghiChu || "",
-    renewalCount: borrow.renewalCount || 0,
+    notes: borrow.notes || "",
   });
 
   // Tải dữ liệu phiếu mượn từ API
@@ -119,13 +116,6 @@ const BorrowManagement = () => {
       return;
     }
 
-    // Kiểm tra số lần gia hạn (tối đa 2 lần)
-    const renewalCount = borrow.renewalCount || 0;
-    if (renewalCount >= 2) {
-      alert("❌ Sách đã được gia hạn tối đa 2 lần! Không thể gia hạn thêm.");
-      return;
-    }
-
     // Hiển thị modal gia hạn
     setSelectedBorrowForRenewal(borrow);
     setShowRenewalModal(true);
@@ -146,7 +136,7 @@ const BorrowManagement = () => {
             ...b, 
             returnDate: renewalData.books[0].newDueDate,
             status: "renewed",
-            renewalCount: (b.renewalCount || 0) + 1
+            //renewalCount: (b.renewalCount || 0) + 1
           }
         : b
     );
@@ -180,9 +170,8 @@ const BorrowManagement = () => {
       IdSach: borrowData.bookId,
       TenSach: borrowData.bookTitle,
       NgayMuon: borrowData.borrowDate,
-      HanTra: borrowData.returnDate,
-      NgayTra: borrowData.actualReturnDate || null,
-      TrangThai: borrowData.status || "borrowed",
+      HanTra: borrowData.expectedReturnDate,
+      NgayTra: borrowData.returnDate || null,
       GhiChu: borrowData.notes || "",
     };
 

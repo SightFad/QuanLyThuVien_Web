@@ -1,22 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { FaWarehouse, FaSearch, FaPlus, FaEdit, FaEye, FaBoxes } from 'react-icons/fa';
-import { warehouseService } from '../../services';
-import './InventoryManagement.css';
+import React, { useState, useEffect } from "react";
+import {
+  FaWarehouse,
+  FaSearch,
+  FaPlus,
+  FaEdit,
+  FaEye,
+  FaBoxes,
+} from "react-icons/fa";
+import { warehouseService } from "../../services";
+import "./InventoryManagement.css";
 
 const InventoryManagement = () => {
   const [inventoryData, setInventoryData] = useState({
     inventory: [],
     pagination: { page: 1, pageSize: 10, totalCount: 0, totalPages: 0 },
-    summary: { totalBooks: 0, availableBooks: 0, borrowedBooks: 0, outOfStockCount: 0, lowStockCount: 0, uniqueTitles: 0 },
-    locations: []
+    summary: {
+      totalBooks: 0,
+      availableBooks: 0,
+      borrowedBooks: 0,
+      outOfStockCount: 0,
+      lowStockCount: 0,
+      uniqueTitles: 0,
+    },
+    locations: [],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterLocation, setFilterLocation] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterLocation, setFilterLocation] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const filteredInventory = inventory.filter((item) => {
+    const matchesSearch =
+      item.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.isbn.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      filterStatus === "all" || item.status === filterStatus;
+    const matchesLocation =
+      filterLocation === "all" || item.location === filterLocation;
+
+    return matchesSearch && matchesStatus && matchesLocation;
+  });
 
   useEffect(() => {
     loadInventory();
@@ -25,22 +52,24 @@ const InventoryManagement = () => {
   const loadInventory = async () => {
     try {
       setLoading(true);
-      setError('');
-      
+      setError("");
+
       const params = {
         search: searchTerm,
         status: filterStatus,
         location: filterLocation,
         page: currentPage,
-        pageSize: 10
+        pageSize: 10,
       };
-      
+
       const data = await warehouseService.getInventory(params);
       setInventoryData(data);
     } catch (error) {
-      console.error('Error loading inventory:', error);
-      setError('Không thể tải dữ liệu tồn kho. Đang hiển thị dữ liệu fallback.');
-      
+      console.error("Error loading inventory:", error);
+      setError(
+        "Không thể tải dữ liệu tồn kho. Đang hiển thị dữ liệu fallback."
+      );
+
       // Fallback to empty data
       const fallbackData = warehouseService.createFallbackInventoryData();
       setInventoryData(fallbackData);
@@ -74,7 +103,9 @@ const InventoryManagement = () => {
   return (
     <div className="inventory-management">
       <div className="page-header">
-        <h1><FaWarehouse /> Quản lý kho sách</h1>
+        <h1>
+          <FaWarehouse /> Quản lý kho sách
+        </h1>
         <p>Theo dõi và quản lý tồn kho sách trong thư viện</p>
       </div>
 
@@ -116,7 +147,10 @@ const InventoryManagement = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">
-              {inventory.filter(item => item.status === 'out_of_stock').length}
+              {
+                inventory.filter((item) => item.status === "out_of_stock")
+                  .length
+              }
             </div>
             <div className="stat-label">Hết sách</div>
           </div>
@@ -137,8 +171,8 @@ const InventoryManagement = () => {
         </div>
 
         <div className="filter-section">
-          <select 
-            value={filterStatus} 
+          <select
+            value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
             <option value="all">Tất cả trạng thái</option>
@@ -168,7 +202,7 @@ const InventoryManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredInventory.map(item => (
+            {filteredInventory.map((item) => (
               <tr key={item.id}>
                 <td>{item.bookTitle}</td>
                 <td>{item.author}</td>
@@ -178,8 +212,11 @@ const InventoryManagement = () => {
                 <td>{item.location}</td>
                 <td>
                   <span className={`status-badge ${item.status}`}>
-                    {item.status === 'available' ? 'Có sẵn' : 
-                     item.status === 'out_of_stock' ? 'Hết sách' : 'Sắp hết'}
+                    {item.status === "available"
+                      ? "Có sẵn"
+                      : item.status === "out_of_stock"
+                      ? "Hết sách"
+                      : "Sắp hết"}
                   </span>
                 </td>
                 <td>
@@ -208,4 +245,4 @@ const InventoryManagement = () => {
   );
 };
 
-export default InventoryManagement; 
+export default InventoryManagement;

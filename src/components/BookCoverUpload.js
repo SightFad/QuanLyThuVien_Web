@@ -58,7 +58,7 @@ const BookCoverUpload = ({ onImageUpload, currentImage, disabled = false }) => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('http://localhost:5280/api/Sach/upload-image', {
+      const response = await fetch('https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Sach/upload-image', {
         method: 'POST',
         body: formData,
       });
