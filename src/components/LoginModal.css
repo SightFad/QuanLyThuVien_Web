@@ -144,30 +144,7 @@
   font-size: 0.875rem;
 }
 
-.login-modal-footer {
-  padding: 1rem 2rem 2rem;
-  text-align: center;
-  border-top: 1px solid #e5e7eb;
-}
 
-.login-modal-footer p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  color: #667eea;
-  cursor: pointer;
-  font-weight: 500;
-  text-decoration: underline;
-}
-
-.link-btn:hover {
-  color: #5a67d8;
-}
 
 @media (max-width: 480px) {
   .login-modal {
@@ -178,7 +155,5 @@
     padding: 1.5rem;
   }
   
-  .login-modal-footer {
-    padding: 1rem 1.5rem 1.5rem;
-  }
+
 } 

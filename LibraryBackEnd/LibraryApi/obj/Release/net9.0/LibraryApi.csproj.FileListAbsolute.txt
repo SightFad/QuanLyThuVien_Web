@@ -337,3 +337,8 @@ C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\LibraryApi.deps.json
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\LibraryApi.runtimeconfig.json
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\publish_output\LibraryApi.staticwebassets.endpoints.json
+<<<<<<< HEAD
+=======
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\bin\Release\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll
+>>>>>>> frontend

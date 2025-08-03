@@ -9,6 +9,7 @@ namespace LibraryApi.Models
         public string TenDangNhap { get; set; }
         public string MatKhau { get; set; }
         public string ChucVu { get; set; }
+        public int? DocGiaId { get; set; } // Liên kết với DocGia, nếu là độc giả
         // Navigation
         public ICollection<PhieuCapQuyen> PhieuCapQuyens { get; set; }
         public ICollection<NhatKyHoatDong> NhatKyHoatDongs { get; set; }

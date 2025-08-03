@@ -1,54 +1,161 @@
-import React, { useState } from 'react';
-import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import './LoginModal.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { apiRequest, MOCK_DATA } from "../config/api";
+import "./LoginModal.css";
 
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
+<<<<<<< HEAD
       const response = await fetch('https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData)
+=======
+      // Thử kết nối với backend
+      const data = await apiRequest("/api/Auth/login", {
+        method: "POST",
+        body: JSON.stringify(formData),
+>>>>>>> frontend
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify({
-          username: data.username,
-          role: data.role,
-          email: data.email
-        }));
-        onLogin(data);
-        onClose();
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Đăng nhập thất bại');
-      }
+      console.log("=== Login Response ===");
+      console.log("Backend data:", data);
+
+      // Map role from backend to frontend
+      let mappedRole = data.role?.trim();
+      console.log("Original role from backend:", mappedRole);
+
+      const userData = {
+        username: data.username,
+        role: mappedRole,
+        email: data.email,
+      };
+
+      // Store token and user data
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      console.log("=== Stored Data ===");
+      console.log("Token stored:", !!data.token);
+      console.log("User data stored:", userData);
+
+      onLogin(userData);
+      onClose();
+
+      // Redirect based on role
+      console.log("=== Redirect Logic ===");
+      console.log("Checking role:", mappedRole);
+
+      setTimeout(() => {
+        switch (mappedRole) {
+          case "Reader":
+            navigate("/reader/home");
+            break;
+          case "Librarian":
+            navigate("/librarian/dashboard");
+            break;
+          case "Accountant":
+          case "Nhân viên Accountant":
+            navigate("/accountant/dashboard");
+            break;
+          case "Nhân viên kho sách":
+          case "Trưởng kho":
+          case "warehouse":
+          case "Warehouse":
+            console.log(
+              "Warehouse role detected, navigating to /warehouse/dashboard"
+            );
+            navigate("/warehouse/dashboard");
+            break;
+          case "Trưởng thư viện":
+            navigate("/manager/dashboard");
+            break;
+          case "Admin":
+            navigate("/admin");
+            break;
+          default:
+            console.log("No matching role, navigating to /");
+            navigate("/");
+        }
+      }, 100);
     } catch (err) {
-      setError('Lỗi kết nối. Vui lòng thử lại.');
+      console.error("Login error:", err);
+
+      // Fallback: Sử dụng dữ liệu mẫu nếu backend không có sẵn
+      if (
+        err.message.includes("fetch") ||
+        err.message.includes("Failed to fetch") ||
+        err.message.includes("NetworkError")
+      ) {
+        console.log("Backend không có sẵn, sử dụng dữ liệu mẫu...");
+
+        const mockUser = MOCK_DATA.users[formData.username];
+        if (mockUser && formData.password === "admin123") {
+          const userData = {
+            username: mockUser.username,
+            role: mockUser.role,
+            email: mockUser.email,
+          };
+
+          localStorage.setItem("token", "mock_token_" + Date.now());
+          localStorage.setItem("user", JSON.stringify(userData));
+
+          onLogin(userData);
+          onClose();
+
+          // Redirect based on role
+          setTimeout(() => {
+            switch (mockUser.role) {
+              case "Reader":
+                navigate("/reader/home");
+                break;
+              case "Librarian":
+                navigate("/librarian/dashboard");
+                break;
+              case "Accountant":
+                navigate("/accountant/dashboard");
+                break;
+              case "Nhân viên kho sách":
+                navigate("/warehouse/dashboard");
+                break;
+              case "Admin":
+                navigate("/admin");
+                break;
+              default:
+                navigate("/");
+            }
+          }, 100);
+        } else {
+          setError("Tên đăng nhập hoặc mật khẩu không đúng");
+        }
+      } else {
+        setError("Lỗi kết nối. Vui lòng thử lại.");
+      }
     } finally {
       setLoading(false);
     }
@@ -61,15 +168,13 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
       <div className="login-modal">
         <div className="login-modal-header">
           <h2>Đăng nhập</h2>
-          <button className="close-btn" onClick={onClose}>&times;</button>
+          <button className="close-btn" onClick={onClose}>
+            &times;
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+          {error && <div className="error-message">{error}</div>}
 
           <div className="form-group">
             <label htmlFor="username">
@@ -92,7 +197,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
             </label>
             <div className="password-input">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 value={formData.password}
@@ -110,21 +215,13 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="login-btn"
-            disabled={loading}
-          >
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
         </form>
-
-        <div className="login-modal-footer">
-          <p>Chưa có tài khoản? <button className="link-btn">Đăng ký</button></p>
-        </div>
       </div>
     </div>
   );
 };
 
-export default LoginModal; 
+export default LoginModal;

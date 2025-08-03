@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaUser, FaKey } from 'react-icons/fa';
-import './UserManagement.css';
+import React, { useState, useEffect } from "react";
+import {
+  FaPlus,
+  FaSearch,
+  FaEdit,
+  FaTrash,
+  FaUser,
+  FaKey,
+} from "react-icons/fa";
+import { apiRequest, MOCK_DATA } from "../config/api";
+import "./UserManagement.css";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
   const [error, setError] = useState('');
 
   const apiUrl = "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Users";
+=======
+  const [error, setError] = useState("");
+>>>>>>> frontend
 
   useEffect(() => {
     fetchUsers();
@@ -20,31 +32,34 @@ const UserManagement = () => {
   useEffect(() => {
     const filtered = users.filter(
       (user) =>
-        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchTerm.toLowerCase())
+        user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.role?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-        setFilteredUsers(data);
-      } else {
-        setError('Không thể tải danh sách người dùng');
-      }
+      const data = await apiRequest("/api/User");
+      setUsers(data);
+      setFilteredUsers(data);
     } catch (err) {
-      setError('Lỗi kết nối');
+      console.log("Backend không có sẵn, sử dụng dữ liệu mẫu...");
+      // Sử dụng dữ liệu mẫu nếu backend không có sẵn
+      const mockUsers = Object.entries(MOCK_DATA.users).map(
+        ([username, user]) => ({
+          id: username,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          isActive: true,
+          createdAt: new Date(),
+          lastLoginAt: null,
+        })
+      );
+      setUsers(mockUsers);
+      setFilteredUsers(mockUsers);
     } finally {
       setLoading(false);
     }
@@ -61,70 +76,66 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
       return;
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${apiUrl}/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      await apiRequest(`/api/User/${userId}`, {
+        method: "DELETE",
       });
-
-      if (response.ok) {
-        fetchUsers();
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Không thể xóa người dùng');
-      }
+      fetchUsers();
     } catch (err) {
-      alert('Lỗi kết nối');
+      alert("Lỗi kết nối");
     }
   };
 
   const handleResetPassword = async (userId) => {
-    const newPassword = prompt('Nhập mật khẩu mới:');
+    const newPassword = prompt("Nhập mật khẩu mới:");
     if (!newPassword) return;
 
+    const response = await apiRequest(`/api/User/${userId}/reset-password`, {
+      method: "POST",
+      body: JSON.stringify({ newPassword }),
+    });
+
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${apiUrl}/${userId}/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ newPassword })
+      await apiRequest(`/api/User/${userId}/reset-password`, {
+        method: "POST",
+        body: JSON.stringify({ newPassword }),
       });
 
       if (response.ok) {
-        alert('Đặt lại mật khẩu thành công');
+        alert("Đặt lại mật khẩu thành công");
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Không thể đặt lại mật khẩu');
+        alert(errorData.message || "Không thể đặt lại mật khẩu");
       }
     } catch (err) {
-      alert('Lỗi kết nối');
+      alert("Lỗi kết nối");
     }
   };
 
   const getRoleBadge = (role) => {
     const roleColors = {
-      'Quản trị viên': 'badge-danger',
-      'Thủ thư': 'badge-primary',
-      'Kế toán': 'badge-warning',
-      'Độc giả': 'badge-success'
+      Admin: "badge-danger",
+      Librarian: "badge-primary",
+      Accountant: "badge-warning",
+      "Thành viên": "badge-success",
     };
-    return <span className={`badge ${roleColors[role] || 'badge-secondary'}`}>{role}</span>;
+    return (
+      <span className={`badge ${roleColors[role] || "badge-secondary"}`}>
+        {role}
+      </span>
+    );
   };
 
   const getStatusBadge = (isActive) => {
-    return isActive ? 
-      <span className="badge badge-success">Hoạt động</span> : 
-      <span className="badge badge-danger">Không hoạt động</span>;
+    return isActive ? (
+      <span className="badge badge-success">Hoạt động</span>
+    ) : (
+      <span className="badge badge-danger">Không hoạt động</span>
+    );
   };
 
   if (loading) {
@@ -139,14 +150,12 @@ const UserManagement = () => {
     <div className="user-management">
       <div className="page-header">
         <h1 className="page-title">Quản lý người dùng</h1>
-        <p className="page-subtitle">Quản lý tài khoản và phân quyền người dùng</p>
+        <p className="page-subtitle">
+          Quản lý tài khoản và phân quyền người dùng
+        </p>
       </div>
 
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+      {error && <div className="error-message">{error}</div>}
 
       <div className="page-actions">
         <div className="search-box">
@@ -166,7 +175,7 @@ const UserManagement = () => {
       <div className="table-container">
         <table className="table">
           <thead>
-            <tr>
+            <tr key="user-table-header-uniquerow">
               <th>ID</th>
               <th>Tên đăng nhập</th>
               <th>Email</th>
@@ -190,12 +199,11 @@ const UserManagement = () => {
                 <td>{user.email}</td>
                 <td>{getRoleBadge(user.role)}</td>
                 <td>{getStatusBadge(user.isActive)}</td>
-                <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
+                <td>{new Date(user.createdAt).toLocaleDateString("vi-VN")}</td>
                 <td>
-                  {user.lastLoginAt ? 
-                    new Date(user.lastLoginAt).toLocaleDateString('vi-VN') : 
-                    'Chưa đăng nhập'
-                  }
+                  {user.lastLoginAt
+                    ? new Date(user.lastLoginAt).toLocaleDateString("vi-VN")
+                    : "Chưa đăng nhập"}
                 </td>
                 <td>
                   <div className="action-buttons">
@@ -239,4 +247,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement; 
+export default UserManagement;

@@ -1,56 +1,79 @@
-import React, { useState, useEffect } from "react";
-import { FaPlus, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
-import BookModal from "../components/BookModal";
-import "./BookManagement.css";
+import React, { useState, useEffect } from 'react';
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaBook, FaFilter } from 'react-icons/fa';
+import { authenticatedRequest } from '../config/api';
+import BookCard from '../components/BookCard';
+import './BookManagement.css';
 
 const BookManagement = () => {
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+<<<<<<< HEAD
   const apiUrl =
     "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Sach";
+=======
+  const categories = ['Tất cả', 'Kỹ năng sống', 'Tiểu thuyết', 'Công nghệ', 'Khoa học', 'Văn học'];
+  const statuses = ['Tất cả', 'Có sẵn', 'Đã mượn', 'Đã đặt', 'Hư hỏng'];
+>>>>>>> frontend
 
-  // Tải dữ liệu sách từ API
   useEffect(() => {
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((data) => {
-        const mappedBooks = data.map((book) => ({
-          id: book.maSach,
-          title: book.tenSach,
-          author: book.tacGia,
-          isbn: book.isbn,
-          category: book.theLoai,
-          publisher: book.nhaXuatBan,
-          publishYear: book.namXB,
-          quantity: book.soLuong,
-          available: book.soLuongCoLai,
-          location: book.viTriLuuTru,
-        }));
-        setBooks(mappedBooks);
-        setFilteredBooks(mappedBooks);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Lỗi khi tải sách:", err);
-        setLoading(false);
-      });
+    fetchBooks();
   }, []);
 
-  // Lọc sách khi tìm kiếm
   useEffect(() => {
-    const filtered = books.filter(
-      (book) =>
-        (book.title?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-        (book.author?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-        (book.isbn || "").includes(searchTerm)
-    );
+    filterBooks();
+  }, [searchTerm, selectedCategory, selectedStatus, books]);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const data = await authenticatedRequest('/api/Book');
+      
+      if (data) {
+        setBooks(data);
+        setFilteredBooks(data);
+      }
+    } catch (err) {
+      console.error('Error fetching books:', err);
+      setError('Không thể tải danh sách sách. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterBooks = () => {
+    let filtered = books;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(book =>
+        book.tenSach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.tacGia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.theLoai?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory && selectedCategory !== 'Tất cả') {
+      filtered = filtered.filter(book => book.theLoai === selectedCategory);
+    }
+
+    // Filter by status
+    if (selectedStatus && selectedStatus !== 'Tất cả') {
+      filtered = filtered.filter(book => book.trangThai === selectedStatus);
+    }
+
     setFilteredBooks(filtered);
-  }, [searchTerm, books]);
+  };
 
   const handleAddBook = () => {
     setEditingBook(null);
@@ -62,122 +85,52 @@ const BookManagement = () => {
     setShowModal(true);
   };
 
-  const handleDeleteBook = (bookId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa sách này?")) {
-      fetch(`${apiUrl}/${bookId}`, {
-        method: "DELETE",
-      })
-        .then(() => {
-          const updatedBooks = books.filter((book) => book.id !== bookId);
-          setBooks(updatedBooks);
-          setFilteredBooks(updatedBooks);
-        })
-        .catch((err) => console.error("Lỗi khi xóa sách:", err));
-    }
-  };
-
-  const isValidIsbn = (isbn) => {
-    const cleaned = isbn.replace(/-/g, "").trim();
-    const regex = /^(978|979)\d{10}$/;
-    return regex.test(cleaned);
-  };
-
-  const handleSaveBook = (bookData) => {
-    if (!isValidIsbn(bookData.isbn)) {
-      alert("Mã ISBN không hợp lệ. Vui lòng nhập đúng chuẩn Việt Nam.");
+  const handleDeleteBook = async (bookId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa sách này?')) {
       return;
     }
 
-    const requestData = {
-      tenSach: bookData.title,
-      tacGia: bookData.author,
-      isbn: bookData.isbn,
-      theLoai: bookData.category,
-      namXB: bookData.publishYear,
-      soLuong: bookData.quantity,
-      trangThai: bookData.trangThai || "Còn"
-    };
-
-    if (editingBook) {
-      // Cập nhật
-      fetch(`${apiUrl}/${editingBook.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...requestData, id: editingBook.id }),
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            const text = await res.text();
-            alert("Lỗi khi cập nhật sách: " + text);
-            console.error("Lỗi khi cập nhật sách:", text);
-            return;
-          }
-          return res.json();
-        })
-        .then(() => refreshBooks())
-        .catch((err) => {
-          alert("Lỗi khi cập nhật sách: " + err);
-          console.error("Lỗi khi cập nhật sách:", err);
-        });
-    } else {
-      // Thêm mới
-      fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            const text = await res.text();
-            alert("Lỗi khi thêm sách: " + text);
-            console.error("Lỗi khi thêm sách:", text);
-            return;
-          }
-          return res.json();
-        })
-        .then((data) => {
-          if (data) {
-            console.log("Sách đã thêm thành công:", data);
-            refreshBooks();
-          }
-        })
-        .catch((err) => {
-          alert("Lỗi khi thêm sách: " + err);
-          console.error("Lỗi khi thêm sách:", err);
-        });
+    try {
+      await authenticatedRequest(`/api/Book/${bookId}`, { method: 'DELETE' });
+      fetchBooks();
+    } catch (err) {
+      alert('Không thể xóa sách');
     }
-
-    setShowModal(false);
-    setEditingBook(null);
   };
 
-  const refreshBooks = () => {
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((data) => {
-        const mappedBooks = data.map((book) => ({
-          id: book.maSach,
-          title: book.tenSach,
-          author: book.tacGia,
-          isbn: book.isbn,
-          category: book.theLoai,
-          publisher: book.nhaXuatBan,
-          publishYear: book.namXB,
-          quantity: book.soLuong,
-          available: book.soLuongCoLai,
-          location: book.viTriLuuTru,
-        }));
-        setBooks(mappedBooks);
-        setFilteredBooks(mappedBooks);
+  const handleBorrowBook = async (book) => {
+    try {
+      await authenticatedRequest(`/api/Book/${book.maSach}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          ...book,
+          trangThai: 'Đã mượn'
+        })
       });
+      fetchBooks();
+    } catch (err) {
+      alert('Không thể mượn sách');
+    }
   };
 
-  const getStatusBadge = (available, quantity) => {
-    if (available === 0)
-      return <span className="badge badge-danger">Hết sách</span>;
-    if (available < quantity)
-      return <span className="badge badge-warning">Còn ít</span>;
-    return <span className="badge badge-success">Có sẵn</span>;
+  const handleReserveBook = async (book) => {
+    try {
+      await authenticatedRequest(`/api/Book/${book.maSach}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          ...book,
+          trangThai: 'Đã đặt'
+        })
+      });
+      fetchBooks();
+    } catch (err) {
+      alert('Không thể đặt trước sách');
+    }
+  };
+
+  const handleViewDetails = (book) => {
+    // Implement book details modal
+    console.log('View details:', book);
   };
 
   if (loading) {
@@ -192,102 +145,84 @@ const BookManagement = () => {
     <div className="book-management">
       <div className="page-header">
         <h1 className="page-title">Quản lý sách</h1>
-        <p className="page-subtitle">Quản lý thông tin sách trong thư viện</p>
+        <p className="page-subtitle">Quản lý kho sách và thông tin sách</p>
       </div>
 
-      <div className="content-section">
-        <div className="section-header">
-          <div className="search-bar">
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+      <div className="page-actions">
+        <div className="search-filters">
+          <div className="search-box">
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Tìm kiếm sách theo tên, tác giả hoặc ISBN..."
+              placeholder="Tìm kiếm sách..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
             />
           </div>
-          <button className="btn btn-primary" onClick={handleAddBook}>
-            <FaPlus /> Thêm sách mới
-          </button>
-        </div>
-
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Mã sách</th>
-                <th>Tên sách</th>
-                <th>Tác giả</th>
-                <th>ISBN</th>
-                <th>Thể loại</th>
-                <th>Số lượng</th>
-                <th>Còn lại</th>
-                <th>Vị trí</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBooks.map((book) => (
-                <tr key={book.id}>
-                  <td>#{book.id.toString().padStart(4, "0")}</td>
-                  <td>
-                    <div className="book-title-cell">
-                      <strong>{book.title}</strong>
-                      <small>
-                        {book.publisher} - {book.publishYear}
-                      </small>
-                    </div>
-                  </td>
-                  <td>{book.author}</td>
-                  <td>{book.isbn}</td>
-                  <td>{book.category}</td>
-                  <td>{book.quantity}</td>
-                  <td>{book.available}</td>
-                  <td>{book.location}</td>
-                  <td>{getStatusBadge(book.available, book.quantity)}</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => handleEditBook(book)}
-                        title="Chỉnh sửa"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDeleteBook(book.id)}
-                        title="Xóa"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+          
+          <div className="filters">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="filter-select"
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
               ))}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredBooks.length === 0 && (
-          <div className="empty-state">
-            <h3>Không tìm thấy sách</h3>
-            <p>Không có sách nào phù hợp với từ khóa tìm kiếm.</p>
+            </select>
+            
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="filter-select"
+            >
+              {statuses.map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
           </div>
-        )}
+        </div>
+        
+        <button className="btn btn-primary" onClick={handleAddBook}>
+          <FaPlus /> Thêm sách
+        </button>
       </div>
 
-      {showModal && (
-        <BookModal
-          book={editingBook}
-          onSave={handleSaveBook}
-          onClose={() => {
-            setShowModal(false);
-            setEditingBook(null);
-          }}
-        />
+      <div className="books-grid">
+        {filteredBooks.map((book) => (
+          <BookCard
+            key={book.maSach}
+            book={{
+              id: book.maSach,
+              title: book.tenSach,
+              author: book.tacGia,
+              category: book.theLoai,
+              shelf: book.keSach,
+              status: book.trangThai,
+              coverImage: book.anhBia,
+              description: book.moTa,
+              publishedYear: book.namXuatBan,
+              isbn: book.isbn
+            }}
+            onBorrow={handleBorrowBook}
+            onReserve={handleReserveBook}
+            onViewDetails={handleViewDetails}
+          />
+        ))}
+      </div>
+
+      {filteredBooks.length === 0 && !loading && (
+        <div className="empty-state">
+          <FaBook className="empty-icon" />
+          <h3>Không có sách nào</h3>
+          <p>Bắt đầu bằng cách thêm sách mới</p>
+        </div>
       )}
     </div>
   );

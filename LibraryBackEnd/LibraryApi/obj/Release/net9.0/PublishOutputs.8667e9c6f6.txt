@@ -12,11 +12,13 @@ C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\LibraryApi.pdb
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Azure.Core.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Azure.Identity.dll
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.Data.SqlClient.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.EntityFrameworkCore.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.EntityFrameworkCore.InMemory.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.EntityFrameworkCore.Relational.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.EntityFrameworkCore.SqlServer.dll
 C:\Users\lepha\Desktop\CNPM-Project\QuanLyThuVien_Web\LibraryBackEnd\LibraryApi\obj\Release\net9.0\PubTmp\Out\Microsoft.Extensions.Caching.Abstractions.dll
