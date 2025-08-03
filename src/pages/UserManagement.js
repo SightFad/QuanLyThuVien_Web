@@ -43,7 +43,7 @@ const UserManagement = () => {
       // Sử dụng dữ liệu mẫu nếu backend không có sẵn
       const mockUsers = Object.entries(MOCK_DATA.users).map(
         ([username, user]) => ({
-          id: Math.random().toString(36).substr(2, 9),
+          id: username,
           username: user.username,
           email: user.email,
           role: user.role,
@@ -169,7 +169,7 @@ const UserManagement = () => {
       <div className="table-container">
         <table className="table">
           <thead>
-            <tr>
+            <tr key="user-table-header-uniquerow">
               <th>ID</th>
               <th>Tên đăng nhập</th>
               <th>Email</th>

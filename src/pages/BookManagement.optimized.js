@@ -21,7 +21,7 @@ const BookManagement = () => {
   
   // Sử dụng custom hook cho API calls
   const { data: books = [], loading, error, refetch } = useApi(
-    "http://localhost:5280/api/Sach",
+    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Sach",
     {},
     true
   );
