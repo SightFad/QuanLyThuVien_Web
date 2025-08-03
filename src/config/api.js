@@ -5,12 +5,12 @@ const API_CONFIG = {
   ENDPOINTS: {
     LOGIN: "/api/Auth/login",
     LOGOUT: "/api/Auth/logout",
-    USERS: "/api/Users",
-    BOOKS: "/api/Books",
-    READERS: "/api/Readers",
-    BORROWS: "/api/Borrows",
-    FINES: "/api/Fines",
-    REPORTS: "/api/Reports",
+    USERS: "/api/User",
+    BOOKS: "/api/Sach",
+    READERS: "/api/DongGia",
+    BORROWS: "/api/Borrow",
+    FINES: "/api/Fine",
+    REPORTS: "/api/Report",
   },
   TIMEOUT: 10000, // 10 seconds
   RETRY_ATTEMPTS: 3,
