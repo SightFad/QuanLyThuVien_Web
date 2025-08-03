@@ -22,23 +22,7 @@ namespace LibraryApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAllUsers()
         {
-            var users = await _context.NguoiDungs
-                .Include(u => u.DocGia) // Include DocGia relationship if exists
-                .Select(u => new
-                {
-                    id = u.MaND,
-                    username = u.TenDangNhap,
-                    email = u.Email ?? "Chưa cập nhật", // Handle null email
-                    role = u.ChucVu,
-                    isActive = true, // Add isActive field (you might want to add this to model)
-                    createdAt = u.NgayTao ?? DateTime.Now, // Handle null created date
-                    lastLoginAt = (DateTime?)null, // You might want to track this
-                    docGiaId = u.DocGiaId,
-                    fullName = u.DocGia != null ? u.DocGia.HoTen : "N/A"
-                })
-                .ToListAsync();
-            
-            return Ok(users);
+            return Ok(_context.NguoiDungs.ToList());
         }
 
         [HttpGet("{id}")]

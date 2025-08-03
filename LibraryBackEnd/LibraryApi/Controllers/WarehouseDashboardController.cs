@@ -55,7 +55,7 @@ namespace LibraryApi.Controllers
                 // Recent activities
                 var recentActivities = await _context.PhieuNhapKhos
                     .Include(p => p.ChiTietPhieuNhapKho)
-                        .ThenInclude(ct => ct.Sach)
+                        .ThenInclude(ct => ct.MaSach)
                     .OrderByDescending(p => p.NgayTao)
                     .Take(5)
                     .Select(p => new

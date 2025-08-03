@@ -44,7 +44,7 @@ namespace LibraryApi.Controllers
                     .CountAsync();
 
                 var monthlyReturns = await _context.PhieuMuons
-                    .Where(p => p.NgayTraThucTe >= thisMonth)
+                    .Where(p => p.NgayTra >= thisMonth)
                     .CountAsync();
 
                 var monthlyNewReaders = await _context.DocGias
@@ -60,9 +60,9 @@ namespace LibraryApi.Controllers
                     .Where(p => p.TrangThai == "DangMuon" && p.HanTra < today)
                     .CountAsync();
 
-                var pendingReservations = await _context.Reservations
-                    .Where(r => r.TrangThai == "DangCho")
-                    .CountAsync();
+                //var pendingReservations = await _context.Reservations
+                //    .Where(r => r.TrangThai == "DangCho")
+                //    .CountAsync();
 
                 // Financial overview
                 var totalRevenue = await _context.PhieuThus
@@ -84,8 +84,8 @@ namespace LibraryApi.Controllers
                 var outOfStockBooks = await _context.Saches
                     .CountAsync(s => s.SoLuongConLai == 0);
 
-                var inactiveUsers = await _context.NguoiDungs
-                    .CountAsync(u => u.NgayTao < today.AddDays(-90)); // Users not logged in for 90 days
+                //var inactiveUsers = await _context.NguoiDungs
+                //    .CountAsync(u => u.NgayTao < today.AddDays(-90)); // Users not logged in for 90 days
 
                 // Popular books (most borrowed this month)
                 var popularBooks = await _context.CT_PhieuMuons
@@ -167,7 +167,7 @@ namespace LibraryApi.Controllers
                         totalBorrows = totalBorrows,
                         activeBorrows = activeBorrows,
                         overdueBorrows = overdueBorrows,
-                        pendingReservations = pendingReservations
+                        //pendingReservations = pendingReservations
                     },
                     monthlyActivity = new
                     {
@@ -187,7 +187,7 @@ namespace LibraryApi.Controllers
                     {
                         lowStockBooks = lowStockBooks,
                         outOfStockBooks = outOfStockBooks,
-                        inactiveUsers = inactiveUsers,
+                        //inactiveUsers = inactiveUsers,
                         systemStatus = "healthy" // In real system, check actual health metrics
                     },
                     growth = new
@@ -319,7 +319,7 @@ namespace LibraryApi.Controllers
                 // Revenue trends
                 var revenueByDay = await _context.PhieuThus
                     .Where(pt => pt.TrangThai == "DaThu" && pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
-                    .GroupBy(pt => pt.NgayThu.Value.Date)
+                    .GroupBy(pt => pt.NgayThu/*.Value*/.Date)
                     .Select(g => new
                     {
                         date = g.Key.ToString("yyyy-MM-dd"),
@@ -378,7 +378,7 @@ namespace LibraryApi.Controllers
                 await _context.NguoiDungs.CountAsync(),
                 await _context.PhieuMuons.CountAsync(),
                 await _context.PhieuThus.CountAsync(),
-                await _context.Reservations.CountAsync()
+                //await _context.Reservations.CountAsync()
             };
 
             return counts.Sum();

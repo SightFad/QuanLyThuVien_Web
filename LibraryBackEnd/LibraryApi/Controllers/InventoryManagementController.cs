@@ -95,8 +95,8 @@ namespace LibraryApi.Controllers
                         price = s.GiaSach,
                         publishYear = s.NamXuatBan,
                         publisher = s.NhaXuatBan,
-                        entryDate = s.NgayNhap?.ToString("yyyy-MM-dd"),
-                        lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
+                        //entryDate = s.NgayNhap?.ToString("yyyy-MM-dd"),
+                        //lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
                     })
                     .ToListAsync();
 
@@ -168,8 +168,8 @@ namespace LibraryApi.Controllers
                         publisher = s.NhaXuatBan,
                         description = s.MoTa,
                         coverImage = s.AnhBia,
-                        entryDate = s.NgayNhap?.ToString("yyyy-MM-dd"),
-                        lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
+                        //entryDate = s.NgayNhap?.ToString("yyyy-MM-dd"),
+                        //lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
                     })
                     .FirstOrDefaultAsync();
 
@@ -251,7 +251,7 @@ namespace LibraryApi.Controllers
 
                 // Apply adjustment
                 book.SoLuong = newTotal;
-                book.SoLuongConLai = newAvailable;
+                //book.SoLuongConLai = newAvailable;
                 book.NgayCapNhat = DateTime.Now;
 
                 // Log the adjustment (you might want to create an AdjustmentLog table)

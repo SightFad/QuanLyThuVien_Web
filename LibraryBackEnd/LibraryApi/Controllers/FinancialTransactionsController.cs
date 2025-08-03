@@ -42,7 +42,7 @@ namespace LibraryApi.Controllers
                 {
                     query = query.Where(pt => 
                         pt.DocGia.HoTen.Contains(search) ||
-                        pt.LyDo.Contains(search) ||
+                        //pt.LyDo.Contains(search) ||
                         pt.GhiChu.Contains(search));
                 }
 
@@ -74,10 +74,10 @@ namespace LibraryApi.Controllers
                         memberName = pt.DocGia.HoTen,
                         memberId = pt.MaDG,
                         amount = pt.SoTien,
-                        paymentMethod = pt.PhuongThucThu ?? "cash", // Default to cash if null
-                        status = pt.TrangThai,
-                        description = pt.LyDo ?? pt.GhiChu ?? "Không có mô tả",
-                        paidDate = pt.NgayThu?.ToString("yyyy-MM-dd"),
+                        //paymentMethod = pt.PhuongThucThu ?? "cash", // Default to cash if null
+                        //status = pt.TrangThai,
+                        //description = pt.LyDo ?? pt.GhiChu ?? "Không có mô tả",
+                        //paidDate = pt.NgayThu?.ToString("yyyy-MM-dd"),
                         collector = pt.NguoiThu
                     })
                     .ToListAsync();
@@ -137,10 +137,10 @@ namespace LibraryApi.Controllers
                         memberEmail = pt.DocGia.Email,
                         memberPhone = pt.DocGia.SDT,
                         amount = pt.SoTien,
-                        paymentMethod = pt.PhuongThucThu ?? "cash",
+                        //paymentMethod = pt.PhuongThucThu ?? "cash",
                         status = pt.TrangThai,
-                        description = pt.LyDo ?? pt.GhiChu ?? "Không có mô tả",
-                        paidDate = pt.NgayThu?.ToString("yyyy-MM-dd"),
+                        //description = pt.LyDo ?? pt.GhiChu ?? "Không có mô tả",
+                        paidDate = pt.NgayThu/*?*/.ToString("yyyy-MM-dd"),
                         collector = pt.NguoiThu,
                         violationId = pt.MaBaoCaoViPham,
                         violationInfo = pt.BaoCaoViPham != null ? new
@@ -180,12 +180,12 @@ namespace LibraryApi.Controllers
                     MaDG = dto.MemberId,
                     LoaiThu = dto.Type,
                     SoTien = dto.Amount,
-                    PhuongThucThu = dto.PaymentMethod,
+                    //PhuongThucThu = dto.PaymentMethod,
                     TrangThai = dto.Status ?? "ChuaThu",
-                    LyDo = dto.Description,
+                    //LyDo = dto.Description,
                     GhiChu = dto.Notes,
                     NgayTao = DateTime.Now,
-                    NgayThu = dto.Status == "DaThu" ? DateTime.Now : null,
+                    //NgayThu = dto.Status == "DaThu" ? DateTime.Now : null,
                     NguoiThu = dto.Status == "DaThu" ? dto.Collector : null,
                     MaBaoCaoViPham = dto.ViolationId
                 };
@@ -213,9 +213,9 @@ namespace LibraryApi.Controllers
                 if (transaction == null)
                     return NotFound("Không tìm thấy giao dịch");
 
-                // Update fields
-                if (!string.IsNullOrEmpty(dto.PaymentMethod))
-                    transaction.PhuongThucThu = dto.PaymentMethod;
+                //// Update fields
+                //if (!string.IsNullOrEmpty(dto.PaymentMethod))
+                //    transaction.PhuongThucThu = dto.PaymentMethod;
                 
                 if (!string.IsNullOrEmpty(dto.Status))
                 {
@@ -259,7 +259,7 @@ namespace LibraryApi.Controllers
                 transaction.TrangThai = "DaThu";
                 transaction.NgayThu = DateTime.Now;
                 transaction.NguoiThu = dto.Collector;
-                transaction.PhuongThucThu = dto.PaymentMethod;
+                //transaction.PhuongThucThu = dto.PaymentMethod;
 
                 if (!string.IsNullOrEmpty(dto.Notes))
                     transaction.GhiChu = dto.Notes;

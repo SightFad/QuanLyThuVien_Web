@@ -276,7 +276,7 @@ namespace LibraryApi.Controllers
                 ["Readers"] = await _context.DocGias.CountAsync(),
                 ["Users"] = await _context.NguoiDungs.CountAsync(),
                 ["BorrowRecords"] = await _context.PhieuMuons.CountAsync(),
-                ["Reservations"] = await _context.Reservations.CountAsync()
+                //["Reservations"] = await _context.Reservations.CountAsync()
             };
 
             var totalRecords = recordCounts.Values.Sum();

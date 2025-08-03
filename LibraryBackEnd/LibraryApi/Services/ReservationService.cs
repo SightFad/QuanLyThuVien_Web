@@ -114,10 +114,8 @@ namespace LibraryApi.Services
                 MaDG = maDG,
                 NgayMuon = DateTime.Now,
                 HanTra = DateTime.Now.AddDays(14), // Mượn 14 ngày
-                TrangThai = "borrowed",
                 NguoiLap = "Hệ thống",
                 GhiChu = "Đặt mượn qua web",
-                NgayTao = DateTime.Now
             };
 
             _context.PhieuMuons.Add(phieuMuon);

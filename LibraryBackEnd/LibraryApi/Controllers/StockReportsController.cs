@@ -264,7 +264,7 @@ namespace LibraryApi.Controllers
                         price = s.GiaSach ?? 0,
                         alertLevel = s.SoLuongConLai == 0 ? "critical" : 
                                    s.SoLuongConLai <= 2 ? "critical" : "warning",
-                        recommendedOrder = Math.Max(10 - s.SoLuongConLai, 5) // Simple recommendation
+                        recommendedOrder = Math.Max(10 - (byte)s.SoLuongConLai, 5) // Simple recommendation
                     })
                     .ToListAsync();
 
@@ -309,7 +309,7 @@ namespace LibraryApi.Controllers
                         availableQuantity = s.SoLuongConLai,
                         location = s.KeSach ?? "Chưa phân kệ",
                         estimatedValue = s.GiaSach ?? 0,
-                        lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
+                        //lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
                     })
                     .OrderBy(s => s.bookTitle)
                     .ToListAsync();
@@ -351,13 +351,13 @@ namespace LibraryApi.Controllers
 
                 var importHistory = await _context.PhieuNhapKhos
                     .Include(p => p.ChiTietPhieuNhapKho)
-                        .ThenInclude(ct => ct.Sach)
+                        .ThenInclude(ct => ct.MaSach)
                     .Where(p => p.NgayNhap >= fromDate)
                     .OrderByDescending(p => p.NgayNhap)
                     .Select(p => new
                     {
                         id = p.Id,
-                        importCode = p.MaPhieuNhap,
+                        importCode = p.MaPhieu,
                         importDate = p.NgayNhap.ToString("yyyy-MM-dd"),
                         supplier = p.NhaCungCap,
                         totalItems = p.ChiTietPhieuNhapKho.Count,
@@ -366,7 +366,7 @@ namespace LibraryApi.Controllers
                         status = p.TrangThai,
                         books = p.ChiTietPhieuNhapKho.Select(ct => new
                         {
-                            bookTitle = ct.Sach.TenSach,
+                            bookTitle = ct.TenSach,
                             quantity = ct.SoLuong,
                             unitPrice = ct.DonGia,
                             totalPrice = ct.SoLuong * ct.DonGia

@@ -10,12 +10,21 @@ namespace LibraryApi.Models
         public int MaPhieuMuon { get; set; }
         public int MaDG { get; set; }
         public DateTime NgayMuon { get; set; } = DateTime.Now;
-        public DateTime HanTra { get; set; }
-        public DateTime? NgayTra { get; set; }
-        public string TrangThai { get; set; } = "borrowed"; // "borrowed", "returned", "overdue"
-        public string NguoiLap { get; set; }
-        public string GhiChu { get; set; }
-        public DateTime NgayTao { get; set; } = DateTime.Now;
+        public DateTime HanTra { get; set; } = DateTime.Now.AddDays(14); // Hạn trả mặc định là 14 ngày sau ngày mượn
+        public DateTime? NgayTra { get; set; } = DateTime.Now;
+
+        public string TrangThai
+        {
+            get
+            {
+                if (NgayTra != null) return "returned";
+                if (DateTime.Now > HanTra) return "overdue";
+                return "borrowed";
+            }
+        }
+
+        public string NguoiLap { get; set; } = null;
+        public string GhiChu { get; set; } = null;
         public DateTime? NgayCapNhat { get; set; }
 
         // Navigation

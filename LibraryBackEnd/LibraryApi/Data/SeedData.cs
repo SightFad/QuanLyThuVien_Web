@@ -248,7 +248,6 @@ namespace LibraryApi.Data
                         MaDG = docGia.MaDG,
                         NgayMuon = DateTime.Now.AddDays(-2),
                         HanTra = DateTime.Now.AddDays(12),
-                        TrangThai = "borrowed",
                         NguoiLap = "admin",
                         GhiChu = "Phiếu mượn mẫu"
                     };

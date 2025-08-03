@@ -1,8 +1,5 @@
 {
   "dependencies": {
-    "apis1": {
-      "type": "apis"
-    },
     "mssql1": {
       "ignored": "true",
       "type": "mssql",
@@ -13,6 +10,9 @@
       "type": "mssql",
       "connectionId": "ConnectionStrings:DefaultConnection",
       "dynamicId": null
+    },
+    "apis1": {
+      "type": "apis"
     }
   }
 }

@@ -95,11 +95,11 @@ namespace LibraryApi.Controllers
                 DiaChi = dto.DiaChi,
                 GioiTinh = dto.GioiTinh,              
                 LoaiDocGia = dto.LoaiDocGia ?? "Thuong",
-                CapBac = "Thuong", // Default value
-                MemberStatus = "ChuaThanhToan", // Default value
-                NgayDangKy = DateTime.Now.AddMonths(-3),
+                CapBac = dto.LoaiDocGia, // Default value
+                NgayDangKy = DateTime.Now,
                 NgayHetHan = DateTime.Now.AddMonths(9),
                 PhiThanhVien = dto.PhiThanhVien,
+                MemberStatus = (dto.PhiThanhVien > 0) ? "DaThanhToan" : "ChuaThanhToan" , // Default value
                 LyDoKhoa = null, // Allow null
                 NgayCapNhat = DateTime.Now
                 
