@@ -1,14 +1,5 @@
 {
   "builds": [
-    {
-      "src": "QuanLyThuVien_Web/package.json",
-      "use": "@vercel/static-build"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "QuanLyThuVien_Web/$1"
-    }
+    { "src": "index.html", "use": "@vercel/static" }
   ]
 }

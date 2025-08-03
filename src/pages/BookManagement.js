@@ -15,13 +15,8 @@ const BookManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-<<<<<<< HEAD
-  const apiUrl =
-    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Sach";
-=======
   const categories = ['Tất cả', 'Kỹ năng sống', 'Tiểu thuyết', 'Công nghệ', 'Khoa học', 'Văn học'];
   const statuses = ['Tất cả', 'Có sẵn', 'Đã mượn', 'Đã đặt', 'Hư hỏng'];
->>>>>>> frontend
 
   useEffect(() => {
     fetchBooks();

@@ -28,19 +28,10 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
     setError("");
 
     try {
-<<<<<<< HEAD
-      const response = await fetch('https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/api/Auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-=======
       // Thử kết nối với backend
       const data = await apiRequest("/api/Auth/login", {
         method: "POST",
         body: JSON.stringify(formData),
->>>>>>> frontend
       });
 
       console.log("=== Login Response ===");
