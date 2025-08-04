@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryApi.Data;
 using LibraryApi.Models;
@@ -38,11 +39,11 @@ namespace LibraryApi.Controllers
 
                 // Generate dynamic reports based on current stock status
                 var lowStockBooks = await _context.Saches
-                    .Where(s => s.SoLuongConLai <= 5 && s.SoLuongConLai > 0)
+                    .Where(s => s.SoLuong.HasValue && s.SoLuong.Value <= 5 && s.SoLuong.Value > 0)
                     .ToListAsync();
 
                 var outOfStockBooks = await _context.Saches
-                    .Where(s => s.SoLuongConLai == 0)
+                    .Where(s => s.SoLuong.HasValue && s.SoLuong.Value == 0)
                     .ToListAsync();
 
                 var damagedBooks = await _context.Saches
@@ -70,7 +71,7 @@ namespace LibraryApi.Controllers
                         {
                             bookId = b.MaSach,
                             bookTitle = b.TenSach,
-                            currentStock = b.SoLuongConLai,
+                            currentStock = b.SoLuong.HasValue ? b.SoLuong.Value : 0,
                             location = b.KeSach
                         }).ToList()
                     });
@@ -192,13 +193,13 @@ namespace LibraryApi.Controllers
                     currentStock = new
                     {
                         totalBooks = await _context.Saches.SumAsync(s => s.SoLuong ?? 0),
-                        availableBooks = await _context.Saches.SumAsync(s => s.SoLuongConLai),
+                        availableBooks = await _context.Saches.SumAsync(s => s.SoLuong.HasValue ? s.SoLuong.Value : 0),
                         uniqueTitles = await _context.Saches.CountAsync()
                     },
                     alerts = new
                     {
-                        lowStockCount = await _context.Saches.CountAsync(s => s.SoLuongConLai > 0 && s.SoLuongConLai <= 5),
-                        outOfStockCount = await _context.Saches.CountAsync(s => s.SoLuongConLai == 0),
+                        lowStockCount = await _context.Saches.CountAsync(s => s.SoLuong.HasValue && s.SoLuong.Value > 0 && s.SoLuong.Value <= 5),
+                        outOfStockCount = await _context.Saches.CountAsync(s => s.SoLuong.HasValue && s.SoLuong.Value == 0),
                         damagedCount = await _context.Saches.CountAsync(s => s.TrangThai == "HuHong" || s.TrangThai == "CanKiemTra")
                     },
                     monthlyActivity = new
@@ -226,8 +227,8 @@ namespace LibraryApi.Controllers
                         {
                             category = g.Key,
                             totalBooks = g.Sum(s => s.SoLuong ?? 0),
-                            availableBooks = g.Sum(s => s.SoLuongConLai),
-                            lowStockItems = g.Count(s => s.SoLuongConLai > 0 && s.SoLuongConLai <= 5)
+                            availableBooks = g.Sum(s => s.SoLuong.HasValue ? s.SoLuong.Value : 0),
+                            lowStockItems = g.Count(s => s.SoLuong.HasValue && s.SoLuong.Value > 0 && s.SoLuong.Value <= 5)
                         })
                         .OrderByDescending(x => x.totalBooks)
                         .Take(5)
@@ -250,8 +251,8 @@ namespace LibraryApi.Controllers
             try
             {
                 var lowStockBooks = await _context.Saches
-                    .Where(s => s.SoLuongConLai <= threshold && s.SoLuongConLai > 0)
-                    .OrderBy(s => s.SoLuongConLai)
+                    .Where(s => s.SoLuong.HasValue && s.SoLuong.Value <= threshold && s.SoLuong.Value > 0)
+                    .OrderBy(s => s.SoLuong.Value)
                     .Select(s => new
                     {
                         id = s.MaSach,

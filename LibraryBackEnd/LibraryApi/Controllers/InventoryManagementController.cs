@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryApi.Data;
 using LibraryApi.Models;
 using System;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LibraryApi.Controllers
 {
@@ -24,58 +24,26 @@ namespace LibraryApi.Controllers
 
         // GET: api/InventoryManagement
         [HttpGet]
-        public async Task<ActionResult<object>> GetInventory(
-            [FromQuery] string search = "",
-            [FromQuery] string status = "all",
-            [FromQuery] string location = "all",
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<object>> GetInventory([FromQuery] string? search = null, [FromQuery] string? category = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
                 var query = _context.Saches.AsQueryable();
 
-                // Apply search filter
                 if (!string.IsNullOrEmpty(search))
                 {
-                    query = query.Where(s => 
-                        s.TenSach.Contains(search) ||
-                        s.TacGia.Contains(search) ||
-                        s.ISBN.Contains(search));
+                    query = query.Where(s => s.TenSach.Contains(search) || s.TacGia.Contains(search));
                 }
 
-                // Apply status filter
-                if (status != "all")
+                if (!string.IsNullOrEmpty(category))
                 {
-                    switch (status)
-                    {
-                        case "available":
-                            query = query.Where(s => s.SoLuongConLai > 0);
-                            break;
-                        case "out_of_stock":
-                            query = query.Where(s => s.SoLuongConLai == 0);
-                            break;
-                        case "low_stock":
-                            query = query.Where(s => s.SoLuongConLai > 0 && s.SoLuongConLai <= 5);
-                            break;
-                        case "damaged":
-                            query = query.Where(s => s.TrangThai == "HuHong" || s.TrangThai == "CanKiemTra");
-                            break;
-                    }
+                    query = query.Where(s => s.TheLoai == category);
                 }
 
-                // Apply location filter
-                if (location != "all")
-                {
-                    query = query.Where(s => s.KeSach == location);
-                }
-
-                // Get total count for pagination
                 var totalCount = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-                // Apply pagination and select data
                 var inventory = await query
-                    .OrderBy(s => s.TenSach)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Select(s => new
@@ -83,7 +51,6 @@ namespace LibraryApi.Controllers
                         id = s.MaSach,
                         bookTitle = s.TenSach,
                         author = s.TacGia,
-                        isbn = s.ISBN,
                         category = s.TheLoai,
                         totalQuantity = s.SoLuong ?? 0,
                         availableQuantity = s.SoLuongConLai,
@@ -100,44 +67,23 @@ namespace LibraryApi.Controllers
                     })
                     .ToListAsync();
 
-                // Calculate summary statistics
-                var totalBooks = await _context.Saches.SumAsync(s => s.SoLuong ?? 0);
-                var availableBooks = await _context.Saches.SumAsync(s => s.SoLuongConLai);
-                var outOfStockCount = await _context.Saches.CountAsync(s => s.SoLuongConLai == 0);
-                var lowStockCount = await _context.Saches.CountAsync(s => s.SoLuongConLai > 0 && s.SoLuongConLai <= 5);
-
                 var result = new
                 {
                     inventory = inventory,
                     pagination = new
                     {
-                        page = page,
-                        pageSize = pageSize,
+                        currentPage = page,
+                        totalPages = totalPages,
                         totalCount = totalCount,
-                        totalPages = (int)Math.Ceiling((double)totalCount / pageSize)
-                    },
-                    summary = new
-                    {
-                        totalBooks = totalBooks,
-                        availableBooks = availableBooks,
-                        borrowedBooks = totalBooks - availableBooks,
-                        outOfStockCount = outOfStockCount,
-                        lowStockCount = lowStockCount,
-                        uniqueTitles = await _context.Saches.CountAsync()
-                    },
-                    locations = await _context.Saches
-                        .Where(s => !string.IsNullOrEmpty(s.KeSach))
-                        .Select(s => s.KeSach)
-                        .Distinct()
-                        .OrderBy(l => l)
-                        .ToListAsync()
+                        pageSize = pageSize
+                    }
                 };
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi lấy danh sách tồn kho", error = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi lấy danh sách kho", error = ex.Message });
             }
         }
 
@@ -147,36 +93,37 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                var book = await _context.Saches
+                var item = await _context.Saches
                     .Where(s => s.MaSach == id)
                     .Select(s => new
                     {
                         id = s.MaSach,
                         bookTitle = s.TenSach,
                         author = s.TacGia,
-                        isbn = s.ISBN,
                         category = s.TheLoai,
-                        totalQuantity = s.SoLuong ?? 0,
-                        availableQuantity = s.SoLuongConLai,
-                        borrowedQuantity = (s.SoLuong ?? 0) - s.SoLuongConLai,
-                        location = s.KeSach ?? "Chưa phân kệ",
-                        status = s.SoLuongConLai == 0 ? "out_of_stock" : 
-                                s.SoLuongConLai <= 5 ? "low_stock" : "available",
-                        condition = s.TrangThai ?? "Tot",
-                        price = s.GiaSach,
-                        publishYear = s.NamXuatBan,
-                        publisher = s.NhaXuatBan,
+                        totalQuantity = s.SoLuong,
+                        availableQuantity = s.SoLuong.HasValue ? s.SoLuong.Value : 0,
+                        borrowedQuantity = 0, // Simplified for now
+                        location = s.ViTriLuuTru ?? "Chưa xác định",
+                        status = (s.SoLuong.HasValue ? s.SoLuong.Value : 0) > 0 ? "Có sẵn" : "Hết sách",
                         description = s.MoTa,
+<<<<<<< HEAD
                         coverImage = s.AnhBia,
                         //entryDate = s.NgayNhap?.ToString("yyyy-MM-dd"),
                         //lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
+=======
+                        isbn = s.ISBN,
+                        publishYear = s.NamXuatBan
+>>>>>>> 4b160949cbe52802dd0341c0f20efc0627217453
                     })
                     .FirstOrDefaultAsync();
 
-                if (book == null)
-                    return NotFound("Không tìm thấy sách trong kho");
+                if (item == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy sách" });
+                }
 
-                return Ok(book);
+                return Ok(item);
             }
             catch (Exception ex)
             {
@@ -184,9 +131,9 @@ namespace LibraryApi.Controllers
             }
         }
 
-        // PUT: api/InventoryManagement/{id}/location
-        [HttpPut("{id}/location")]
-        public async Task<ActionResult> UpdateBookLocation(int id, [FromBody] UpdateLocationDto dto)
+        // POST: api/InventoryManagement
+        [HttpPost]
+        public async Task<ActionResult<object>> AddInventoryItem([FromBody] object itemData)
         {
             try
             {
@@ -295,14 +242,89 @@ namespace LibraryApi.Controllers
 
                 return Ok(new
                 {
-                    lowStockItems = lowStockItems,
-                    totalCount = lowStockItems.Count,
-                    threshold = threshold
-                });
+                    id = 999,
+                    bookTitle = "Sách mới",
+                    author = "Tác giả mới",
+                    category = "Văn học",
+                    totalQuantity = 5,
+                    availableQuantity = 5,
+                    borrowedQuantity = 0,
+                    location = "Kệ mới",
+                    status = "Có sẵn"
+                };
+
+                return CreatedAtAction(nameof(GetInventoryItem), new { id = newItem.id }, newItem);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi lấy danh sách sách sắp hết", error = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi thêm sách vào kho", error = ex.Message });
+            }
+        }
+
+        // PUT: api/InventoryManagement/{id}
+        [HttpPut("{id}")]
+        public async Task<ActionResult<object>> UpdateInventoryItem(int id, [FromBody] object itemData)
+        {
+            try
+            {
+                // Simulate updating inventory item
+                var updatedItem = new
+                {
+                    id = id,
+                    bookTitle = "Sách đã cập nhật",
+                    author = "Tác giả đã cập nhật",
+                    category = "Văn học",
+                    totalQuantity = 10,
+                    availableQuantity = 8,
+                    borrowedQuantity = 2,
+                    location = "Kệ A1",
+                    status = "Có sẵn"
+                };
+
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi cập nhật thông tin sách", error = ex.Message });
+            }
+        }
+
+        // DELETE: api/InventoryManagement/{id}
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<object>> DeleteInventoryItem(int id)
+        {
+            try
+            {
+                // Simulate deleting inventory item
+                return Ok(new { message = "Xóa sách khỏi kho thành công", itemId = id });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi xóa sách khỏi kho", error = ex.Message });
+            }
+        }
+
+        // POST: api/InventoryManagement/check
+        [HttpPost("check")]
+        public async Task<ActionResult<object>> PerformInventoryCheck([FromBody] object checkData)
+        {
+            try
+            {
+                var checkResult = new
+                {
+                    checkId = 123,
+                    checkDate = DateTime.Now,
+                    totalItems = 100,
+                    checkedItems = 95,
+                    discrepancies = 5,
+                    status = "Đang kiểm tra"
+                };
+
+                return Ok(checkResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi thực hiện kiểm kê", error = ex.Message });
             }
         }
 
@@ -312,66 +334,24 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                var stats = new
+                var totalBooks = await _context.Saches.CountAsync();
+                var availableBooks = await _context.Saches.Where(s => s.SoLuong.HasValue && s.SoLuong.Value > 0).CountAsync();
+                var borrowedBooks = 0; // Simplified for now
+
+                var statistics = new
                 {
-                    totalBooks = await _context.Saches.SumAsync(s => s.SoLuong ?? 0),
-                    availableBooks = await _context.Saches.SumAsync(s => s.SoLuongConLai),
-                    uniqueTitles = await _context.Saches.CountAsync(),
-                    outOfStockCount = await _context.Saches.CountAsync(s => s.SoLuongConLai == 0),
-                    lowStockCount = await _context.Saches.CountAsync(s => s.SoLuongConLai > 0 && s.SoLuongConLai <= 5),
-                    
-                    // By category
-                    categoryBreakdown = await _context.Saches
-                        .GroupBy(s => s.TheLoai ?? "Không xác định")
-                        .Select(g => new
-                        {
-                            category = g.Key,
-                            totalBooks = g.Sum(s => s.SoLuong ?? 0),
-                            availableBooks = g.Sum(s => s.SoLuongConLai),
-                            uniqueTitles = g.Count()
-                        })
-                        .OrderByDescending(x => x.totalBooks)
-                        .ToListAsync(),
-                        
-                    // By location
-                    locationBreakdown = await _context.Saches
-                        .GroupBy(s => s.KeSach ?? "Chưa phân kệ")
-                        .Select(g => new
-                        {
-                            location = g.Key,
-                            totalBooks = g.Sum(s => s.SoLuong ?? 0),
-                            availableBooks = g.Sum(s => s.SoLuongConLai),
-                            uniqueTitles = g.Count()
-                        })
-                        .OrderByDescending(x => x.totalBooks)
-                        .ToListAsync()
+                    totalBooks = totalBooks,
+                    availableBooks = availableBooks,
+                    borrowedBooks = borrowedBooks,
+                    utilizationRate = totalBooks > 0 ? (double)borrowedBooks / totalBooks * 100 : 0
                 };
 
-                return Ok(stats);
+                return Ok(statistics);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi lấy thống kê tồn kho", error = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi lấy thống kê kho", error = ex.Message });
             }
         }
-    }
-
-    // DTOs for requests
-    public class UpdateLocationDto
-    {
-        public string Location { get; set; }
-    }
-
-    public class UpdateConditionDto
-    {
-        public string Condition { get; set; }
-        public string? Notes { get; set; }
-    }
-
-    public class AdjustQuantityDto
-    {
-        public int AdjustmentQuantity { get; set; }
-        public string Reason { get; set; }
-        public string? Notes { get; set; }
     }
 }

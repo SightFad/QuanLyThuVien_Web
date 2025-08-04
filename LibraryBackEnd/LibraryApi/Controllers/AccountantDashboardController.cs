@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
+/*
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryApi.Data;
 using LibraryApi.Models;
@@ -27,99 +28,96 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                var today = DateTime.Now.Date;
-                var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
-                var firstDayOfYear = new DateTime(today.Year, 1, 1);
+                var today = DateTime.Today;
+                var thisMonth = new DateTime(today.Year, today.Month, 1);
+                var lastMonth = thisMonth.AddMonths(-1);
 
-                // Revenue calculations
+                // Financial overview
                 var totalRevenue = await _context.PhieuThus
-                    .Where(pt => pt.TrangThai == "DaThu" && pt.NgayThu >= firstDayOfYear)
-                    .SumAsync(pt => pt.SoTien);
+                    .Where(p => p.TrangThai == "Đã thu")
+                    .SumAsync(p => p.SoTien);
 
                 var monthlyRevenue = await _context.PhieuThus
-                    .Where(pt => pt.TrangThai == "DaThu" && pt.NgayThu >= firstDayOfMonth)
-                    .SumAsync(pt => pt.SoTien);
+                    .Where(p => p.TrangThai == "Đã thu" && p.NgayThu >= thisMonth)
+                    .SumAsync(p => p.SoTien);
 
-                // Fine calculations
-                var pendingFines = await _context.PhieuThus
-                    .Where(pt => pt.LoaiThu == "PhiPhat" && pt.TrangThai == "ChuaThu")
-                    .SumAsync(pt => pt.SoTien);
-
-                var overdueDate = today.AddDays(-30);
-                var overdueFines = await _context.PhieuThus
-                    .Where(pt => pt.LoaiThu == "PhiPhat" && 
-                                pt.TrangThai == "ChuaThu" && 
-                                pt.NgayTao < overdueDate)
-                    .SumAsync(pt => pt.SoTien);
+                var lastMonthRevenue = await _context.PhieuThus
+                    .Where(p => p.TrangThai == "Đã thu" && p.NgayThu >= lastMonth && p.NgayThu < thisMonth)
+                    .SumAsync(p => p.SoTien);
 
                 // Transaction counts
-                var todayTransactions = await _context.PhieuThus
-                    .Where(pt => pt.NgayTao.Date == today)
-                    .CountAsync();
-
+                var totalTransactions = await _context.PhieuThus.CountAsync();
                 var monthlyTransactions = await _context.PhieuThus
-                    .Where(pt => pt.NgayTao >= firstDayOfMonth)
+                    .Where(p => p.NgayThu >= thisMonth)
                     .CountAsync();
 
-                // Member statistics
-                var totalMembers = await _context.DocGias.CountAsync();
-                var activeMembers = await _context.DocGias
-                    .Where(d => d.MemberStatus == "DaThanhToan")
+                // Revenue by type
+                var revenueByType = await _context.PhieuThus
+                    .Where(p => p.TrangThai == "Đã thu")
+                    .GroupBy(p => p.LoaiThu)
+                    .Select(g => new
+                    {
+                        type = g.Key,
+                        amount = g.Sum(p => p.SoTien),
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                // Pending collections
+                var pendingCollections = await _context.PhieuThus
+                    .Where(p => p.TrangThai == "Chưa thu")
+                    .SumAsync(p => p.SoTien);
+
+                var pendingTransactions = await _context.PhieuThus
+                    .Where(p => p.TrangThai == "Chưa thu")
                     .CountAsync();
-
-                // Book statistics
-                var totalBooks = await _context.Saches.CountAsync();
-                var availableBooks = await _context.Saches
-                    .Where(s => s.SoLuongConLai > 0)
-                    .CountAsync();
-
-                // Financial data (income vs expenses)
-                var income = await _context.PhieuThus
-                    .Where(pt => pt.TrangThai == "DaThu" && pt.NgayThu >= firstDayOfMonth)
-                    .SumAsync(pt => pt.SoTien);
-
-                // Mock expenses data (since we don't have expenses table yet)
-                var expenses = income * 0.7m; // Assume 70% of income as expenses
-                var profit = income - expenses;
 
                 // Recent transactions
                 var recentTransactions = await _context.PhieuThus
-                    .Include(pt => pt.DocGia)
-                    .OrderByDescending(pt => pt.NgayTao)
-                    .Take(5)
-                    .Select(pt => new
+                    .Include(p => p.DocGia)
+                    .OrderByDescending(p => p.NgayThu)
+                    .Take(10)
+                    .Select(p => new
                     {
-                        id = pt.MaPhieuThu,
-                        type = pt.LoaiThu == "PhiPhat" ? "fine" : "income",
-                        title = $"{pt.DocGia.HoTen} - {(pt.LoaiThu == "PhiPhat" ? "Tiền phạt" : "Phí thành viên")}",
-                        amount = pt.SoTien,
-                        time = GetTimeAgo(pt.NgayTao),
-                        memberName = pt.DocGia.HoTen
+                        id = p.MaPhieuThu,
+                        type = p.LoaiThu,
+                        amount = p.SoTien,
+                        status = p.TrangThai,
+                        date = p.NgayThu,
+                        collector = p.NguoiThu,
+                        description = p.GhiChu
                     })
+                    .ToListAsync();
+
+                // Monthly trends
+                var monthlyTrends = await _context.PhieuThus
+                    .Where(p => p.NgayThu >= lastMonth)
+                    .GroupBy(p => new { p.NgayThu.Year, p.NgayThu.Month })
+                    .Select(g => new
+                    {
+                        month = $"{g.Key.Year}-{g.Key.Month:D2}",
+                        revenue = g.Sum(p => p.SoTien),
+                        transactions = g.Count()
+                    })
+                    .OrderBy(x => x.month)
                     .ToListAsync();
 
                 var summary = new
                 {
-                    stats = new
+                    overview = new
                     {
                         totalRevenue = totalRevenue,
                         monthlyRevenue = monthlyRevenue,
-                        pendingFines = pendingFines,
-                        overdueFines = overdueFines,
-                        todayTransactions = todayTransactions,
+                        lastMonthRevenue = lastMonthRevenue,
+                        revenueGrowth = lastMonthRevenue > 0 ? Math.Round(((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100, 1) : 0,
+                        totalTransactions = totalTransactions,
                         monthlyTransactions = monthlyTransactions,
-                        totalMembers = totalMembers,
-                        activeMembers = activeMembers,
-                        totalBooks = totalBooks,
-                        availableBooks = availableBooks
+                        pendingCollections = pendingCollections,
+                        pendingTransactions = pendingTransactions
                     },
-                    financialData = new
-                    {
-                        income = income,
-                        expenses = expenses,
-                        profit = profit
-                    },
+                    revenueByType = revenueByType,
                     recentTransactions = recentTransactions,
+                    monthlyTrends = monthlyTrends,
                     generatedAt = DateTime.Now
                 };
 
@@ -127,32 +125,20 @@ namespace LibraryApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi lấy thông tin dashboard", error = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi lấy thông tin accountant dashboard", error = ex.Message });
             }
         }
 
-        // GET: api/AccountantDashboard/financial-overview?period=month
-        [HttpGet("financial-overview")]
-        public async Task<ActionResult<object>> GetFinancialOverview([FromQuery] string period = "month")
+        // GET: api/AccountantDashboard/revenue-analysis
+        [HttpGet("revenue-analysis")]
+        public async Task<ActionResult<object>> GetRevenueAnalysis()
         {
             try
             {
-                var (fromDate, toDate) = GetDateRangeFromPeriod(period);
+                var today = DateTime.Today;
+                var lastMonth = today.AddMonths(-1);
 
-                // Revenue by type
-                var membershipFees = await _context.PhieuThus
-                    .Where(pt => pt.LoaiThu == "PhiThanhVien" && 
-                                pt.TrangThai == "DaThu" && 
-                                pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
-                    .SumAsync(pt => pt.SoTien);
-
-                var fineRevenue = await _context.PhieuThus
-                    .Where(pt => pt.LoaiThu == "PhiPhat" && 
-                                pt.TrangThai == "DaThu" && 
-                                pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
-                    .SumAsync(pt => pt.SoTien);
-
-                // Daily revenue trend
+                // Revenue by day (last 30 days)
                 var dailyRevenue = await _context.PhieuThus
                     .Where(pt => pt.TrangThai == "DaThu" && 
                                 pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
@@ -160,74 +146,54 @@ namespace LibraryApi.Controllers
                     .Select(g => new
                     {
                         date = g.Key.ToString("yyyy-MM-dd"),
-                        amount = g.Sum(pt => pt.SoTien)
+                        revenue = g.Sum(p => p.SoTien),
+                        transactions = g.Count()
                     })
                     .OrderBy(x => x.date)
                     .ToListAsync();
 
-                // Top paying members
-                var topMembers = await _context.PhieuThus
-                    .Include(pt => pt.DocGia)
-                    .Where(pt => pt.TrangThai == "DaThu" && 
-                                pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
-                    .GroupBy(pt => new { pt.MaDG, pt.DocGia.HoTen })
+                // Revenue by payment method
+                var revenueByPaymentMethod = await _context.PhieuThus
+                    .Where(p => p.TrangThai == "Đã thu")
+                    .GroupBy(p => p.HinhThucThanhToan)
                     .Select(g => new
                     {
-                        memberName = g.Key.HoTen,
-                        totalPaid = g.Sum(pt => pt.SoTien),
-                        transactionCount = g.Count()
+                        method = g.Key,
+                        amount = g.Sum(p => p.SoTien),
+                        count = g.Count(),
+                        percentage = 0.0 // Will be calculated in frontend
                     })
-                    .OrderByDescending(x => x.totalPaid)
+                    .ToListAsync();
+
+                // Top revenue sources
+                var topRevenueSources = await _context.PhieuThus
+                    .Where(p => p.TrangThai == "Đã thu")
+                    .GroupBy(p => p.LoaiThu)
+                    .Select(g => new
+                    {
+                        source = g.Key,
+                        amount = g.Sum(p => p.SoTien),
+                        count = g.Count()
+                    })
+                    .OrderByDescending(x => x.amount)
                     .Take(5)
                     .ToListAsync();
 
-                var overview = new
+                var analysis = new
                 {
-                    totalRevenue = membershipFees + fineRevenue,
-                    membershipFees = membershipFees,
-                    fineRevenue = fineRevenue,
                     dailyRevenue = dailyRevenue,
-                    topMembers = topMembers,
-                    period = $"{fromDate:dd/MM/yyyy} - {toDate:dd/MM/yyyy}",
+                    revenueByPaymentMethod = revenueByPaymentMethod,
+                    topRevenueSources = topRevenueSources,
                     generatedAt = DateTime.Now
                 };
 
-                return Ok(overview);
+                return Ok(analysis);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi lấy tổng quan tài chính", error = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi lấy phân tích doanh thu", error = ex.Message });
             }
-        }
-
-        // Helper method to get date range from period
-        private (DateTime fromDate, DateTime toDate) GetDateRangeFromPeriod(string period)
-        {
-            var today = DateTime.Now.Date;
-            
-            return period?.ToLower() switch
-            {
-                "week" => (today.AddDays(-7), today),
-                "month" => (today.AddDays(-30), today),
-                "quarter" => (today.AddDays(-90), today),
-                "year" => (today.AddDays(-365), today),
-                _ => (today.AddDays(-30), today) // Default to month
-            };
-        }
-
-        // Helper method to get time ago string
-        private string GetTimeAgo(DateTime dateTime)
-        {
-            var timespan = DateTime.Now - dateTime;
-            
-            if (timespan.TotalMinutes < 1)
-                return "Vừa xong";
-            else if (timespan.TotalMinutes < 60)
-                return $"{(int)timespan.TotalMinutes} phút trước";
-            else if (timespan.TotalHours < 24)
-                return $"{(int)timespan.TotalHours} giờ trước";
-            else
-                return $"{(int)timespan.TotalDays} ngày trước";
         }
     }
 }
+*/

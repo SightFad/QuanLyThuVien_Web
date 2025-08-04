@@ -61,7 +61,7 @@ namespace LibraryApi.Controllers
                     .Where(p => p.MaDG == readerId && p.TrangThai == "borrowed" && p.HanTra < DateTime.Now)
                     .CountAsync();
 
-                // Get unpaid fines
+                // Calculate total fines
                 var totalFines = await _context.PhieuThus
                     .Where(pt => pt.MaDG == readerId && pt.LoaiThu == "PhiPhat" && pt.TrangThai == "ChuaThu")
                     .SumAsync(pt => pt.SoTien);
