@@ -22,30 +22,7 @@ namespace LibraryApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetBooks()
         {
-            var books = await _context.Saches
-                .Include(s => s.CT_PhieuMuons)
-                .ToListAsync();
-            var result = books.Select(book => {
-                // Số sách đã mượn (chưa trả)
-                int daMuon = book.CT_PhieuMuons?.Count() ?? 0;
-                int tong = book.SoLuong ?? 0;
-                int conLai = tong - daMuon;
-                return new {
-                    book.MaSach,
-                    book.TenSach,
-                    book.TacGia,
-                    book.TheLoai,
-                    book.NamXB,
-                    book.ISBN,
-                    book.SoLuong,
-                    book.TrangThai,
-                    book.ViTriLuuTru,
-                    book.NhaXuatBan,
-                    book.AnhBia,
-                    SoLuongConLai = conLai < 0 ? 0 : conLai
-                };
-            });
-            return Ok(result);
+            return Ok(_context.Saches.ToList());
         }
 
         // Endpoint tìm kiếm nâng cao với fuzzy search
@@ -92,7 +69,7 @@ namespace LibraryApi.Controllers
             // Lọc theo năm xuất bản
             if (namXuatBan.HasValue)
             {
-                query = query.Where(s => s.NamXB == namXuatBan.Value);
+                query = query.Where(s => s.NamXuatBan == namXuatBan.Value);
             }
 
             var books = await query.ToListAsync();
@@ -107,7 +84,7 @@ namespace LibraryApi.Controllers
                     book.TenSach,
                     book.TacGia,
                     book.TheLoai,
-                    book.NamXB,
+                    book.NamXuatBan,
                     book.ISBN,
                     book.SoLuong,
                     book.TrangThai,
@@ -233,7 +210,7 @@ namespace LibraryApi.Controllers
                 TenSach = dto.TenSach,
                 TacGia = dto.TacGia,
                 TheLoai = dto.TheLoai,
-                NamXB = dto.NamXB,
+                NamXuatBan = dto.NamXuatBan,
                 ISBN = dto.ISBN,
                 SoLuong = dto.SoLuong,
                 TrangThai = dto.TrangThai,
@@ -254,7 +231,7 @@ namespace LibraryApi.Controllers
             book.TenSach = dto.TenSach;
             book.TacGia = dto.TacGia;
             book.TheLoai = dto.TheLoai;
-            book.NamXB = dto.NamXB;
+            book.NamXuatBan = dto.NamXuatBan;
             book.ISBN = dto.ISBN;
             book.SoLuong = dto.SoLuong;
             book.TrangThai = dto.TrangThai;

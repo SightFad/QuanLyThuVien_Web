@@ -37,7 +37,6 @@ namespace LibraryApi.Models
         {
             CT_PhieuMuons = new List<CT_PhieuMuon>();
             PhieuGiaHans = new List<PhieuGiaHan>();
-            PhieuTras = new List<PhieuTra>();
         }
     }
 }

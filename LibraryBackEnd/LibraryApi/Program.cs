@@ -34,6 +34,10 @@ builder.Services.AddScoped<ViolationService>();
 
 // Add JWT Authentication (simplified for testing)
 var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("JWT key is not configured in appsettings.json");
+}
 Console.WriteLine($"JWT Key: {jwtKey}");
 Console.WriteLine($"JWT Key Length: {jwtKey?.Length}");
 

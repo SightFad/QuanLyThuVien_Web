@@ -6,6 +6,8 @@ using LibraryApi.Services;
 using System.Security.Cryptography;
 using System.Text;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LibraryApi.Controllers
 {
@@ -26,7 +28,7 @@ namespace LibraryApi.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDangNhap == request.Username);
-            if (user == null || user.MatKhau != request.Password)
+            if (user == null || !VerifyPassword(request.Password, user.MatKhau))
                 return Unauthorized("Sai tên đăng nhập hoặc mật khẩu");
             
             var token = _jwtService.GenerateToken(user);
@@ -84,7 +86,7 @@ namespace LibraryApi.Controllers
             var user = new NguoiDung
             {
                 TenDangNhap = request.Username,
-                MatKhau = request.Password, // Có thể hash nếu muốn
+                MatKhau = HashPassword(request.Password), // Có thể hash nếu muốn
                 ChucVu = "Reader",
                 DocGiaId = docGia.MaDG
             };
@@ -137,8 +139,8 @@ namespace LibraryApi.Controllers
 
     public class RegisterRequest
     {
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public required string Username { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
     }
 } 

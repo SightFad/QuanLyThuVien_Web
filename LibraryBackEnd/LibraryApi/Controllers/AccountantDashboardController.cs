@@ -140,9 +140,8 @@ namespace LibraryApi.Controllers
 
                 // Revenue by day (last 30 days)
                 var dailyRevenue = await _context.PhieuThus
-                    .Where(pt => pt.TrangThai == "DaThu" && 
-                                pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
-                    .GroupBy(pt => pt.NgayThu/*.Value*/.Date)
+                    .Where(p => p.TrangThai == "Đã thu" && p.NgayThu >= lastMonth)
+                    .GroupBy(p => p.NgayThu.Date)
                     .Select(g => new
                     {
                         date = g.Key.ToString("yyyy-MM-dd"),

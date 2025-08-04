@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryApi.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    [Migration("20250803213238_AnotherDBupdate")]
-    partial class AnotherDBupdate
+    [Migration("20250804202953_DBreupdate")]
+    partial class DBreupdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,9 @@ namespace LibraryApi.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("MaSach")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaGiaHan")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("MaPhieuMuon", "MaSach");
@@ -498,6 +501,8 @@ namespace LibraryApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("MaND");
+
+                    b.HasIndex("DocGiaId");
 
                     b.ToTable("NguoiDungs");
                 });
@@ -1037,9 +1042,6 @@ namespace LibraryApi.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("NamXB")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int?>("NamXuatBan")
                         .HasColumnType("INTEGER");
 
@@ -1263,6 +1265,15 @@ namespace LibraryApi.Migrations
                     b.Navigation("PhieuMuon");
 
                     b.Navigation("Sach");
+                });
+
+            modelBuilder.Entity("LibraryApi.Models.NguoiDung", b =>
+                {
+                    b.HasOne("LibraryApi.Models.DocGia", "DocGia")
+                        .WithMany()
+                        .HasForeignKey("DocGiaId");
+
+                    b.Navigation("DocGia");
                 });
 
             modelBuilder.Entity("LibraryApi.Models.NhatKyHoatDong", b =>

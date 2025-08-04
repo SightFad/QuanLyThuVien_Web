@@ -6,11 +6,15 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LibraryApi.Migrations
 {
     /// <inheritdoc />
-    public partial class AnotherDBupdate : Migration
+    public partial class DBreupdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "NamXB",
+                table: "Saches");
+
             migrationBuilder.DropColumn(
                 name: "NgayTao",
                 table: "PhieuMuon");
@@ -139,15 +143,6 @@ namespace LibraryApi.Migrations
 
             migrationBuilder.AlterColumn<int>(
                 name: "NamXuatBan",
-                table: "Saches",
-                type: "INTEGER",
-                nullable: true,
-                oldClrType: typeof(int),
-                oldType: "int",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<int>(
-                name: "NamXB",
                 table: "Saches",
                 type: "INTEGER",
                 nullable: true,
@@ -1596,6 +1591,13 @@ namespace LibraryApi.Migrations
                 oldClrType: typeof(int),
                 oldType: "int");
 
+            migrationBuilder.AddColumn<int>(
+                name: "MaGiaHan",
+                table: "CT_PhieuMuons",
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0);
+
             migrationBuilder.AlterColumn<int>(
                 name: "SachMaSach",
                 table: "CT_KiemKe",
@@ -2074,11 +2076,31 @@ namespace LibraryApi.Migrations
                 oldType: "int")
                 .Annotation("Sqlite:Autoincrement", true)
                 .OldAnnotation("Sqlite:Autoincrement", true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NguoiDungs_DocGiaId",
+                table: "NguoiDungs",
+                column: "DocGiaId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_NguoiDungs_DocGias_DocGiaId",
+                table: "NguoiDungs",
+                column: "DocGiaId",
+                principalTable: "DocGias",
+                principalColumn: "MaDG");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_NguoiDungs_DocGias_DocGiaId",
+                table: "NguoiDungs");
+
+            migrationBuilder.DropIndex(
+                name: "IX_NguoiDungs_DocGiaId",
+                table: "NguoiDungs");
+
             migrationBuilder.DropColumn(
                 name: "GiaTien",
                 table: "Saches");
@@ -2098,6 +2120,10 @@ namespace LibraryApi.Migrations
             migrationBuilder.DropColumn(
                 name: "NgayTao",
                 table: "NguoiDungs");
+
+            migrationBuilder.DropColumn(
+                name: "MaGiaHan",
+                table: "CT_PhieuMuons");
 
             migrationBuilder.AlterColumn<string>(
                 name: "TrangThai",
@@ -2226,15 +2252,6 @@ namespace LibraryApi.Migrations
                 oldType: "INTEGER",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<int>(
-                name: "NamXB",
-                table: "Saches",
-                type: "int",
-                nullable: true,
-                oldClrType: typeof(int),
-                oldType: "INTEGER",
-                oldNullable: true);
-
             migrationBuilder.AlterColumn<string>(
                 name: "MoTa",
                 table: "Saches",
@@ -2285,6 +2302,12 @@ namespace LibraryApi.Migrations
                 oldType: "INTEGER")
                 .Annotation("Sqlite:Autoincrement", true)
                 .OldAnnotation("Sqlite:Autoincrement", true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "NamXB",
+                table: "Saches",
+                type: "int",
+                nullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "NguoiLap",
