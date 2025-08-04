@@ -29,7 +29,10 @@ namespace LibraryApi.Controllers
                 // Apply search filter
                 if (!string.IsNullOrEmpty(search))
                 {
-                    query = query.Where(p => p.LoaiThu.Contains(search) || p.GhiChu.Contains(search));
+                    query = query.Where(pt => 
+                        pt.DocGia.HoTen.Contains(search) ||
+                        //pt.LyDo.Contains(search) ||
+                        pt.GhiChu.Contains(search));
                 }
 
                 // Apply type filter
@@ -48,15 +51,17 @@ namespace LibraryApi.Controllers
                     .Take(pageSize)
                     .Select(p => new
                     {
-                        id = p.MaPhieuThu,
-                        type = p.LoaiThu,
-                        amount = p.SoTien,
-                        paymentMethod = p.HinhThucThanhToan,
-                        description = p.GhiChu,
-                        date = p.NgayThu,
-                        status = p.TrangThai,
-                        collector = p.NguoiThu,
-                        memberName = p.DocGia.HoTen
+                        id = pt.MaPhieuThu,
+                        date = pt.NgayTao.ToString("yyyy-MM-dd"),
+                        type = pt.LoaiThu,
+                        memberName = pt.DocGia.HoTen,
+                        memberId = pt.MaDG,
+                        amount = pt.SoTien,
+                        //paymentMethod = pt.PhuongThucThu ?? "cash", // Default to cash if null
+                        //status = pt.TrangThai,
+                        //description = pt.LyDo ?? pt.GhiChu ?? "Không có mô tả",
+                        //paidDate = pt.NgayThu?.ToString("yyyy-MM-dd"),
+                        collector = pt.NguoiThu
                     })
                     .ToListAsync();
 
@@ -91,16 +96,27 @@ namespace LibraryApi.Controllers
                     .Where(p => p.MaPhieuThu == id)
                     .Select(p => new
                     {
-                        id = p.MaPhieuThu,
-                        type = p.LoaiThu,
-                        amount = p.SoTien,
-                        paymentMethod = p.HinhThucThanhToan,
-                        description = p.GhiChu,
-                        date = p.NgayThu,
-                        status = p.TrangThai,
-                        collector = p.NguoiThu,
-                        memberName = p.DocGia.HoTen,
-                        memberId = p.MaDG
+                        id = pt.MaPhieuThu,
+                        date = pt.NgayTao.ToString("yyyy-MM-dd"),
+                        type = pt.LoaiThu,
+                        memberName = pt.DocGia.HoTen,
+                        memberId = pt.MaDG,
+                        memberEmail = pt.DocGia.Email,
+                        memberPhone = pt.DocGia.SDT,
+                        amount = pt.SoTien,
+                        //paymentMethod = pt.PhuongThucThu ?? "cash",
+                        status = pt.TrangThai,
+                        //description = pt.LyDo ?? pt.GhiChu ?? "Không có mô tả",
+                        paidDate = pt.NgayThu/*?*/.ToString("yyyy-MM-dd"),
+                        collector = pt.NguoiThu,
+                        violationId = pt.MaBaoCaoViPham,
+                        violationInfo = pt.BaoCaoViPham != null ? new
+                        {
+                            id = pt.BaoCaoViPham.Id,
+                            violationCode = pt.BaoCaoViPham.MaViPham,
+                            violationType = pt.BaoCaoViPham.MucDoViPham,
+                            notes = pt.BaoCaoViPham.GhiChu
+                        } : null
                     })
                     .FirstOrDefaultAsync();
 
@@ -126,15 +142,17 @@ namespace LibraryApi.Controllers
                 // Simulate transaction creation
                 var newTransaction = new
                 {
-                    id = 999,
-                    type = "Phí thành viên",
-                    amount = 50000,
-                    paymentMethod = "Tiền mặt",
-                    description = "Phí thành viên tháng 1",
-                    date = DateTime.Now,
-                    status = "Đã thu",
-                    collector = "admin",
-                    memberName = "Nguyễn Văn A"
+                    MaDG = dto.MemberId,
+                    LoaiThu = dto.Type,
+                    SoTien = dto.Amount,
+                    //PhuongThucThu = dto.PaymentMethod,
+                    TrangThai = dto.Status ?? "ChuaThu",
+                    //LyDo = dto.Description,
+                    GhiChu = dto.Notes,
+                    NgayTao = DateTime.Now,
+                    //NgayThu = dto.Status == "DaThu" ? DateTime.Now : null,
+                    NguoiThu = dto.Status == "DaThu" ? dto.Collector : null,
+                    MaBaoCaoViPham = dto.ViolationId
                 };
 
                 return CreatedAtAction(nameof(GetTransaction), new { id = newTransaction.id }, newTransaction);
@@ -151,8 +169,18 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                // Simulate transaction update
-                var updatedTransaction = new
+                var transaction = await _context.PhieuThus.FindAsync(id);
+                if (transaction == null)
+                    return NotFound("Không tìm thấy giao dịch");
+
+                //// Update fields
+                //if (!string.IsNullOrEmpty(dto.PaymentMethod))
+                //    transaction.PhuongThucThu = dto.PaymentMethod;
+                
+                if (!string.IsNullOrEmpty(dto.Status))
+                {
+                    transaction.TrangThai = dto.Status;
+                    if (dto.Status == "DaThu" && transaction.NgayThu == null)
                     {
                         id = id,
                         type = "Phí thành viên",
@@ -179,8 +207,24 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                // Simulate transaction deletion
-                return Ok(new { message = "Xóa giao dịch thành công", transactionId = id });
+                var transaction = await _context.PhieuThus.FindAsync(id);
+                if (transaction == null)
+                    return NotFound("Không tìm thấy giao dịch");
+
+                if (transaction.TrangThai == "DaThu")
+                    return BadRequest("Giao dịch đã được thanh toán");
+
+                transaction.TrangThai = "DaThu";
+                transaction.NgayThu = DateTime.Now;
+                transaction.NguoiThu = dto.Collector;
+                //transaction.PhuongThucThu = dto.PaymentMethod;
+
+                if (!string.IsNullOrEmpty(dto.Notes))
+                    transaction.GhiChu = dto.Notes;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Xử lý thanh toán thành công" });
             }
             catch (Exception ex)
             {

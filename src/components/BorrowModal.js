@@ -6,7 +6,8 @@ const BorrowModal = ({ borrow, onSave, onClose }) => {
     memberId: '',
     memberName: '',
     borrowDate: new Date().toISOString().split('T')[0],
-    expectedReturnDate: '',
+    returnDate: '',
+    expectedReturnDate: new Date().toISOString().split('T')[0],
     books: [
       {
         stt: 1,
@@ -265,10 +266,12 @@ const BorrowModal = ({ borrow, onSave, onClose }) => {
     try {
       // Transform form data to match API expectations
       const transformedData = {
-        memberId: formData.memberId,
-        memberName: formData.memberName,
+        readerId: formData.memberId,
+        readerName: formData.memberName,
         borrowDate: formData.borrowDate,
         expectedReturnDate: formData.expectedReturnDate,
+        returnDate: formData.returnDate || null,
+        notes: formData.notes || '',
         books: formData.books.filter(book => book.bookId.trim() !== '')
       };
 

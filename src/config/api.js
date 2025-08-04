@@ -7,7 +7,7 @@ const API_CONFIG = {
     LOGOUT: "/api/Auth/logout",
     USERS: "/api/User",
     BOOKS: "/api/Sach",
-    READERS: "/api/DongGia",
+    READERS: "/api/DocGia",
     BORROWS: "/api/Borrow",
     FINES: "/api/Fine",
     REPORTS: "/api/Report",
@@ -60,7 +60,7 @@ export const apiRequest = async (endpoint, options = {}) => {
         errorData.message || `HTTP error! status: ${response.status}`
       );
     }
-
+    if (response.status === 204) return null;
     const data = await response.json();
     console.log("API Response data:", data);
     return data;

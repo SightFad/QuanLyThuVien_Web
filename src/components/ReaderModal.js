@@ -133,11 +133,11 @@ const ReaderModal = ({ reader, onSave, onClose }) => {
 
       // Transform form data to match the expected format for parent
       const transformedData = {
-        hoTen: formData.hoTen,
-        tenDG: formData.tenDG,
+        name: formData.hoTen,
+        TenDG: formData.tenDG,
         email: formData.email,
-        sdt: formData.soDienThoai,
-        diaChi: formData.diaChiLienHe,
+        phone: formData.soDienThoai,
+        address: formData.diaChiLienHe,
         gioiTinh: formData.gioiTinh,
         ngaySinh: formData.ngaySinh,
         goiDangKy: formData.goiDangKy || "thuong",
@@ -145,14 +145,12 @@ const ReaderModal = ({ reader, onSave, onClose }) => {
         phiThanhVien: getPackagePriceValue(formData.goiDangKy),
       };
 
-
-        const result = await onSave(transformedData);
-        if (result && result.accountInfo) {
-          alert(
-            `Tạo thành viên thành công!\n\nThông tin tài khoản:\nTên đăng nhập: ${result.accountInfo.username}\nMật khẩu: ${result.accountInfo.password}\n\nVui lòng lưu lại thông tin này để đăng nhập!`
-          );
-        }
-      
+      const result = await onSave(transformedData);
+      if (result && result.accountInfo) {
+        alert(
+          `Tạo thành viên thành công!\n\nThông tin tài khoản:\nTên đăng nhập: ${result.accountInfo.username}\nMật khẩu: ${result.accountInfo.password}\n\nVui lòng lưu lại thông tin này để đăng nhập!`
+        );
+      }
 
       // Hiển thị thông tin tài khoản nếu có
       if (result && result.accountInfo) {

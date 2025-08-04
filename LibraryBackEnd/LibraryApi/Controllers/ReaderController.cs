@@ -159,9 +159,9 @@ namespace LibraryApi.Controllers
                         location = ct.Sach.ViTriLuuTru,
                         borrowDate = p.NgayMuon.ToString("yyyy-MM-dd"),
                         returnDate = p.HanTra.ToString("yyyy-MM-dd"),
-                        actualReturnDate = p.NgayTra.HasValue ? p.NgayTra.Value.ToString("yyyy-MM-dd") : "",
+                        //actualReturnDate = p.NgayTra?.ToString("yyyy-MM-dd") ?? "",
                         status = (p.NgayTra > p.HanTra) ? "returned_late" : "returned",
-                        fine = 0, // Calculate fine based on late return
+                        fine = /*p.PhieuTras.FirstOrDefault()?.TienPhat ??*/ 0,
                         coverImage = ct.Sach.AnhBia
                     }))
                     .ToListAsync();

@@ -1,4 +1,4 @@
-/*
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -259,13 +259,13 @@ namespace LibraryApi.Controllers
                         bookTitle = s.TenSach,
                         author = s.TacGia,
                         category = s.TheLoai,
-                        currentStock = s.SoLuong.HasValue ? s.SoLuong.Value : 0,
-                        totalStock = s.SoLuong.HasValue ? s.SoLuong.Value : 0,
-                        location = s.KeSach != null ? s.KeSach : "Chưa phân kệ",
-                        price = s.GiaSach.HasValue ? s.GiaSach.Value : 0,
-                        alertLevel = (s.SoLuong.HasValue ? s.SoLuong.Value : 0) == 0 ? "critical" : 
-                                   (s.SoLuong.HasValue ? s.SoLuong.Value : 0) <= 2 ? "critical" : "warning",
-                        recommendedOrder = Math.Max(10 - (s.SoLuong.HasValue ? s.SoLuong.Value : 0), 5) // Simple recommendation
+                        currentStock = s.SoLuongConLai,
+                        totalStock = s.SoLuong ?? 0,
+                        location = s.KeSach ?? "Chưa phân kệ",
+                        price = s.GiaSach ?? 0,
+                        alertLevel = s.SoLuongConLai == 0 ? "critical" : 
+                                   s.SoLuongConLai <= 2 ? "critical" : "warning",
+                        recommendedOrder = Math.Max(10 - (byte)s.SoLuongConLai, 5) // Simple recommendation
                     })
                     .ToListAsync();
 
@@ -306,11 +306,11 @@ namespace LibraryApi.Controllers
                         author = s.TacGia,
                         category = s.TheLoai,
                         condition = s.TrangThai,
-                        quantity = s.SoLuong.HasValue ? s.SoLuong.Value : 0,
-                        availableQuantity = s.SoLuong.HasValue ? s.SoLuong.Value : 0,
-                        location = s.KeSach != null ? s.KeSach : "Chưa phân kệ",
-                        estimatedValue = s.GiaSach.HasValue ? s.GiaSach.Value : 0,
-                        lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
+                        quantity = s.SoLuong ?? 0,
+                        availableQuantity = s.SoLuongConLai,
+                        location = s.KeSach ?? "Chưa phân kệ",
+                        estimatedValue = s.GiaSach ?? 0,
+                        //lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
                     })
                     .OrderBy(s => s.bookTitle)
                     .ToListAsync();
@@ -352,6 +352,7 @@ namespace LibraryApi.Controllers
 
                 var importHistory = await _context.PhieuNhapKhos
                     .Include(p => p.ChiTietPhieuNhapKho)
+                        .ThenInclude(ct => ct.MaSach)
                     .Where(p => p.NgayNhap >= fromDate)
                     .OrderByDescending(p => p.NgayNhap)
                     .Select(p => new
@@ -407,4 +408,3 @@ namespace LibraryApi.Controllers
         }
     }
 }
-*/

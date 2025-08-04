@@ -24,25 +24,7 @@ namespace LibraryApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetUsers()
         {
-            try
-            {
-                var users = await _context.NguoiDungs
-                    .Select(u => new
-                    {
-                        id = u.MaND,
-                        username = u.TenDangNhap,
-                        role = u.ChucVu,
-                        status = "Active",
-                        createdAt = u.NgayTao
-                    })
-                    .ToListAsync();
-
-                return Ok(users);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Lỗi khi lấy danh sách người dùng", error = ex.Message });
-            }
+            return Ok(_context.NguoiDungs.ToList());
         }
 
         // GET: api/User/{id}

@@ -43,7 +43,6 @@ namespace LibraryApi.Services
                 MaDG = maDG,
                 NgayMuon = now,
                 HanTra = hanTra,
-                TrangThai = "borrowed",
                 NguoiLap = "",
                 GhiChu = ghiChu ?? "",
                 CT_PhieuMuons = new List<CT_PhieuMuon>()

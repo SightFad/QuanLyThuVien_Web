@@ -29,14 +29,62 @@ namespace LibraryApi.Controllers
                 var totalReaders = await _context.DocGias.CountAsync();
                 var totalBooks = await _context.Saches.SumAsync(s => s.SoLuong ?? 0);
                 var totalBorrows = await _context.PhieuMuons.CountAsync();
-                var activeBorrows = await _context.PhieuMuons.CountAsync(p => p.TrangThai == "Đang mượn");
+
+                // Monthly activity
+                var monthlyBorrows = await _context.PhieuMuons
+                    .Where(p => p.NgayMuon >= thisMonth)
+                    .CountAsync();
+
+                var monthlyReturns = await _context.PhieuMuons
+                    .Where(p => p.NgayTra >= thisMonth)
+                    .CountAsync();
+
+                var monthlyNewReaders = await _context.DocGias
+                    .Where(d => d.NgayDangKy >= thisMonth)
+                    .CountAsync();
+
+                // Current status
+                var activeBorrows = await _context.PhieuMuons
+                    .Where(p => p.TrangThai == "DangMuon")
+                    .CountAsync();
+
                 var overdueBorrows = await _context.PhieuMuons
                     .Where(p => p.NgayTraThucTe < DateTime.Now && p.TrangThai == "Đang mượn")
                     .CountAsync();
 
-                // User statistics by role
-                var usersByRole = await _context.NguoiDungs
-                    .GroupBy(u => u.ChucVu)
+                //var pendingReservations = await _context.Reservations
+                //    .Where(r => r.TrangThai == "DangCho")
+                //    .CountAsync();
+
+                // Financial overview
+                var totalRevenue = await _context.PhieuThus
+                    .Where(pt => pt.TrangThai == "DaThu")
+                    .SumAsync(pt => pt.SoTien);
+
+                var monthlyRevenue = await _context.PhieuThus
+                    .Where(pt => pt.TrangThai == "DaThu" && pt.NgayThu >= thisMonth)
+                    .SumAsync(pt => pt.SoTien);
+
+                var pendingFines = await _context.PhieuThus
+                    .Where(pt => pt.LoaiThu == "PhiPhat" && pt.TrangThai == "ChuaThu")
+                    .SumAsync(pt => pt.SoTien);
+
+                // System health
+                var lowStockBooks = await _context.Saches
+                    .CountAsync(s => s.SoLuongConLai <= 5 && s.SoLuongConLai > 0);
+
+                var outOfStockBooks = await _context.Saches
+                    .CountAsync(s => s.SoLuongConLai == 0);
+
+                //var inactiveUsers = await _context.NguoiDungs
+                //    .CountAsync(u => u.NgayTao < today.AddDays(-90)); // Users not logged in for 90 days
+
+                // Popular books (most borrowed this month)
+                var popularBooks = await _context.CT_PhieuMuons
+                    .Include(ct => ct.Sach)
+                    .Include(ct => ct.PhieuMuon)
+                    .Where(ct => ct.PhieuMuon.NgayMuon >= thisMonth)
+                    .GroupBy(ct => new { ct.Sach.MaSach, ct.Sach.TenSach, ct.Sach.TacGia })
                     .Select(g => new
                     {
                         role = g.Key,
@@ -114,7 +162,8 @@ namespace LibraryApi.Controllers
                         totalBooks = totalBooks,
                         totalBorrows = totalBorrows,
                         activeBorrows = activeBorrows,
-                        overdueBorrows = overdueBorrows
+                        overdueBorrows = overdueBorrows,
+                        //pendingReservations = pendingReservations
                     },
                     statistics = new
                     {
@@ -126,13 +175,33 @@ namespace LibraryApi.Controllers
                     system = systemHealth,
                     financial = new
                     {
+<<<<<<< HEAD
+                        totalRevenue = totalRevenue,
+                        monthlyRevenue = monthlyRevenue,
+                        pendingFines = pendingFines,
+                    },
+                    systemHealth = new
+                    {
+                        lowStockBooks = lowStockBooks,
+                        outOfStockBooks = outOfStockBooks,
+                        //inactiveUsers = inactiveUsers,
+                        systemStatus = "healthy" // In real system, check actual health metrics
+                    },
+                    growth = new
+                    {
+                        borrowGrowth = lastMonthBorrows > 0 ? Math.Round(((monthlyBorrows - lastMonthBorrows) / (double)lastMonthBorrows) * 100, 1) : 0,
+                        readerGrowth = lastMonthReaders > 0 ? Math.Round(((monthlyNewReaders - lastMonthReaders) / (double)lastMonthReaders) * 100, 1) : 0,
+                        revenueGrowth = lastMonthRevenue > 0 ? Math.Round(((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100, 1) : 0
+                    },
+                    insights = new
+                    {
+                        popularBooks = popularBooks,
+                        activeUsers = activeUsers,
+                        recentActivities = recentActivities
+=======
                         totalFines = totalFines,
                         totalMemberships = totalMemberships,
                         totalRevenue = totalFines + totalMemberships
-                    },
-                    generatedAt = DateTime.Now
-                };
-
                 return Ok(summary);
             }
             catch (Exception ex)
@@ -255,9 +324,15 @@ namespace LibraryApi.Controllers
                     .ToListAsync();
 
                 // Revenue trends
+<<<<<<< HEAD
+                var revenueByDay = await _context.PhieuThus
+                    .Where(pt => pt.TrangThai == "DaThu" && pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
+                    .GroupBy(pt => pt.NgayThu/*.Value*/.Date)
+=======
                 var revenueTrends = await _context.PhieuThus
                     .Where(p => p.NgayThu >= lastMonth)
                     .GroupBy(p => p.NgayThu.Date)
+>>>>>>> 4b160949cbe52802dd0341c0f20efc0627217453
                     .Select(g => new
                     {
                         date = g.Key.ToString("yyyy-MM-dd"),
@@ -283,6 +358,89 @@ namespace LibraryApi.Controllers
                 return StatusCode(500, new { message = "Lỗi khi lấy analytics", error = ex.Message });
             }
         }
+<<<<<<< HEAD
+
+        // Helper methods
+        private async Task<int> GetTotalRecords()
+        {
+            var counts = new[]
+            {
+                await _context.Saches.CountAsync(),
+                await _context.DocGias.CountAsync(),
+                await _context.NguoiDungs.CountAsync(),
+                await _context.PhieuMuons.CountAsync(),
+                await _context.PhieuThus.CountAsync(),
+                //await _context.Reservations.CountAsync()
+            };
+
+            return counts.Sum();
+        }
+
+        private async Task<List<object>> GetSystemAlerts()
+        {
+            var alerts = new List<object>();
+
+            // Check for overdue books
+            var overdueCount = await _context.PhieuMuons
+                .CountAsync(p => p.TrangThai == "DangMuon" && p.HanTra < DateTime.Now.Date);
+            
+            if (overdueCount > 0)
+            {
+                alerts.Add(new
+                {
+                    type = "warning",
+                    message = $"{overdueCount} sách đang quá hạn",
+                    action = "Xem danh sách sách quá hạn"
+                });
+            }
+
+            // Check for low stock
+            var lowStockCount = await _context.Saches
+                .CountAsync(s => s.SoLuongConLai <= 5 && s.SoLuongConLai > 0);
+            
+            if (lowStockCount > 0)
+            {
+                alerts.Add(new
+                {
+                    type = "info",
+                    message = $"{lowStockCount} đầu sách sắp hết",
+                    action = "Xem danh sách cần nhập thêm"
+                });
+            }
+
+            // Check for pending fines
+            var pendingFinesAmount = await _context.PhieuThus
+                .Where(pt => pt.LoaiThu == "PhiPhat" && pt.TrangThai == "ChuaThu")
+                .SumAsync(pt => pt.SoTien);
+            
+            if (pendingFinesAmount > 1000000) // > 1M VND
+            {
+                alerts.Add(new
+                {
+                    type = "warning",
+                    message = $"Tiền phạt chưa thu: {pendingFinesAmount:N0} VNĐ",
+                    action = "Xem danh sách phạt chưa thu"
+                });
+            }
+
+            return alerts;
+        }
+
+        private (DateTime fromDate, DateTime toDate) GetDateRangeFromPeriod(string period)
+        {
+            var today = DateTime.Now.Date;
+            
+            return period?.ToLower() switch
+            {
+                "week" => (today.AddDays(-7), today),
+                "month" => (today.AddDays(-30), today),
+                "quarter" => (today.AddDays(-90), today),
+                "year" => (today.AddDays(-365), today),
+                _ => (today.AddDays(-30), today) // Default to month
+            };
+        }
+=======
+>>>>>>> 4b160949cbe52802dd0341c0f20efc0627217453
     }
 }
 */

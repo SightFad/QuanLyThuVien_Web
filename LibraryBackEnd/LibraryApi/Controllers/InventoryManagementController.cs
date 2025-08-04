@@ -52,11 +52,18 @@ namespace LibraryApi.Controllers
                         bookTitle = s.TenSach,
                         author = s.TacGia,
                         category = s.TheLoai,
-                        totalQuantity = s.SoLuong,
-                        availableQuantity = s.SoLuong.HasValue ? s.SoLuong.Value : 0,
-                        borrowedQuantity = 0, // Simplified for now
-                        location = s.ViTriLuuTru ?? "Chưa xác định",
-                        status = (s.SoLuong.HasValue ? s.SoLuong.Value : 0) > 0 ? "Có sẵn" : "Hết sách"
+                        totalQuantity = s.SoLuong ?? 0,
+                        availableQuantity = s.SoLuongConLai,
+                        borrowedQuantity = (s.SoLuong ?? 0) - s.SoLuongConLai,
+                        location = s.KeSach ?? "Chưa phân kệ",
+                        status = s.SoLuongConLai == 0 ? "out_of_stock" : 
+                                s.SoLuongConLai <= 5 ? "low_stock" : "available",
+                        condition = s.TrangThai ?? "Tot",
+                        price = s.GiaSach,
+                        publishYear = s.NamXuatBan,
+                        publisher = s.NhaXuatBan,
+                        //entryDate = s.NgayNhap?.ToString("yyyy-MM-dd"),
+                        //lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
                     })
                     .ToListAsync();
 
@@ -100,8 +107,14 @@ namespace LibraryApi.Controllers
                         location = s.ViTriLuuTru ?? "Chưa xác định",
                         status = (s.SoLuong.HasValue ? s.SoLuong.Value : 0) > 0 ? "Có sẵn" : "Hết sách",
                         description = s.MoTa,
+<<<<<<< HEAD
+                        coverImage = s.AnhBia,
+                        //entryDate = s.NgayNhap?.ToString("yyyy-MM-dd"),
+                        //lastUpdated = s.NgayCapNhat?.ToString("yyyy-MM-dd")
+=======
                         isbn = s.ISBN,
                         publishYear = s.NamXuatBan
+>>>>>>> 4b160949cbe52802dd0341c0f20efc0627217453
                     })
                     .FirstOrDefaultAsync();
 
@@ -124,8 +137,110 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                // Simulate adding inventory item
-                var newItem = new
+                var book = await _context.Saches.FindAsync(id);
+                if (book == null)
+                    return NotFound("Không tìm thấy sách");
+
+                book.KeSach = dto.Location;
+                book.NgayCapNhat = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Cập nhật vị trí sách thành công" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi cập nhật vị trí sách", error = ex.Message });
+            }
+        }
+
+        // PUT: api/InventoryManagement/{id}/condition
+        [HttpPut("{id}/condition")]
+        public async Task<ActionResult> UpdateBookCondition(int id, [FromBody] UpdateConditionDto dto)
+        {
+            try
+            {
+                var book = await _context.Saches.FindAsync(id);
+                if (book == null)
+                    return NotFound("Không tìm thấy sách");
+
+                book.TrangThai = dto.Condition;
+                book.NgayCapNhat = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Cập nhật tình trạng sách thành công" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi cập nhật tình trạng sách", error = ex.Message });
+            }
+        }
+
+        // POST: api/InventoryManagement/{id}/adjust-quantity
+        [HttpPost("{id}/adjust-quantity")]
+        public async Task<ActionResult> AdjustQuantity(int id, [FromBody] AdjustQuantityDto dto)
+        {
+            try
+            {
+                var book = await _context.Saches.FindAsync(id);
+                if (book == null)
+                    return NotFound("Không tìm thấy sách");
+
+                // Validate adjustment
+                var newTotal = (book.SoLuong ?? 0) + dto.AdjustmentQuantity;
+                if (newTotal < 0)
+                    return BadRequest("Số lượng điều chỉnh không hợp lệ");
+
+                var newAvailable = book.SoLuongConLai + dto.AdjustmentQuantity;
+                if (newAvailable < 0)
+                    return BadRequest("Số lượng có sẵn không đủ để điều chỉnh");
+
+                // Apply adjustment
+                book.SoLuong = newTotal;
+                //book.SoLuongConLai = newAvailable;
+                book.NgayCapNhat = DateTime.Now;
+
+                // Log the adjustment (you might want to create an AdjustmentLog table)
+                // For now, we'll just save the changes
+                await _context.SaveChangesAsync();
+
+                return Ok(new 
+                { 
+                    message = "Điều chỉnh số lượng thành công",
+                    newTotalQuantity = book.SoLuong,
+                    newAvailableQuantity = book.SoLuongConLai
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi điều chỉnh số lượng", error = ex.Message });
+            }
+        }
+
+        // GET: api/InventoryManagement/low-stock
+        [HttpGet("low-stock")]
+        public async Task<ActionResult<object>> GetLowStockItems([FromQuery] int threshold = 5)
+        {
+            try
+            {
+                var lowStockItems = await _context.Saches
+                    .Where(s => s.SoLuongConLai <= threshold && s.SoLuongConLai > 0)
+                    .OrderBy(s => s.SoLuongConLai)
+                    .Select(s => new
+                    {
+                        id = s.MaSach,
+                        bookTitle = s.TenSach,
+                        author = s.TacGia,
+                        availableQuantity = s.SoLuongConLai,
+                        totalQuantity = s.SoLuong ?? 0,
+                        location = s.KeSach ?? "Chưa phân kệ",
+                        alertLevel = s.SoLuongConLai == 0 ? "critical" : 
+                                   s.SoLuongConLai <= 2 ? "critical" : "warning"
+                    })
+                    .ToListAsync();
+
+                return Ok(new
                 {
                     id = 999,
                     bookTitle = "Sách mới",

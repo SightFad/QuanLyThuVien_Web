@@ -1,1 +1,13 @@
 node_modules/
+# .NET build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.json
+*.log
+*.suo
+*.user
+*.vs/
