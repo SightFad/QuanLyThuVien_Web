@@ -12,45 +12,27 @@ namespace LibraryApi.Controllers
     {
         private readonly LibraryContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<DashboardController> _logger;
 
-        public SachController(LibraryContext context, IWebHostEnvironment environment)
+        public SachController(LibraryContext context, IWebHostEnvironment environment, ILogger<DashboardController> logger)
         {
             _context = context;
             _environment = environment;
+            _logger = logger;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CreateSachDto>>> GetBooks()
+        public async Task<ActionResult<IEnumerable<Sach>>> GetBooks()
         {
-            var books = await _context
-                .Saches.Include(s => s.CT_PhieuMuons)
-                .ThenInclude(pm => pm.PhieuTra) // Include để xác định sách đã trả hay chưa
-                .ToListAsync();
-
-            var result = books.Select(book =>
+            try
             {
-                int daMuon = book.CT_PhieuMuons?.Count(pm => pm.PhieuTra == null) ?? 0;
-                int tong = book.SoLuong ?? 0;
-                int conLai = tong - daMuon;
-
-                return new CreateSachDto
-                {
-                    MaSach = book.MaSach,
-                    TenSach = book.TenSach,
-                    TacGia = book.TacGia,
-                    TheLoai = book.TheLoai,
-                    NamXB = book.NamXB,
-                    ISBN = book.ISBN,
-                    SoLuong = book.SoLuong,
-                    TrangThai = book.TrangThai,
-                    ViTriLuuTru = book.ViTriLuuTru,
-                    NhaXuatBan = book.NhaXuatBan,
-                    AnhBia = book.AnhBia,
-                    SoLuongConLai = conLai < 0 ? 0 : conLai,
-                };
-            });
-
-            return Ok(result);
+                var books = await _context.Saches.ToListAsync();
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi lấy danh sách sách.");
+                return StatusCode(500, "Đã xảy ra lỗi nội bộ.");
+            }
         }
 
         // Endpoint tìm kiếm nâng cao với fuzzy search
