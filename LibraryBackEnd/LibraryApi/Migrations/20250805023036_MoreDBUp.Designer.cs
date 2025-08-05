@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryApi.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    [Migration("20250803213238_AnotherDBupdate")]
-    partial class AnotherDBupdate
+    [Migration("20250805023036_MoreDBUp")]
+    partial class MoreDBUp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -498,6 +498,8 @@ namespace LibraryApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("MaND");
+
+                    b.HasIndex("DocGiaId");
 
                     b.ToTable("NguoiDungs");
                 });
@@ -1027,6 +1029,7 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("ISBN")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("KeSach")
@@ -1035,6 +1038,7 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("MoTa")
                         .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("NamXB")
@@ -1054,6 +1058,7 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("NhaXuatBan")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("SoLuong")
@@ -1061,22 +1066,27 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("TacGia")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TenSach")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TheLoai")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TrangThai")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ViTriLuuTru")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("MaSach");
@@ -1263,6 +1273,15 @@ namespace LibraryApi.Migrations
                     b.Navigation("PhieuMuon");
 
                     b.Navigation("Sach");
+                });
+
+            modelBuilder.Entity("LibraryApi.Models.NguoiDung", b =>
+                {
+                    b.HasOne("LibraryApi.Models.DocGia", "DocGia")
+                        .WithMany()
+                        .HasForeignKey("DocGiaId");
+
+                    b.Navigation("DocGia");
                 });
 
             modelBuilder.Entity("LibraryApi.Models.NhatKyHoatDong", b =>

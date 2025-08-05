@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryApi.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    [Migration("20250803090944_reUpdateDB")]
-    partial class reUpdateDB
+    [Migration("20250805025235_reupdateDB")]
+    partial class reupdateDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,9 +160,14 @@ namespace LibraryApi.Migrations
                     b.Property<int>("MaSach")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("PhieuTraMaPhieuTra")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("MaPhieuMuon", "MaSach");
 
                     b.HasIndex("MaSach");
+
+                    b.HasIndex("PhieuTraMaPhieuTra");
 
                     b.ToTable("CT_PhieuMuons");
                 });
@@ -482,8 +487,15 @@ namespace LibraryApi.Migrations
                     b.Property<int?>("DocGiaId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("MatKhau")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("NgayTao")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TenDangNhap")
@@ -491,6 +503,8 @@ namespace LibraryApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("MaND");
+
+                    b.HasIndex("DocGiaId");
 
                     b.ToTable("NguoiDungs");
                 });
@@ -795,17 +809,10 @@ namespace LibraryApi.Migrations
                     b.Property<DateTime>("NgayMuon")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("NgayTao")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime?>("NgayTra")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NguoiLap")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TrangThai")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -1017,6 +1024,7 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("AnhBia")
                         .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal?>("GiaSach")
@@ -1024,6 +1032,7 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("ISBN")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("KeSach")
@@ -1032,19 +1041,24 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("MoTa")
                         .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("NamXB")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("NamXuatBan")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("NgayCapNhat")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("NgayNhap")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("NgayTao")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("NhaXuatBan")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("SoLuong")
@@ -1052,22 +1066,27 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("TacGia")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TenSach")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TheLoai")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TrangThai")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ViTriLuuTru")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("MaSach");
@@ -1165,7 +1184,15 @@ namespace LibraryApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LibraryApi.Models.PhieuTra", "PhieuTra")
+                        .WithMany()
+                        .HasForeignKey("PhieuTraMaPhieuTra")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("PhieuMuon");
+
+                    b.Navigation("PhieuTra");
 
                     b.Navigation("Sach");
                 });
@@ -1254,6 +1281,15 @@ namespace LibraryApi.Migrations
                     b.Navigation("PhieuMuon");
 
                     b.Navigation("Sach");
+                });
+
+            modelBuilder.Entity("LibraryApi.Models.NguoiDung", b =>
+                {
+                    b.HasOne("LibraryApi.Models.DocGia", "DocGia")
+                        .WithMany()
+                        .HasForeignKey("DocGiaId");
+
+                    b.Navigation("DocGia");
                 });
 
             modelBuilder.Entity("LibraryApi.Models.NhatKyHoatDong", b =>

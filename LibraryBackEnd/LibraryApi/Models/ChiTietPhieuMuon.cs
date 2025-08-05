@@ -6,6 +6,7 @@ namespace LibraryApi.Models
     {
         public int MaPhieuMuon { get; set; }
         public PhieuMuon PhieuMuon { get; set; }
+        public PhieuTra PhieuTra { get; set; }
         public int MaSach { get; set; }
         public Sach Sach { get; set; }
         // PRIMARY KEY (MaPhieuMuon, MaSach)

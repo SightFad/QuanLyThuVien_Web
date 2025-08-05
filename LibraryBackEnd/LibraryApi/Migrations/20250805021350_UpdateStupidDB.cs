@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LibraryApi.Migrations
 {
     /// <inheritdoc />
-    public partial class reUpdateDB : Migration
+    public partial class UpdateStupidDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,22 +58,6 @@ namespace LibraryApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DocGias", x => x.MaDG);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "NguoiDungs",
-                columns: table => new
-                {
-                    MaND = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    TenDangNhap = table.Column<string>(type: "TEXT", nullable: false),
-                    MatKhau = table.Column<string>(type: "TEXT", nullable: false),
-                    ChucVu = table.Column<string>(type: "TEXT", nullable: false),
-                    DocGiaId = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_NguoiDungs", x => x.MaND);
                 });
 
             migrationBuilder.CreateTable(
@@ -144,6 +128,7 @@ namespace LibraryApi.Migrations
                     ISBN = table.Column<string>(type: "TEXT", nullable: false),
                     SoLuong = table.Column<int>(type: "INTEGER", nullable: true),
                     GiaSach = table.Column<decimal>(type: "TEXT", nullable: true),
+                    GiaTien = table.Column<decimal>(type: "TEXT", nullable: true),
                     TrangThai = table.Column<string>(type: "TEXT", nullable: false),
                     ViTriLuuTru = table.Column<string>(type: "TEXT", nullable: false),
                     NhaXuatBan = table.Column<string>(type: "TEXT", nullable: false),
@@ -151,11 +136,36 @@ namespace LibraryApi.Migrations
                     KeSach = table.Column<string>(type: "TEXT", nullable: false),
                     MoTa = table.Column<string>(type: "TEXT", nullable: false),
                     NamXuatBan = table.Column<int>(type: "INTEGER", nullable: true),
-                    NgayNhap = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    NgayNhap = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    NgayTao = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    NgayCapNhat = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Saches", x => x.MaSach);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NguoiDungs",
+                columns: table => new
+                {
+                    MaND = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    TenDangNhap = table.Column<string>(type: "TEXT", nullable: false),
+                    MatKhau = table.Column<string>(type: "TEXT", nullable: false),
+                    ChucVu = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    NgayTao = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DocGiaId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NguoiDungs", x => x.MaND);
+                    table.ForeignKey(
+                        name: "FK_NguoiDungs_DocGias_DocGiaId",
+                        column: x => x.DocGiaId,
+                        principalTable: "DocGias",
+                        principalColumn: "MaDG");
                 });
 
             migrationBuilder.CreateTable(
@@ -168,10 +178,8 @@ namespace LibraryApi.Migrations
                     NgayMuon = table.Column<DateTime>(type: "TEXT", nullable: false),
                     HanTra = table.Column<DateTime>(type: "TEXT", nullable: false),
                     NgayTra = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    TrangThai = table.Column<string>(type: "TEXT", nullable: false),
                     NguoiLap = table.Column<string>(type: "TEXT", nullable: false),
                     GhiChu = table.Column<string>(type: "TEXT", nullable: false),
-                    NgayTao = table.Column<DateTime>(type: "TEXT", nullable: false),
                     NgayCapNhat = table.Column<DateTime>(type: "TEXT", nullable: true),
                     DocGiaMaDG = table.Column<int>(type: "INTEGER", nullable: true)
                 },
@@ -233,48 +241,6 @@ namespace LibraryApi.Migrations
                         column: x => x.MaDG,
                         principalTable: "DocGias",
                         principalColumn: "MaDG",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "NhatKyHoatDongs",
-                columns: table => new
-                {
-                    MaNK = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    MaND = table.Column<int>(type: "INTEGER", nullable: false),
-                    ThoiGian = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    HanhDong = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_NhatKyHoatDongs", x => x.MaNK);
-                    table.ForeignKey(
-                        name: "FK_NhatKyHoatDongs_NguoiDungs_MaND",
-                        column: x => x.MaND,
-                        principalTable: "NguoiDungs",
-                        principalColumn: "MaND",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PhieuCapQuyens",
-                columns: table => new
-                {
-                    MaPhieuQuyen = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    MaND = table.Column<int>(type: "INTEGER", nullable: false),
-                    QuyenDuocCap = table.Column<string>(type: "TEXT", nullable: false),
-                    ThoiHan = table.Column<DateTime>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PhieuCapQuyens", x => x.MaPhieuQuyen);
-                    table.ForeignKey(
-                        name: "FK_PhieuCapQuyens_NguoiDungs_MaND",
-                        column: x => x.MaND,
-                        principalTable: "NguoiDungs",
-                        principalColumn: "MaND",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -387,6 +353,48 @@ namespace LibraryApi.Migrations
                         column: x => x.MaSach,
                         principalTable: "Saches",
                         principalColumn: "MaSach",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NhatKyHoatDongs",
+                columns: table => new
+                {
+                    MaNK = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    MaND = table.Column<int>(type: "INTEGER", nullable: false),
+                    ThoiGian = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    HanhDong = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NhatKyHoatDongs", x => x.MaNK);
+                    table.ForeignKey(
+                        name: "FK_NhatKyHoatDongs_NguoiDungs_MaND",
+                        column: x => x.MaND,
+                        principalTable: "NguoiDungs",
+                        principalColumn: "MaND",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PhieuCapQuyens",
+                columns: table => new
+                {
+                    MaPhieuQuyen = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    MaND = table.Column<int>(type: "INTEGER", nullable: false),
+                    QuyenDuocCap = table.Column<string>(type: "TEXT", nullable: false),
+                    ThoiHan = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhieuCapQuyens", x => x.MaPhieuQuyen);
+                    table.ForeignKey(
+                        name: "FK_PhieuCapQuyens_NguoiDungs_MaND",
+                        column: x => x.MaND,
+                        principalTable: "NguoiDungs",
+                        principalColumn: "MaND",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -798,6 +806,11 @@ namespace LibraryApi.Migrations
                 name: "IX_DatTruocSaches_MaSach",
                 table: "DatTruocSaches",
                 column: "MaSach");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NguoiDungs_DocGiaId",
+                table: "NguoiDungs",
+                column: "DocGiaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NhatKyHoatDongs_MaND",

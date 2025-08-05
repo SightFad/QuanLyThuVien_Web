@@ -141,7 +141,7 @@ app.MapControllers();
                             SoLuong = 5,
                             TrangThai = "Có sẵn",
                             MoTa = "Cuốn sách kinh điển về nghệ thuật đối nhân xử thế và kỹ năng giao tiếp.",
-                            NamXuatBan = 1936,
+                            NamXB = 1936,
                             ISBN = "978-0-671-02703-2",
                             AnhBia = "/images/book-covers/python.jpg"
                         },
@@ -156,7 +156,7 @@ app.MapControllers();
                             SoLuong = 3,
                             TrangThai = "Có sẵn",
                             MoTa = "Câu chuyện về hành trình tìm kiếm kho báu và ý nghĩa cuộc sống.",
-                            NamXuatBan = 1988,
+                            NamXB = 1988,
                             ISBN = "978-0-06-231500-7",
                             AnhBia = "/images/book-covers/ml.jpg"
                         },
@@ -171,7 +171,7 @@ app.MapControllers();
                             SoLuong = 2,
                             TrangThai = "Đã mượn",
                             MoTa = "Hướng dẫn chi tiết về React.js và các best practices.",
-                            NamXuatBan = 2023,
+                            NamXB = 2023,
                             ISBN = "978-1-234-56789-0",
                             AnhBia = "/images/book-covers/react.jpg"
                         },
@@ -186,7 +186,7 @@ app.MapControllers();
                             SoLuong = 4,
                             TrangThai = "Có sẵn",
                             MoTa = "Nguyên lý thiết kế cơ sở dữ liệu và tối ưu hóa hiệu suất.",
-                            NamXuatBan = 2022,
+                            NamXB = 2022,
                             ISBN = "978-0-987-65432-1",
                             AnhBia = "/images/book-covers/database.jpg"
                         },
@@ -201,7 +201,7 @@ app.MapControllers();
                             SoLuong = 3,
                             TrangThai = "Đã đặt",
                             MoTa = "Toàn diện về phát triển web hiện đại với các công nghệ mới nhất.",
-                            NamXuatBan = 2023,
+                            NamXB = 2023,
                             ISBN = "978-5-432-10987-6",
                             AnhBia = "/images/book-covers/web.jpg"
                         }

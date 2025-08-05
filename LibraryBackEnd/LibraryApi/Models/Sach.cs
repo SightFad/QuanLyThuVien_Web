@@ -1,53 +1,80 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LibraryApi.Models
 {
     public class Sach
     {
         [Key]
-        public int MaSach { get; set; } // PRIMARY KEY
+        public int MaSach { get; set; }
+
         [Required]
+        [StringLength(100)]
         public string TenSach { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string TacGia { get; set; }
+
+        [Required]
+        [StringLength(50)]
         public string TheLoai { get; set; }
+
         public int? NamXB { get; set; }
+
+        [StringLength(20)]
         public string ISBN { get; set; }
+
         public int? SoLuong { get; set; }
-        public decimal? GiaSach { get; set; } // Giá sách để tính phạt
-        public decimal? GiaTien { get; set; } // Alias for GiaSach for frontend compatibility
+
+        public decimal? GiaSach { get; set; }
+
+        [NotMapped]
+        public decimal? GiaTien => GiaSach; // Alias không lưu vào DB
+
+        [StringLength(50)]
         public string TrangThai { get; set; }
+
+        [StringLength(50)]
         public string ViTriLuuTru { get; set; }
-        public string NhaXuatBan { get; set; } // Thêm trường nhà xuất bản
-        public string AnhBia { get; set; } // Thêm trường hình ảnh bìa sách
-        
-        // Additional properties to fix compilation errors
+
+        [StringLength(50)]
+        public string NhaXuatBan { get; set; }
+
+        [StringLength(200)]
+        public string AnhBia { get; set; }
+
+        [StringLength(500)]
+        public string MoTa { get; set; }
+
         public string KeSach { get; set; } = string.Empty;
-        public string MoTa { get; set; } = string.Empty;
-        public int? NamXuatBan { get; set; }
+
         public DateTime? NgayNhap { get; set; }
-        public DateTime NgayTao { get; set; } = DateTime.Now; // Creation date
-        public DateTime? NgayCapNhat { get; set; } // Last update date
-        
-        // Computed property for available quantity
-        public int? SoLuongConLai 
-        { 
-            get 
-            { 
-                if (SoLuong == null) return null;
-                // Calculate based on borrowed books (this should be computed from borrowed records)
-                return SoLuong; // Simplified for now, should be calculated from CT_PhieuMuon
-            } 
-        }
 
-        // Navigation
-        public ICollection<CT_PhieuMuon> CT_PhieuMuons { get; set; }
-        public ICollection<CT_PhieuTra> CT_PhieuTras { get; set; }
-        public ICollection<PhieuDatTruoc> PhieuDatTruocs { get; set; }
+        public DateTime NgayTao { get; set; } = DateTime.Now;
 
-        public ICollection<PhieuDeXuatMuaSach> PhieuDeXuatMuaSachs { get; set; }
-        public ICollection<PhieuGiaHan> PhieuGiaHans { get; set; }
-        public ICollection<ChiTietPhieuKiemKe> ChiTietPhieuKiemKes { get; set; }
+        public DateTime? NgayCapNhat { get; set; }
+
+        // Navigation properties — đã được khởi tạo & xử lý vòng lặp JSON
+        [JsonIgnore]
+        public ICollection<CT_PhieuMuon> CT_PhieuMuons { get; set; } = new List<CT_PhieuMuon>();
+
+        [JsonIgnore]
+        public ICollection<CT_PhieuTra> CT_PhieuTras { get; set; } = new List<CT_PhieuTra>();
+
+        [JsonIgnore]
+        public ICollection<PhieuDatTruoc> PhieuDatTruocs { get; set; } = new List<PhieuDatTruoc>();
+
+        [JsonIgnore]
+        public ICollection<PhieuDeXuatMuaSach> PhieuDeXuatMuaSachs { get; set; } = new List<PhieuDeXuatMuaSach>();
+
+        [JsonIgnore]
+        public ICollection<PhieuGiaHan> PhieuGiaHans { get; set; } = new List<PhieuGiaHan>();
+
+        [JsonIgnore]
+        public ICollection<ChiTietPhieuKiemKe> ChiTietPhieuKiemKes { get; set; } = new List<ChiTietPhieuKiemKe>();
     }
 }

@@ -42,7 +42,6 @@ namespace LibraryApi.Controllers
                 TacGia = request.TacGia,
                 TheLoai = request.TheLoai,
                 NhaXuatBan = request.NhaXuatBan,
-                NamXuatBan = request.NamXuatBan,
                 ISBN = request.ISBN,
                 SoLuong = request.SoLuong ?? 1,
                 ViTriLuuTru = request.ViTriLuuTru,
@@ -68,7 +67,6 @@ namespace LibraryApi.Controllers
             book.TacGia = request.TacGia;
             book.TheLoai = request.TheLoai;
             book.NhaXuatBan = request.NhaXuatBan;
-            book.NamXuatBan = request.NamXuatBan;
             book.ISBN = request.ISBN;
             book.SoLuong = request.SoLuong ?? book.SoLuong;
             book.ViTriLuuTru = request.ViTriLuuTru;

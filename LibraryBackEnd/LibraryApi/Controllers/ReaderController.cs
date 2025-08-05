@@ -77,7 +77,6 @@ namespace LibraryApi.Controllers
                         title = s.TenSach,
                         author = s.TacGia,
                         category = s.TheLoai,
-                        available = s.SoLuongConLai ?? s.SoLuong,
                         total = s.SoLuong,
                         location = s.ViTriLuuTru,
                         coverImage = s.AnhBia
