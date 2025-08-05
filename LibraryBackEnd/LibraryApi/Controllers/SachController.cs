@@ -1,8 +1,8 @@
+using System.Text.RegularExpressions;
 using LibraryApi.Data;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 
 namespace LibraryApi.Controllers
 {
@@ -20,9 +20,37 @@ namespace LibraryApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetBooks()
+        public async Task<ActionResult<IEnumerable<CreateSachDto>>> GetBooks()
         {
-            return Ok(_context.Saches.ToList());
+            var books = await _context
+                .Saches.Include(s => s.CT_PhieuMuons)
+                .ThenInclude(pm => pm.PhieuTra) // Include để xác định sách đã trả hay chưa
+                .ToListAsync();
+
+            var result = books.Select(book =>
+            {
+                int daMuon = book.CT_PhieuMuons?.Count(pm => pm.PhieuTra == null) ?? 0;
+                int tong = book.SoLuong ?? 0;
+                int conLai = tong - daMuon;
+
+                return new CreateSachDto
+                {
+                    MaSach = book.MaSach,
+                    TenSach = book.TenSach,
+                    TacGia = book.TacGia,
+                    TheLoai = book.TheLoai,
+                    NamXB = book.NamXB,
+                    ISBN = book.ISBN,
+                    SoLuong = book.SoLuong,
+                    TrangThai = book.TrangThai,
+                    ViTriLuuTru = book.ViTriLuuTru,
+                    NhaXuatBan = book.NhaXuatBan,
+                    AnhBia = book.AnhBia,
+                    SoLuongConLai = conLai < 0 ? 0 : conLai,
+                };
+            });
+
+            return Ok(result);
         }
 
         // Endpoint tìm kiếm nâng cao với fuzzy search
@@ -32,19 +60,19 @@ namespace LibraryApi.Controllers
             [FromQuery] string? tacGia = null,
             [FromQuery] string? isbn = null,
             [FromQuery] string? theLoai = null,
-            [FromQuery] int? namXuatBan = null)
+            [FromQuery] int? namXuatBan = null
+        )
         {
-            var query = _context.Saches
-                .Include(s => s.CT_PhieuMuons)
-                .AsQueryable();
+            var query = _context.Saches.Include(s => s.CT_PhieuMuons).AsQueryable();
 
             // Fuzzy search cho tên sách
             if (!string.IsNullOrEmpty(tenSach))
             {
                 var searchTerm = tenSach.ToLower();
-                query = query.Where(s => 
-                    EF.Functions.Like(s.TenSach.ToLower(), $"%{searchTerm}%") ||
-                    s.TenSach.ToLower().Contains(searchTerm));
+                query = query.Where(s =>
+                    EF.Functions.Like(s.TenSach.ToLower(), $"%{searchTerm}%")
+                    || s.TenSach.ToLower().Contains(searchTerm)
+                );
             }
 
             // Tìm kiếm theo tác giả
@@ -73,13 +101,15 @@ namespace LibraryApi.Controllers
             }
 
             var books = await query.ToListAsync();
-            
-            var result = books.Select(book => {
+
+            var result = books.Select(book =>
+            {
                 // Số sách đã mượn (chưa trả)
                 int daMuon = book.CT_PhieuMuons?.Count() ?? 0;
                 int tong = book.SoLuong ?? 0;
                 int conLai = tong - daMuon;
-                return new {
+                return new
+                {
                     book.MaSach,
                     book.TenSach,
                     book.TacGia,
@@ -92,7 +122,7 @@ namespace LibraryApi.Controllers
                     book.NhaXuatBan,
                     book.AnhBia,
                     SoLuongConLai = conLai < 0 ? 0 : conLai,
-                    MoTa = book.TrangThai // Sử dụng TrangThai làm mô tả tạm thời
+                    MoTa = book.TrangThai, // Sử dụng TrangThai làm mô tả tạm thời
                 };
             });
 
@@ -101,7 +131,9 @@ namespace LibraryApi.Controllers
 
         // Endpoint lấy gợi ý tìm kiếm
         [HttpGet("suggestions")]
-        public async Task<ActionResult<IEnumerable<object>>> GetSearchSuggestions([FromQuery] string q)
+        public async Task<ActionResult<IEnumerable<object>>> GetSearchSuggestions(
+            [FromQuery] string q
+        )
         {
             if (string.IsNullOrEmpty(q) || q.Length < 2)
             {
@@ -112,8 +144,8 @@ namespace LibraryApi.Controllers
             var suggestions = new List<object>();
 
             // Gợi ý từ tên sách
-            var bookSuggestions = await _context.Saches
-                .Where(s => s.TenSach.ToLower().Contains(searchTerm))
+            var bookSuggestions = await _context
+                .Saches.Where(s => s.TenSach.ToLower().Contains(searchTerm))
                 .Select(s => new { Text = s.TenSach, Type = "Tên sách" })
                 .Take(3)
                 .ToListAsync();
@@ -121,8 +153,8 @@ namespace LibraryApi.Controllers
             suggestions.AddRange(bookSuggestions);
 
             // Gợi ý từ tác giả
-            var authorSuggestions = await _context.Saches
-                .Where(s => s.TacGia.ToLower().Contains(searchTerm))
+            var authorSuggestions = await _context
+                .Saches.Where(s => s.TacGia.ToLower().Contains(searchTerm))
                 .Select(s => new { Text = s.TacGia, Type = "Tác giả" })
                 .Take(2)
                 .ToListAsync();
@@ -130,8 +162,8 @@ namespace LibraryApi.Controllers
             suggestions.AddRange(authorSuggestions);
 
             // Gợi ý từ ISBN
-            var isbnSuggestions = await _context.Saches
-                .Where(s => s.ISBN.Contains(searchTerm))
+            var isbnSuggestions = await _context
+                .Saches.Where(s => s.ISBN.Contains(searchTerm))
                 .Select(s => new { Text = s.ISBN, Type = "ISBN" })
                 .Take(1)
                 .ToListAsync();
@@ -153,7 +185,7 @@ namespace LibraryApi.Controllers
             // Kiểm tra định dạng file
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            
+
             if (!allowedExtensions.Contains(fileExtension))
             {
                 return BadRequest("Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif)");
@@ -168,7 +200,11 @@ namespace LibraryApi.Controllers
             try
             {
                 // Tạo thư mục uploads nếu chưa tồn tại
-                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "book-covers");
+                var uploadsFolder = Path.Combine(
+                    _environment.WebRootPath,
+                    "uploads",
+                    "book-covers"
+                );
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -198,7 +234,8 @@ namespace LibraryApi.Controllers
         public async Task<ActionResult<Sach>> GetBook(int id)
         {
             var book = await _context.Saches.FirstOrDefaultAsync(s => s.MaSach == id);
-            if (book == null) return NotFound();
+            if (book == null)
+                return NotFound();
             return book;
         }
 
@@ -216,7 +253,7 @@ namespace LibraryApi.Controllers
                 TrangThai = dto.TrangThai,
                 ViTriLuuTru = dto.ViTriLuuTru,
                 NhaXuatBan = dto.NhaXuatBan,
-                AnhBia = dto.AnhBia
+                AnhBia = dto.AnhBia,
             };
             _context.Saches.Add(book);
             await _context.SaveChangesAsync();
@@ -227,7 +264,8 @@ namespace LibraryApi.Controllers
         public async Task<IActionResult> UpdateBook(int id, [FromBody] CreateSachDto dto)
         {
             var book = await _context.Saches.FirstOrDefaultAsync(s => s.MaSach == id);
-            if (book == null) return NotFound();
+            if (book == null)
+                return NotFound();
             book.TenSach = dto.TenSach;
             book.TacGia = dto.TacGia;
             book.TheLoai = dto.TheLoai;
@@ -246,7 +284,8 @@ namespace LibraryApi.Controllers
         public async Task<IActionResult> DeleteBook(int id)
         {
             var book = await _context.Saches.FirstOrDefaultAsync(s => s.MaSach == id);
-            if (book == null) return NotFound();
+            if (book == null)
+                return NotFound();
             _context.Saches.Remove(book);
             await _context.SaveChangesAsync();
             return NoContent();
@@ -256,7 +295,10 @@ namespace LibraryApi.Controllers
         /// Cập nhật trạng thái sách (dành cho Librarian)
         /// </summary>
         [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateBookStatus(int id, [FromBody] UpdateBookStatusDto dto)
+        public async Task<IActionResult> UpdateBookStatus(
+            int id,
+            [FromBody] UpdateBookStatusDto dto
+        )
         {
             try
             {
@@ -268,19 +310,23 @@ namespace LibraryApi.Controllers
 
                 // Cập nhật trạng thái
                 book.TrangThai = dto.TrangThai;
-                
+
                 // Lưu thông tin cập nhật
                 await _context.SaveChangesAsync();
 
-                return Ok(new { 
-                    message = "Cập nhật trạng thái sách thành công",
-                    book = new {
-                        book.MaSach,
-                        book.TenSach,
-                        book.TrangThai,
-                        NgayCapNhat = DateTime.Now
+                return Ok(
+                    new
+                    {
+                        message = "Cập nhật trạng thái sách thành công",
+                        book = new
+                        {
+                            book.MaSach,
+                            book.TenSach,
+                            book.TrangThai,
+                            NgayCapNhat = DateTime.Now,
+                        },
                     }
-                });
+                );
             }
             catch (Exception ex)
             {

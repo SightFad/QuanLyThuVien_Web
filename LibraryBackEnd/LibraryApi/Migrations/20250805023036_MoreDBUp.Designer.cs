@@ -3,6 +3,7 @@ using System;
 using LibraryApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryApi.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    partial class LibraryContextModelSnapshot : ModelSnapshot
+    [Migration("20250805023036_MoreDBUp")]
+    partial class MoreDBUp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -157,14 +160,9 @@ namespace LibraryApi.Migrations
                     b.Property<int>("MaSach")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PhieuTraMaPhieuTra")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("MaPhieuMuon", "MaSach");
 
                     b.HasIndex("MaSach");
-
-                    b.HasIndex("PhieuTraMaPhieuTra");
 
                     b.ToTable("CT_PhieuMuons");
                 });
@@ -1021,10 +1019,12 @@ namespace LibraryApi.Migrations
 
                     b.Property<string>("AnhBia")
                         .IsRequired()
-                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal?>("GiaSach")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("GiaTien")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ISBN")
@@ -1042,6 +1042,9 @@ namespace LibraryApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("NamXB")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("NamXuatBan")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("NgayCapNhat")
@@ -1181,15 +1184,7 @@ namespace LibraryApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LibraryApi.Models.PhieuTra", "PhieuTra")
-                        .WithMany()
-                        .HasForeignKey("PhieuTraMaPhieuTra")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("PhieuMuon");
-
-                    b.Navigation("PhieuTra");
 
                     b.Navigation("Sach");
                 });
