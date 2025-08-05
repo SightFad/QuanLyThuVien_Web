@@ -142,7 +142,7 @@ namespace LibraryApi.Controllers
                 var dailyRevenue = await _context.PhieuThus
                     .Where(pt => pt.TrangThai == "DaThu" && 
                                 pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
-                    .GroupBy(pt => pt.NgayThu/*.Value*/.Date)
+                    .GroupBy(pt => pt.NgayThu/*.Value.Date)
                     .Select(g => new
                     {
                         date = g.Key.ToString("yyyy-MM-dd"),

@@ -327,7 +327,7 @@ namespace LibraryApi.Controllers
 <<<<<<< HEAD
                 var revenueByDay = await _context.PhieuThus
                     .Where(pt => pt.TrangThai == "DaThu" && pt.NgayThu >= fromDate && pt.NgayThu <= toDate)
-                    .GroupBy(pt => pt.NgayThu/*.Value*/.Date)
+                    .GroupBy(pt => pt.NgayThu/*.Value.Date)
 =======
                 var revenueTrends = await _context.PhieuThus
                     .Where(p => p.NgayThu >= lastMonth)

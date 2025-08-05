@@ -36,7 +36,7 @@ namespace LibraryApi.Models
             get 
             { 
                 if (SoLuong == null) return null;
-                // Calculate based on borrowed books (this should be computed from borrowed records)
+                
                 return SoLuong; // Simplified for now, should be calculated from CT_PhieuMuon
             } 
         }

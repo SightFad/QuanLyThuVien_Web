@@ -496,6 +496,8 @@ namespace LibraryApi.Migrations
 
                     b.HasKey("MaND");
 
+                    b.HasIndex("DocGiaId");
+
                     b.ToTable("NguoiDungs");
                 });
 
@@ -1260,6 +1262,15 @@ namespace LibraryApi.Migrations
                     b.Navigation("PhieuMuon");
 
                     b.Navigation("Sach");
+                });
+
+            modelBuilder.Entity("LibraryApi.Models.NguoiDung", b =>
+                {
+                    b.HasOne("LibraryApi.Models.DocGia", "DocGia")
+                        .WithMany()
+                        .HasForeignKey("DocGiaId");
+
+                    b.Navigation("DocGia");
                 });
 
             modelBuilder.Entity("LibraryApi.Models.NhatKyHoatDong", b =>

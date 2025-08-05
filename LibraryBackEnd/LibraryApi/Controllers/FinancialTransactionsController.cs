@@ -107,7 +107,7 @@ namespace LibraryApi.Controllers
                         //paymentMethod = pt.PhuongThucThu ?? "cash",
                         status = pt.TrangThai,
                         //description = pt.LyDo ?? pt.GhiChu ?? "Không có mô tả",
-                        paidDate = pt.NgayThu/*?*/.ToString("yyyy-MM-dd"),
+                        paidDate = pt.NgayThu/*?.ToString("yyyy-MM-dd"),
                         collector = pt.NguoiThu,
                         violationId = pt.MaBaoCaoViPham,
                         violationInfo = pt.BaoCaoViPham != null ? new

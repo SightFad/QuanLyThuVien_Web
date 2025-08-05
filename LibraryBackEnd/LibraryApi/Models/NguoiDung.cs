@@ -12,9 +12,6 @@ namespace LibraryApi.Models
         public string Email { get; set; } = string.Empty;
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public int? DocGiaId { get; set; } // Liên kết với DocGia, nếu là độc giả
-        [Required]
-        public string Email { get; set; } = string.Empty;
-        public DateTime NgayTao { get; set; } = DateTime.Now;
         // Navigation
         public DocGia? DocGia { get; set; }
         public ICollection<PhieuCapQuyen> PhieuCapQuyens { get; set; } = new List<PhieuCapQuyen>();

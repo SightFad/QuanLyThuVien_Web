@@ -22,30 +22,7 @@ namespace LibraryApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetBooks()
         {
-            var books = await _context.Saches
-                .Include(s => s.CT_PhieuMuons)
-                .ToListAsync();
-            var result = books.Select(book => {
-                // Số sách đã mượn (chưa trả)
-                int daMuon = book.CT_PhieuMuons?.Count() ?? 0;
-                int tong = book.SoLuong ?? 0;
-                int conLai = tong - daMuon;
-                return new {
-                    book.MaSach,
-                    book.TenSach,
-                    book.TacGia,
-                    book.TheLoai,
-                    book.NamXB,
-                    book.ISBN,
-                    book.SoLuong,
-                    book.TrangThai,
-                    book.ViTriLuuTru,
-                    book.NhaXuatBan,
-                    book.AnhBia,
-                    SoLuongConLai = conLai < 0 ? 0 : conLai
-                };
-            });
-            return Ok(result);
+            return Ok(_context.Saches.ToList());
         }
 
         // Endpoint tìm kiếm nâng cao với fuzzy search
