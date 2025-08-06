@@ -13,20 +13,20 @@ namespace LibraryApi.Models
 
         [Required]
         [StringLength(100)]
-        public string TenSach { get; set; }
+        public required string TenSach { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string TacGia { get; set; }
+        public required string TacGia { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string TheLoai { get; set; }
+        public required string TheLoai { get; set; }
 
         public int? NamXB { get; set; }
 
         [StringLength(20)]
-        public string ISBN { get; set; }
+        public required string ISBN { get; set; }
 
         public int? SoLuong { get; set; }
 
@@ -36,19 +36,19 @@ namespace LibraryApi.Models
         public decimal? GiaTien => GiaSach; // Alias không lưu vào DB
 
         [StringLength(50)]
-        public string TrangThai { get; set; }
+        public required string TrangThai { get; set; }
 
         [StringLength(50)]
-        public string ViTriLuuTru { get; set; }
+        public required string ViTriLuuTru { get; set; }
 
         [StringLength(50)]
-        public string NhaXuatBan { get; set; }
+        public required string NhaXuatBan { get; set; }
 
         [StringLength(200)]
-        public string AnhBia { get; set; }
+        public required string AnhBia { get; set; }
 
         [StringLength(500)]
-        public string MoTa { get; set; }
+        public required string MoTa { get; set; }
 
         public string KeSach { get; set; } = string.Empty;
 

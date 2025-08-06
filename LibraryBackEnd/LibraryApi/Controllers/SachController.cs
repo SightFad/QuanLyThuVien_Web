@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using LibraryApi.Data;
 using LibraryApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,25 +15,44 @@ namespace LibraryApi.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<DashboardController> _logger;
 
-        public SachController(LibraryContext context, IWebHostEnvironment environment, ILogger<DashboardController> logger)
+        public SachController(
+            LibraryContext context,
+            IWebHostEnvironment environment,
+            ILogger<DashboardController> logger
+        )
         {
             _context = context;
             _environment = environment;
             _logger = logger;
         }
 
-        public async Task<ActionResult<IEnumerable<Sach>>> GetBooks()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<object>>> GetBooks()
         {
-            try
+            var books = await _context.Saches.Include(s => s.CT_PhieuMuons).ToListAsync();
+            var result = books.Select(book =>
             {
-                var books = await _context.Saches.ToListAsync();
-                return Ok(books);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi lấy danh sách sách.");
-                return StatusCode(500, "Đã xảy ra lỗi nội bộ.");
-            }
+                // Số sách đã mượn (chưa trả)
+                int daMuon = book.CT_PhieuMuons?.Count() ?? 0;
+                int tong = book.SoLuong ?? 0;
+                int conLai = tong - daMuon;
+                return new
+                {
+                    book.MaSach,
+                    book.TenSach,
+                    book.TacGia,
+                    book.TheLoai,
+                    book.NamXB,
+                    book.ISBN,
+                    book.SoLuong,
+                    book.TrangThai,
+                    book.ViTriLuuTru,
+                    book.NhaXuatBan,
+                    book.AnhBia,
+                    SoLuongConLai = conLai < 0 ? 0 : conLai,
+                };
+            });
+            return Ok(result);
         }
 
         // Endpoint tìm kiếm nâng cao với fuzzy search
@@ -236,6 +256,7 @@ namespace LibraryApi.Controllers
                 ViTriLuuTru = dto.ViTriLuuTru,
                 NhaXuatBan = dto.NhaXuatBan,
                 AnhBia = dto.AnhBia,
+                MoTa = dto.MoTa,
             };
             _context.Saches.Add(book);
             await _context.SaveChangesAsync();

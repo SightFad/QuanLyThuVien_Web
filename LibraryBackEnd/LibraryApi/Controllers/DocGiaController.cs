@@ -20,16 +20,16 @@ namespace LibraryApi.Controllers
             // Tạo username từ họ tên: lấy tên cuối + số ngẫu nhiên
             var nameParts = hoTen.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var lastName = nameParts.Length > 0 ? nameParts[nameParts.Length - 1] : hoTen;
-            
+
             // Loại bỏ dấu tiếng Việt và chuyển thành chữ thường
             var cleanName = RemoveVietnameseAccents(lastName).ToLower();
-            
+
             // Thêm số ngẫu nhiên để tránh trùng lặp
             var random = new Random();
             var randomNumber = random.Next(100, 999);
-            
+
             var username = $"{cleanName}{randomNumber}";
-            
+
             // Kiểm tra xem username đã tồn tại chưa
             var counter = 1;
             var originalUsername = username;
@@ -38,7 +38,7 @@ namespace LibraryApi.Controllers
                 username = $"{originalUsername}{counter}";
                 counter++;
             }
-            
+
             return username;
         }
 
@@ -58,7 +58,10 @@ namespace LibraryApi.Controllers
 
             foreach (char c in normalized)
             {
-                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
+                if (
+                    System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)
+                    != System.Globalization.UnicodeCategory.NonSpacingMark
+                )
                     stringBuilder.Append(c);
             }
 
@@ -93,16 +96,15 @@ namespace LibraryApi.Controllers
                 Email = dto.Email,
                 SDT = dto.SDT,
                 DiaChi = dto.DiaChi,
-                GioiTinh = dto.GioiTinh,              
+                GioiTinh = dto.GioiTinh,
                 LoaiDocGia = dto.LoaiDocGia ?? "Thuong",
                 CapBac = dto.LoaiDocGia, // Default value
                 NgayDangKy = DateTime.Now,
                 NgayHetHan = DateTime.Now.AddMonths(9),
                 PhiThanhVien = dto.PhiThanhVien,
-                MemberStatus = (dto.PhiThanhVien > 0) ? "DaThanhToan" : "ChuaThanhToan" , // Default value
+                MemberStatus = (dto.PhiThanhVien > 0) ? "DaThanhToan" : "ChuaThanhToan", // Default value
                 LyDoKhoa = null, // Allow null
-                NgayCapNhat = DateTime.Now
-                
+                NgayCapNhat = DateTime.Now,
             };
             _context.DocGias.Add(docGia);
             _context.SaveChanges();
@@ -110,28 +112,32 @@ namespace LibraryApi.Controllers
             // Tự động tạo tài khoản đăng nhập cho Reader
             var username = GenerateUsername(dto.HoTen);
             var password = GeneratePassword();
-            
+
             var nguoiDung = new NguoiDung
             {
                 TenDangNhap = username,
                 MatKhau = password,
                 ChucVu = "Reader",
-                DocGiaId = docGia.MaDG
+                DocGiaId = docGia.MaDG,
             };
             _context.NguoiDungs.Add(nguoiDung);
             _context.SaveChanges();
 
             // Trả về thông tin tài khoản
-            return CreatedAtAction(nameof(GetById), new { id = docGia.MaDG }, new
-            {
-                docGia,
-                accountInfo = new
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = docGia.MaDG },
+                new
                 {
-                    username = username,
-                    password = password,
-                    message = "Tài khoản đăng nhập đã được tạo tự động"
+                    docGia,
+                    accountInfo = new
+                    {
+                        username = username,
+                        password = password,
+                        message = "Tài khoản đăng nhập đã được tạo tự động",
+                    },
                 }
-            });
+            );
         }
 
         // PUT: api/DocGia/5
@@ -181,7 +187,15 @@ namespace LibraryApi.Controllers
             docGia.NgayDangKy = DateTime.Now;
             // NgayHetHan sẽ được cập nhật khi xác nhận thanh toán
             _context.SaveChanges();
-            return Ok(new { docGia.MaDG, docGia.LoaiDocGia, docGia.MemberStatus, docGia.NgayDangKy });
+            return Ok(
+                new
+                {
+                    docGia.MaDG,
+                    docGia.LoaiDocGia,
+                    docGia.MemberStatus,
+                    docGia.NgayDangKy,
+                }
+            );
         }
 
         // POST: api/DocGia/ConfirmMembership
@@ -198,7 +212,16 @@ namespace LibraryApi.Controllers
             // Tính ngày hết hạn: mặc định 1 năm cho mọi gói, có thể thay đổi nếu cần
             docGia.NgayHetHan = DateTime.Now.AddYears(1);
             _context.SaveChanges();
-            return Ok(new { docGia.MaDG, docGia.LoaiDocGia, docGia.MemberStatus, docGia.NgayDangKy, docGia.NgayHetHan });
+            return Ok(
+                new
+                {
+                    docGia.MaDG,
+                    docGia.LoaiDocGia,
+                    docGia.MemberStatus,
+                    docGia.NgayDangKy,
+                    docGia.NgayHetHan,
+                }
+            );
         }
     }
 }

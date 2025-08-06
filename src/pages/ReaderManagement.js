@@ -10,7 +10,7 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import { apiRequest } from "../config/api";
+import { apiRequest, authenticatedRequest } from "../config/api";
 import ReaderModal from "../components/ReaderModal";
 import "./ReaderManagement.css";
 import { render } from "@testing-library/react";
@@ -154,7 +154,7 @@ const ReaderManagement = () => {
   const handleDeleteReader = async (readerId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa thành viên này?")) {
       try {
-        await apiRequest(`/api/DocGia/${readerId}`, {
+        await authenticatedRequest(`/api/DocGia/${readerId}`, {
           method: "DELETE",
         });
 
