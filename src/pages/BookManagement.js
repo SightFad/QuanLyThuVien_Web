@@ -42,12 +42,12 @@ const BookManagement = () => {
   }, [searchTerm, selectedCategory, selectedStatus, books]);
 
   const fetchBooks = async () => {
-    try {
-      setLoading(true);
-      setError("");
+    setLoading(true);
+    setError(null);
 
+    try {
       const data = await apiRequest("/api/Sach");
-      const mappedReaders = data.map((books) => ({
+      const mappedBooks = data.map((books) => ({
         id: books.maSach,
         title: books.tenSach,
         author: books.tacGia,
@@ -61,10 +61,8 @@ const BookManagement = () => {
         coverImage: books.anhBia,
       }));
 
-  
-        setBooks(mappedReaders);
-        setFilteredBooks(mappedReaders);
-      
+      setBooks(mappedBooks);
+      setFilteredBooks(mappedBooks);
     } catch (err) {
       console.error("Error fetching books:", err);
       setError("Không thể tải danh sách sách. Vui lòng thử lại.");
@@ -105,21 +103,7 @@ const BookManagement = () => {
   };
 
   const handleEditBook = (book) => {
-    setEditingBook({
-      MaSach: book.id,
-      TenSach: book.title,
-      TacGia: book.author,
-      ISBN: book.isbn,
-      TheLoai: book.category,
-      NhaXuatBan: book.publisher,
-      NamXuatBan: book.publishedYear,
-      SoLuong: book.quantity,
-      SoLuongConLai: book.available,
-      ViTriLuuTru: book.location,
-      AnhBia: book.coverImage,
-      MoTa: book.description,
-      KeSach: book.shelf,
-    });
+    setEditingBook(book);
     setShowModal(true);
   };
 
@@ -264,20 +248,18 @@ const BookManagement = () => {
       <div className="books-grid">
         {filteredBooks.map((book) => (
           <BookManagementCard
-            key={book.MaSach}
+            key={book.maSach}
             book={{
-              id: book.MaSach,
-              title: book.TenSach,
-              author: book.TacGia,
-              category: book.TheLoai,
-              shelf: book.KeSach || book.ViTriLuuTru,
-              status: book.TrangThai,
-              coverImage: book.AnhBia,
-              description: book.MoTa,
-              publishedYear: book.NamXuatBan || book.NamXB,
-              isbn: book.ISBN,
-              quantity: book.SoLuong,
-              available: book.SoLuongConLai || book.SoLuong,
+              id: book.maSach,
+              title: book.tenSach,
+              author: book.tacGia,
+              category: book.theLoai,
+              shelf: book.keSach || book.viTriLuuTru,
+              coverImage: book.anhBia,
+              publishedYear: book.namXB,
+              isbn: book.isbn,
+              quantity: book.soLuong,
+              available: book.soLuongConLai || book.soLuong,
             }}
             onEdit={handleEditBook}
             onDelete={handleDeleteBook}
@@ -310,7 +292,6 @@ const BookManagement = () => {
                   available: editingBook.SoLuongConLai,
                   location: editingBook.ViTriLuuTru || editingBook.KeSach,
                   coverImage: editingBook.AnhBia,
-                  description: editingBook.MoTa,
                 }
               : null
           }

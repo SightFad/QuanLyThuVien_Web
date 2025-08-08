@@ -1,7 +1,7 @@
 // API Configuration
 const API_CONFIG = {
   BASE_URL:
-    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net/",
+    "https://libraryapi20250714182231-dvf7buahgwdmcmg7.southeastasia-01.azurewebsites.net",
   ENDPOINTS: {
     LOGIN: "/api/Auth/login",
     LOGOUT: "/api/Auth/logout",
